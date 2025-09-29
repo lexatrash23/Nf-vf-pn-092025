@@ -76,7 +76,7 @@ process BUSCO_transcriptome_metazoa {
     tuple path(trinity_fasta), path(metazoa)
 
     output:
-    path "*", emit: busco_transcriptome_met
+    path "*.transcriptome/*.txt", emit: busco_transcriptome_met
 
 
     script:
@@ -98,7 +98,7 @@ process BUSCO_transcriptome_mollusca {
     tuple path(trinity_fasta), path(mollusca)
 
     output:
-    path "*", emit: busco_transcriptome_mollusca
+    path "*.transcriptome/*.txt", emit: busco_transcriptome_mollusca
 
 
     script:
@@ -226,7 +226,7 @@ process BUSCO_translatome_metazoa {
     tuple path(Transdecoder_pep), path(metazoa)
 
     output:
-    path "*", emit: busco_translatome_met
+    path "*.protein/*.txt", emit: busco_translatome_met
 
 
     script:
@@ -248,7 +248,7 @@ process BUSCO_translatome_mollusca {
     tuple path(Transdecoder_pep), path(mollusca)
 
     output:
-    path "*", emit: busco_transcriptome_mollusca
+    path "*.protein/*.txt", emit: busco_transcriptome_mollusca
 
     script:
 
