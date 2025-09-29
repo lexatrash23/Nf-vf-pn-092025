@@ -1,6 +1,7 @@
 #!/usr/bin/env nextflow
 
 def launchDir = System.getProperty('user.dir')
+
 // Process 1: PostTrimFastqc
 process PostTrimFastqc {
 
@@ -503,59 +504,59 @@ process CopyTodata {
     script:
     """
     # Create required directories
-    mkdir -p ${task.workDir}/../Analysis/htmls
-    mkdir -p ${task.workDir}/../Analysis/data
-    mkdir -p ${task.workDir}/../Analysis/data/busco_transcriptome
-    mkdir -p ${task.workDir}/../Analysis/data/busco_translatome
+    mkdir -p ${launchDir}/../Analysis/htmls
+    mkdir -p ${launchDir}/../Analysis/data
+    mkdir -p ${launchDir}/../Analysis/data/busco_transcriptome
+    mkdir -p ${launchDir}/../Analysis/data/busco_translatome
 
     # 4/5: FastQC multiqc report
-    cp -v "${task.workDir}/results/Fastqc/posttrim/"multiqc_report.html "${task.workDir}/../Analysis/htmls/multiqc_report.html"
+    cp -v "${launchDir}/results/Fastqc/posttrim/"multiqc_report.html "${launchDir}/../Analysis/htmls/multiqc_report.html"
 
     # 6: Trinity fasta
-    cp -v "${trinity_fasta}" "${task.workDir}/../Analysis/data/${params.Sample_name}_trinity.fasta"
+    cp -v "${trinity_fasta}" "${launchDir}/../Analysis/data/${params.Sample_name}_trinity.fasta"
 
     # 7/8: BUSCO transcriptome logs
-    cp -v "${task.workDir}/results/BUSCO/transcriptome/${params.Sample_name}_mol.transcriptome"/*.txt "${task.workDir}/../Analysis/data/busco_transcriptome/"
-    cp -v "${task.workDir}/results/BUSCO/transcriptome/${params.Sample_name}_met.transcriptome"/*.txt "${task.workDir}/../Analysis/data/busco_transcriptome/"
+    cp -v "${launchDir}/results/BUSCO/transcriptome/${params.Sample_name}_mol.transcriptome"/*.txt "${launchDir}/../Analysis/data/busco_transcriptome/"
+    cp -v "${launchDir}/results/BUSCO/transcriptome/${params.Sample_name}_met.transcriptome"/*.txt "${launchDir}/../Analysis/data/busco_transcriptome/"
 
     # 9: Kallisto TSV
-    cp -v "${task.workDir}/results/kallisto/trinity/output/"*.tsv "${task.workDir}/../Analysis/data/${params.Sample_name}_kalltrin.tsv"
+    cp -v "${launchDir}/results/kallisto/trinity/output/"*.tsv "${launchDir}/../Analysis/data/${params.Sample_name}_kalltrin.tsv"
 
     # 10: CDS output
-    cp -v "${task.workDir}/results/Transdecoder/"*.transdecoder.cds "${task.workDir}/../Analysis/data/${params.Sample_name}_transcds.cds"
+    cp -v "${launchDir}/results/Transdecoder/"*.transdecoder.cds "${launchDir}/../Analysis/data/${params.Sample_name}_transcds.cds"
 
     # 11: PEP output
-    cp -v "${task.workDir}/results/Transdecoder/"*.transdecoder.pep "${task.workDir}/../Analysis/data/${params.Sample_name}_transpep.pep"
+    cp -v "${launchDir}/results/Transdecoder/"*.transdecoder.pep "${launchDir}/../Analysis/data/${params.Sample_name}_transpep.pep"
 
     # 12/13: BUSCO translatome logs
-    cp -v "${task.workDir}/results/BUSCO/translatome/${params.Sample_name}_mol.protein"/*.txt "${task.workDir}/../Analysis/data/busco_translatome/"
-    cp -v "${task.workDir}/results/BUSCO/translatome/${params.Sample_name}_met.protein"/*.txt "${task.workDir}/../Analysis/data/busco_translatome/"
+    cp -v "${launchDir}/results/BUSCO/translatome/${params.Sample_name}_mol.protein"/*.txt "${launchDir}/../Analysis/data/busco_translatome/"
+    cp -v "${launchDir}/results/BUSCO/translatome/${params.Sample_name}_met.protein"/*.txt "${launchDir}/../Analysis/data/busco_translatome/"
 
     # 14: SignalP mature peptides
-    cp -v "${task.workDir}/results/Signalp/"*.fasta "${task.workDir}/../Analysis/data/${params.Sample_name}_mature.fasta"
+    cp -v "${launchDir}/results/Signalp/"*.fasta "${launchDir}/../Analysis/data/${params.Sample_name}_mature.fasta"
 
     # 15: SignalP summary
-    cp -v "${task.workDir}/results/Signalp/"*.signalp5 "${task.workDir}/../Analysis/data/${params.Sample_name}_summary.signalp"
+    cp -v "${launchDir}/results/Signalp/"*.signalp5 "${launchDir}/../Analysis/data/${params.Sample_name}_summary.signalp"
 
     # 16/17: BLASTX
-    cp -v "${task.workDir}/results/Blast/Blastx/"*.blastx.db.0.txt "${task.workDir}/../Analysis/data/${params.Sample_name}_blasxpunitox0.txt"
-    cp -v "${task.workDir}/results/Blast/Blastx/"*.blastx.db.6.txt "${task.workDir}/../Analysis/data/${params.Sample_name}_blastxunitox6.txt"
+    cp -v "${launchDir}/results/Blast/Blastx/"*.blastx.db.0.txt "${launchDir}/../Analysis/data/${params.Sample_name}_blasxpunitox0.txt"
+    cp -v "${launchDir}/results/Blast/Blastx/"*.blastx.db.6.txt "${launchDir}/../Analysis/data/${params.Sample_name}_blastxunitox6.txt"
 
     # 18/19: BLASTP
-    cp -v "${task.workDir}/results/Blast/Blastp/"*.blastp.db.0.txt "${task.workDir}/../Analysis/data/${params.Sample_name}_blastpunitox0.txt"
-    cp -v "${task.workDir}/results/Blast/Blastp/"*.blastp.db.6.txt "${task.workDir}/../Analysis/data/${params.Sample_name}_blastpunitox6.txt"
+    cp -v "${launchDir}/results/Blast/Blastp/"*.blastp.db.0.txt "${launchDir}/../Analysis/data/${params.Sample_name}_blastpunitox0.txt"
+    cp -v "${launchDir}/results/Blast/Blastp/"*.blastp.db.6.txt "${launchDir}/../Analysis/data/${params.Sample_name}_blastpunitox6.txt"
 
     # 20: Kallisto + Transdecoder
-    cp -v "${task.workDir}/results/kallisto/transdecoder/output/"*.tsv "${task.workDir}/../Analysis/data/${params.Sample_name}_kalltrans.tsv"
+    cp -v "${launchDir}/results/kallisto/transdecoder/output/"*.tsv "${launchDir}/../Analysis/data/${params.Sample_name}_kalltrans.tsv"
 
     # 21: InterProScan output
-    cp -v "${Interproscandata}" "${task.workDir}/../Analysis/data/${params.Sample_name}_cleaned.pep.tsv"
+    cp -v "${Interproscandata}" "${launchDir}/../Analysis/data/${params.Sample_name}_cleaned.pep.tsv"
     
-    blastn_files=("${task.workDir}/results/Blast/Blastn/"*.blastn.db.0.txt)
+    blastn_files=("${launchDir}/results/Blast/Blastn/"*.blastn.db.0.txt)
 
     if [ -e "\$blastn_files" ]; then
-    cp -v "${task.workDir}/results/Blast/Blastn/"*.blastn.db.0.txt "${task.workDir}/../Analysis/data/${params.Sample_name}_blastnunitox0.txt"
-    cp -v "${task.workDir}/results/Blast/Blastn/"*.blastn.db.6.txt "${task.workDir}/../Analysis/data/${params.Sample_name}_blastnunitox6.txt"
+    cp -v "${launchDir}/results/Blast/Blastn/"*.blastn.db.0.txt "${launchDir}/../Analysis/data/${params.Sample_name}_blastnunitox0.txt"
+    cp -v "${launchDir}/results/Blast/Blastn/"*.blastn.db.6.txt "${launchDir}/../Analysis/data/${params.Sample_name}_blastnunitox6.txt"
     fi
 
     """
