@@ -4,7 +4,7 @@ def launchDir = System.getProperty('user.dir')
 // Process 1: PostTrimFastqc
 process PostTrimFastqc {
 
-    conda "${launchDir}/bin/Setup/VF.yaml"
+    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     input:
     tuple path(R1), path(R2)
@@ -24,7 +24,7 @@ process PostTrimFastqc {
 // Process 2: MultiQC
 process MultiQC {
 
-    conda "${launchDir}/bin/Setup/VF.yaml"
+    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Fastqc/posttrim/", mode: 'copy'
 
@@ -45,7 +45,7 @@ process MultiQC {
 // Process 3: TrinityStats
 process TrinityStats {
 
-    conda "${launchDir}/bin/Setup/VF.yaml"
+    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Stats/", mode: 'copy'
 
@@ -67,7 +67,7 @@ process TrinityStats {
 // Process 4: BUSCO_transcriptome_metazoa
 process BUSCO_transcriptome_metazoa {
 
-    conda "${launchDir}/bin/Setup/busco.yaml"
+    conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
     publishDir "results/BUSCO/transcriptome/", mode: 'copy'
 
@@ -89,7 +89,7 @@ process BUSCO_transcriptome_metazoa {
 // Process 5: BUSCO_transcriptome_mollusca
 process BUSCO_transcriptome_mollusca {
 
-    conda "${launchDir}/bin/Setup/busco.yaml"
+    conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
     publishDir "results/BUSCO/transcriptome/", mode: 'copy'
 
@@ -113,7 +113,7 @@ process BUSCO_transcriptome_mollusca {
 // Process 7: Kallisto_Trinity
 process Kallisto_Trinity {
 
-    conda "${launchDir}/bin/Setup/VF.yaml"
+    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/kallisto/trinity/output", mode: 'copy'
 
@@ -145,7 +145,7 @@ process Kallisto_Trinity {
 // Process 8a: Blastdatabasecreation
 process Blastdatabasecreation {
 
-    conda "${launchDir}/bin/Setup/VF.yaml"
+    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     input:
     path(database_fasta)
@@ -165,7 +165,7 @@ process Blastdatabasecreation {
 // Process 8: Blastx
 process Blastx {
 
-    conda "${launchDir}/bin/Setup/VF.yaml"
+    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Blast/Blastx/", mode: 'copy'
 
@@ -192,7 +192,7 @@ process Blastx {
 // Process 9: Transdecoder
 process Transdecoder {
 
-    conda "${launchDir}/bin/Setup/VF.yaml"
+    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Transdecoder", mode: 'copy'
 
@@ -217,7 +217,7 @@ process Transdecoder {
 // Process 10: BUSCO_translatome_metazoa
 process BUSCO_translatome_metazoa {
 
-    conda "${launchDir}/bin/Setup/busco.yaml"
+    conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
     publishDir "results/BUSCO/translatome/", mode: 'copy'
 
@@ -239,7 +239,7 @@ process BUSCO_translatome_metazoa {
 // Process 11: BUSCO_translatome_mollusca
 process BUSCO_translatome_mollusca {
 
-    conda "${launchDir}/bin/Setup/busco.yaml"
+    conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
     publishDir "results/BUSCO/translatome/", mode: 'copy'
 
@@ -260,7 +260,7 @@ process BUSCO_translatome_mollusca {
 // Process 12: Kallisto_Transdecoder
 process Kallisto_Transdecoder {
 
-    conda "${launchDir}/bin/Setup/VF.yaml"
+    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/kallisto/transdecoder/output", mode: 'copy'
 
@@ -290,7 +290,7 @@ process Kallisto_Transdecoder {
 // Process 13: Blastp
 process Blastp {
 
-    conda "${launchDir}/bin/Setup/VF.yaml"
+    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Blast/Blastp/", mode: 'copy'
 
@@ -316,7 +316,7 @@ process Blastp {
 // Process 14: Transdecoder_complete
 process Transdecoder_complete {
 
-    conda "${launchDir}/bin/Setup/VF.yaml"
+    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Transdecoder", mode: 'copy'
 
@@ -339,7 +339,7 @@ process Transdecoder_complete {
 // Process 15: SignalP
 process SignalP {
 
-    conda "${launchDir}/bin/Setup/VF.yaml"
+    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Signalp", mode: 'copy'
 
@@ -371,7 +371,7 @@ process SignalP {
 // Process 16: Filter2
 process Filter2 {
 
-    conda "${launchDir}/bin/Setup/VF.yaml"
+    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Transdecoder", mode: 'copy'
 
@@ -393,7 +393,7 @@ process Filter2 {
 // Process 17: STATS
 process stats {
 
-    conda "${launchDir}/bin/Setup/VF.yaml"
+    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Stats", mode: 'copy'
 
@@ -423,7 +423,7 @@ process stats {
 // Process 18: Interproscan
 process Interproscan {
 
-    conda "${launchDir}/bin/Setup/VF.yaml"
+    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Interproscan", mode: 'copy'
 
@@ -450,7 +450,7 @@ process Interproscan {
 // Process 19a: GenomeBlastdatabasecreation
 process GenomeBlastdatabasecreation {
 
-    conda "${launchDir}/bin/Setup/VF.yaml"
+    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     input:
     path(genome_fasta)
@@ -469,7 +469,7 @@ process GenomeBlastdatabasecreation {
 
 // Process 19: GenomeBlasts
 process GenomeBlasts {
-    conda "${launchDir}/bin/Setup/VF.yaml"
+    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Blast/Blastn/", mode: 'copy'
 
@@ -503,59 +503,59 @@ process CopyTodata {
     script:
     """
     # Create required directories
-    mkdir -p ${launchDir}/../Analysis/htmls
-    mkdir -p ${launchDir}/../Analysis/data
-    mkdir -p ${launchDir}/../Analysis/data/busco_transcriptome
-    mkdir -p ${launchDir}/../Analysis/data/busco_translatome
+    mkdir -p ${workflow.projectDir}/../Analysis/htmls
+    mkdir -p ${workflow.projectDir}/../Analysis/data
+    mkdir -p ${workflow.projectDir}/../Analysis/data/busco_transcriptome
+    mkdir -p ${workflow.projectDir}/../Analysis/data/busco_translatome
 
     # 4/5: FastQC multiqc report
-    cp -v "${launchDir}/results/Fastqc/posttrim/"multiqc_report.html "${launchDir}/../Analysis/htmls/multiqc_report.html"
+    cp -v "${workflow.projectDir}/results/Fastqc/posttrim/"multiqc_report.html "${workflow.projectDir}/../Analysis/htmls/multiqc_report.html"
 
     # 6: Trinity fasta
-    cp -v "${trinity_fasta}" "${launchDir}/../Analysis/data/${params.Sample_name}_trinity.fasta"
+    cp -v "${trinity_fasta}" "${workflow.projectDir}/../Analysis/data/${params.Sample_name}_trinity.fasta"
 
     # 7/8: BUSCO transcriptome logs
-    cp -v "${launchDir}/results/BUSCO/transcriptome/${params.Sample_name}_mol.transcriptome"/*.txt "${launchDir}/../Analysis/data/busco_transcriptome/"
-    cp -v "${launchDir}/results/BUSCO/transcriptome/${params.Sample_name}_met.transcriptome"/*.txt "${launchDir}/../Analysis/data/busco_transcriptome/"
+    cp -v "${workflow.projectDir}/results/BUSCO/transcriptome/${params.Sample_name}_mol.transcriptome"/*.txt "${workflow.projectDir}/../Analysis/data/busco_transcriptome/"
+    cp -v "${workflow.projectDir}/results/BUSCO/transcriptome/${params.Sample_name}_met.transcriptome"/*.txt "${workflow.projectDir}/../Analysis/data/busco_transcriptome/"
 
     # 9: Kallisto TSV
-    cp -v "${launchDir}/results/kallisto/trinity/output/"*.tsv "${launchDir}/../Analysis/data/${params.Sample_name}_kalltrin.tsv"
+    cp -v "${workflow.projectDir}/results/kallisto/trinity/output/"*.tsv "${workflow.projectDir}/../Analysis/data/${params.Sample_name}_kalltrin.tsv"
 
     # 10: CDS output
-    cp -v "${launchDir}/results/Transdecoder/"*.transdecoder.cds "${launchDir}/../Analysis/data/${params.Sample_name}_transcds.cds"
+    cp -v "${workflow.projectDir}/results/Transdecoder/"*.transdecoder.cds "${workflow.projectDir}/../Analysis/data/${params.Sample_name}_transcds.cds"
 
     # 11: PEP output
-    cp -v "${launchDir}/results/Transdecoder/"*.transdecoder.pep "${launchDir}/../Analysis/data/${params.Sample_name}_transpep.pep"
+    cp -v "${workflow.projectDir}/results/Transdecoder/"*.transdecoder.pep "${workflow.projectDir}/../Analysis/data/${params.Sample_name}_transpep.pep"
 
     # 12/13: BUSCO translatome logs
-    cp -v "${launchDir}/results/BUSCO/translatome/${params.Sample_name}_mol.protein"/*.txt "${launchDir}/../Analysis/data/busco_translatome/"
-    cp -v "${launchDir}/results/BUSCO/translatome/${params.Sample_name}_met.protein"/*.txt "${launchDir}/../Analysis/data/busco_translatome/"
+    cp -v "${workflow.projectDir}/results/BUSCO/translatome/${params.Sample_name}_mol.protein"/*.txt "${workflow.projectDir}/../Analysis/data/busco_translatome/"
+    cp -v "${workflow.projectDir}/results/BUSCO/translatome/${params.Sample_name}_met.protein"/*.txt "${workflow.projectDir}/../Analysis/data/busco_translatome/"
 
     # 14: SignalP mature peptides
-    cp -v "${launchDir}/results/Signalp/"*.fasta "${launchDir}/../Analysis/data/${params.Sample_name}_mature.fasta"
+    cp -v "${workflow.projectDir}/results/Signalp/"*.fasta "${workflow.projectDir}/../Analysis/data/${params.Sample_name}_mature.fasta"
 
     # 15: SignalP summary
-    cp -v "${launchDir}/results/Signalp/"*.signalp5 "${launchDir}/../Analysis/data/${params.Sample_name}_summary.signalp"
+    cp -v "${workflow.projectDir}/results/Signalp/"*.signalp5 "${workflow.projectDir}/../Analysis/data/${params.Sample_name}_summary.signalp"
 
     # 16/17: BLASTX
-    cp -v "${launchDir}/results/Blast/Blastx/"*.blastx.db.0.txt "${launchDir}/../Analysis/data/${params.Sample_name}_blasxpunitox0.txt"
-    cp -v "${launchDir}/results/Blast/Blastx/"*.blastx.db.6.txt "${launchDir}/../Analysis/data/${params.Sample_name}_blastxunitox6.txt"
+    cp -v "${workflow.projectDir}/results/Blast/Blastx/"*.blastx.db.0.txt "${workflow.projectDir}/../Analysis/data/${params.Sample_name}_blasxpunitox0.txt"
+    cp -v "${workflow.projectDir}/results/Blast/Blastx/"*.blastx.db.6.txt "${workflow.projectDir}/../Analysis/data/${params.Sample_name}_blastxunitox6.txt"
 
     # 18/19: BLASTP
-    cp -v "${launchDir}/results/Blast/Blastp/"*.blastp.db.0.txt "${launchDir}/../Analysis/data/${params.Sample_name}_blastpunitox0.txt"
-    cp -v "${launchDir}/results/Blast/Blastp/"*.blastp.db.6.txt "${launchDir}/../Analysis/data/${params.Sample_name}_blastpunitox6.txt"
+    cp -v "${workflow.projectDir}/results/Blast/Blastp/"*.blastp.db.0.txt "${workflow.projectDir}/../Analysis/data/${params.Sample_name}_blastpunitox0.txt"
+    cp -v "${workflow.projectDir}/results/Blast/Blastp/"*.blastp.db.6.txt "${workflow.projectDir}/../Analysis/data/${params.Sample_name}_blastpunitox6.txt"
 
     # 20: Kallisto + Transdecoder
-    cp -v "${launchDir}/results/kallisto/transdecoder/output/"*.tsv "${launchDir}/../Analysis/data/${params.Sample_name}_kalltrans.tsv"
+    cp -v "${workflow.projectDir}/results/kallisto/transdecoder/output/"*.tsv "${workflow.projectDir}/../Analysis/data/${params.Sample_name}_kalltrans.tsv"
 
     # 21: InterProScan output
-    cp -v "${Interproscandata}" "${launchDir}/../Analysis/data/${params.Sample_name}_cleaned.pep.tsv"
+    cp -v "${Interproscandata}" "${workflow.projectDir}/../Analysis/data/${params.Sample_name}_cleaned.pep.tsv"
     
-    blastn_files=("${launchDir}/results/Blast/Blastn/"*.blastn.db.0.txt)
+    blastn_files=("${workflow.projectDir}/results/Blast/Blastn/"*.blastn.db.0.txt)
 
     if [ -e "\$blastn_files" ]; then
-    cp -v "${launchDir}/results/Blast/Blastn/"*.blastn.db.0.txt "${launchDir}/../Analysis/data/${params.Sample_name}_blastnunitox0.txt"
-    cp -v "${launchDir}/results/Blast/Blastn/"*.blastn.db.6.txt "${launchDir}/../Analysis/data/${params.Sample_name}_blastnunitox6.txt"
+    cp -v "${workflow.projectDir}/results/Blast/Blastn/"*.blastn.db.0.txt "${workflow.projectDir}/../Analysis/data/${params.Sample_name}_blastnunitox0.txt"
+    cp -v "${workflow.projectDir}/results/Blast/Blastn/"*.blastn.db.6.txt "${workflow.projectDir}/../Analysis/data/${params.Sample_name}_blastnunitox6.txt"
     fi
 
     """
