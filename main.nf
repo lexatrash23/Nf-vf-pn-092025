@@ -70,12 +70,13 @@ process BUSCO_transcriptome_metazoa {
 
     conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
-    publishDir "results/BUSCO/transcriptome/", mode: 'copy'
+    publishDir "results/BUSCO/transcriptome/",pattern = "*.txt", mode: 'copy'
 
     input:
     tuple path(trinity_fasta), path(metazoa)
 
     output:
+    path "${params.Sample_name}_met.transcriptome"
     path "${params.Sample_name}_met.transcriptome/*.txt", emit: busco_transcriptome_met
 
 
@@ -92,12 +93,13 @@ process BUSCO_transcriptome_mollusca {
 
     conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
-    publishDir "results/BUSCO/transcriptome/", mode: 'copy'
+    publishDir "results/BUSCO/transcriptome/",pattern = "*.txt", mode: 'copy'
 
     input:
     tuple path(trinity_fasta), path(mollusca)
 
     output:
+    path "${params.Sample_name}_mol.transcriptome"
     path "${params.Sample_name}_mol.transcriptome/*.txt", emit: busco_transcriptome_mollusca
 
 
@@ -220,12 +222,13 @@ process BUSCO_translatome_metazoa {
 
     conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
-    publishDir "results/BUSCO/translatome/", mode: 'copy'
+    publishDir "results/BUSCO/translatome/",pattern = "*.txt", mode: 'copy'
 
     input:
     tuple path(Transdecoder_pep), path(metazoa)
 
     output:
+    path "${params.Sample_name}_met.protein"
     path "${params.Sample_name}_met.protein/*.txt", emit: busco_translatome_met
 
 
@@ -242,12 +245,13 @@ process BUSCO_translatome_mollusca {
 
     conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
-    publishDir "results/BUSCO/translatome/", mode: 'copy'
+    publishDir "results/BUSCO/translatome/", pattern = "*.txt",  mode: 'copy'
 
     input:
     tuple path(Transdecoder_pep), path(mollusca)
 
     output:
+    path "${params.Sample_name}_mol.protein"
     path "${params.Sample_name}_mol.protein/*.txt", emit: busco_transcriptome_mollusca
 
     script:
