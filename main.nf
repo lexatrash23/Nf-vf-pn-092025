@@ -236,7 +236,7 @@ process BUSCO_translatome_metazoa {
 
     """
     busco -i ${Transdecoder_pep} -l ${metazoa} -c 10 -o ${params.Sample_name}_met.protein -m protein -e 1e-5 -f
-    mv ${params.Sample_name}_met.translatome/*.txt "."
+    mv ${params.Sample_name}_met.protein/*.txt "."
     
     """
 
@@ -259,7 +259,7 @@ process BUSCO_translatome_mollusca {
 
     """
     busco -i ${Transdecoder_pep} -l ${mollusca} -c 10 -o ${params.Sample_name}_mol.protein -m protein -e 1e-5 -f
-    mv "${params.Sample_name}_mol.translatome/*.txt" "."
+    mv "${params.Sample_name}_mol.protein/*.txt" "."
     """
 
 }
