@@ -249,20 +249,24 @@ process BUSCO_translatome_mollusca {
 
     publishDir "results/BUSCO/translatome/", mode: 'copy'
 
+
     input:
     tuple path(Transdecoder_pep), path(mollusca)
 
     output:
-    path "*.txt", emit: busco_translatome_mollusca
+    path "*.txt", emit: busco_translatome_met
+
 
     script:
 
     """
     busco -i ${Transdecoder_pep} -l ${mollusca} -c 10 -o ${params.Sample_name}_mol.protein -m protein -e 1e-5 -f
-    mv "${params.Sample_name}_mol.protein/*.txt" "."
+    mv ${params.Sample_name}_mol.protein/*.txt "."
+    
     """
 
 }
+
 
 // Process 12: Kallisto_Transdecoder
 process Kallisto_Transdecoder {
