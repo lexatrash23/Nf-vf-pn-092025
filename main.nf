@@ -259,7 +259,7 @@ process BUSCO_translatome_mollusca {
 
     """
     busco -i ${Transdecoder_pep} -l ${mollusca} -c 10 -o ${params.Sample_name}_mol.protein -m protein -e 1e-5 -f
-    mv "${params.Sample_name}_mol.protein/*.txt" "."
+    mv "${params.Sample_name}_mol.protein"/*.txt" "."
     """
 
 }
