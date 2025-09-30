@@ -70,7 +70,7 @@ process BUSCO_transcriptome_metazoa {
 
     conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
-    publishDir "results/BUSCO/transcriptome/",pattern = "*.txt", mode: 'copy'
+    publishDir "results/BUSCO/transcriptome/", mode: 'copy', pattern: '*.txt'
 
     input:
     tuple path(trinity_fasta), path(metazoa)
@@ -93,7 +93,7 @@ process BUSCO_transcriptome_mollusca {
 
     conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
-    publishDir "results/BUSCO/transcriptome/",pattern = "*.txt", mode: 'copy'
+    publishDir "results/BUSCO/transcriptome/", mode: 'copy', pattern: '*.txt'
 
     input:
     tuple path(trinity_fasta), path(mollusca)
@@ -222,7 +222,8 @@ process BUSCO_translatome_metazoa {
 
     conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
-    publishDir "results/BUSCO/translatome/",pattern = "*.txt", mode: 'copy'
+    publishDir "results/BUSCO/translatome/", mode: 'copy', pattern: '*.txt'
+
 
     input:
     tuple path(Transdecoder_pep), path(metazoa)
@@ -245,7 +246,7 @@ process BUSCO_translatome_mollusca {
 
     conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
-    publishDir "results/BUSCO/translatome/", pattern = "*.txt",  mode: 'copy'
+    publishDir "results/BUSCO/translatome/", mode: 'copy', pattern: '*.txt'
 
     input:
     tuple path(Transdecoder_pep), path(mollusca)
