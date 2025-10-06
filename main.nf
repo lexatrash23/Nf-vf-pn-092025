@@ -412,20 +412,18 @@ process stats {
     tuple path(Transdecoder_pep), path(Transdecoder_cds), path(transdecodercomplete_pep), path(transdecodercomplete_cds), path(maturesequences), path(transdecoderpep_signalp)
 
     output:
-    path "${params.Sample_name}.Transdecoder.complete.signalp.sequences.fasta", emit: transdecoderpep_signalp
+    path "*"
 
 
     script:
 
     """
-    seqkit grep -f <(seqkit seq -n ${maturesequences}) ${transdecodercomplete_pep} > ${params.Sample_name}.Transdecoder.complete.signalp.sequences.fasta
     seqkit stats ${Transdecoder_pep} > ${params.Sample_name}_Transdecoder_pep.stats.txt
     seqkit stats ${Transdecoder_cds} > ${params.Sample_name}_Transdecoder_cds.stats.txt
     seqkit stats ${transdecodercomplete_pep} > ${params.Sample_name}_complete_pep.stats.txt
     seqkit stats ${transdecodercomplete_cds} > ${params.Sample_name}_transdecodercomplete_cds.stats.txt
     seqkit stats ${maturesequences} > ${params.Sample_name}_maturesequences.stats.txt
         seqkit stats ${transdecoderpep_signalp} > ${params.Sample_name}_transdecoderpep_signalp.stats.txt
-    seqkit stats ${params.Sample_name}.Transdecoder.complete.signalp.sequences.fasta > ${params.Sample_name}_Transdecoder.complete.signalp.stats.txt
     
     """
 
