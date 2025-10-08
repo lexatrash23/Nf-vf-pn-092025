@@ -49,7 +49,7 @@ process PostTrimFastqc {
 
 // Process 2: MultiQC
 process MultiQC {
-    errorStrategy 'ignore'
+    
     
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
@@ -95,7 +95,7 @@ process TrinityStats {
 // Process 4: BUSCO_transcriptome_metazoa
 process BUSCO_transcriptome_metazoa {
 
-    errorStrategy 'ignore'
+    
 
     conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
@@ -120,7 +120,7 @@ process BUSCO_transcriptome_metazoa {
 // Process 5: BUSCO_transcriptome_mollusca
 process BUSCO_transcriptome_mollusca {
 
-    errorStrategy 'ignore'
+    
 
     conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
@@ -147,10 +147,7 @@ process BUSCO_transcriptome_mollusca {
 // Process 7: Kallisto_Trinity
 process Kallisto_Trinity {
 
-    errorStrategy 'retry'
-    maxRetries 2
-    cpus { task.attempt * 2 }
-    memory { (task.attempt * 2) * 1.9.GB }
+
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
@@ -185,7 +182,7 @@ process Kallisto_Trinity {
 
 // Process 8a: Blastdatabasecreation
 process Blastdatabasecreation {
-    errorStrategy 'ignore'
+    
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
@@ -207,7 +204,7 @@ process Blastdatabasecreation {
 // Process 8: Blastx
 process Blastx {
 
-    errorStrategy 'ignore'
+    
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
@@ -236,7 +233,7 @@ process Blastx {
 // Process 9: Transdecoder
 process Transdecoder {
 
-    errorStrategy 'ignore'
+    
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
@@ -264,7 +261,7 @@ process Transdecoder {
 process BUSCO_translatome_metazoa {
 
 
-    errorStrategy 'ignore'
+    
 
     conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
@@ -291,7 +288,7 @@ process BUSCO_translatome_metazoa {
 // Process 11: BUSCO_translatome_mollusca
 process BUSCO_translatome_mollusca {
 
-    errorStrategy 'ignore'
+    
 
     conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
@@ -319,7 +316,7 @@ process BUSCO_translatome_mollusca {
 // Process 12: Kallisto_Transdecoder
 process Kallisto_Transdecoder {
 
-    errorStrategy 'ignore'
+    
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
@@ -351,7 +348,7 @@ process Kallisto_Transdecoder {
 // Process 13: Blastp
 process Blastp {
 
-    errorStrategy 'ignore'
+    
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
@@ -379,7 +376,7 @@ process Blastp {
 // Process 14: Transdecoder_complete
 process Transdecoder_complete {
 
-    errorStrategy 'ignore'
+    
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
@@ -404,7 +401,7 @@ process Transdecoder_complete {
 // Process 15: SignalP
 process SignalP {
 
-    errorStrategy 'ignore'
+    
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
@@ -437,7 +434,7 @@ process SignalP {
 
 // Process 16: Filter2
 process Filter2 {
-    errorStrategy 'ignore'
+    
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Transdecoder", mode: 'copy'
@@ -459,7 +456,7 @@ process Filter2 {
 
 // Process 17: STATS
 process stats {
-    errorStrategy 'ignore'
+    
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Stats", mode: 'copy'
@@ -488,10 +485,7 @@ process stats {
 // Process 18: Interproscan
 process Interproscan {
 
-    errorStrategy 'retry'
-    maxRetries 2
-    cpus { task.attempt * 2 }
-    memory { (task.attempt * 2) * 1.9.GB }
+
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
@@ -521,7 +515,7 @@ process Interproscan {
 
 // Process 19a: GenomeBlastdatabasecreation
 process GenomeBlastdatabasecreation {
-    errorStrategy 'ignore'
+    
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     input:
@@ -541,7 +535,7 @@ process GenomeBlastdatabasecreation {
 
 // Process 19: GenomeBlasts
 process GenomeBlasts {
-    errorStrategy 'ignore'
+    
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Blast/Blastn/", mode: 'copy'
