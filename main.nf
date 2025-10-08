@@ -27,7 +27,6 @@ if ( params.help ) {
 
 
 
-
 // Process 1: PostTrimFastqc
 process PostTrimFastqc {
 
@@ -148,14 +147,16 @@ process BUSCO_transcriptome_mollusca {
 // Process 7: Kallisto_Trinity
 process Kallisto_Trinity {
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
-
-    publishDir "results/kallisto/trinity/output", mode: 'copy'
-    
     errorStrategy 'retry'
     maxRetries 2
     cpus { task.attempt * 2 }
     memory { (task.attempt * 2) * 1.9.GB }
+
+    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+
+    publishDir "results/kallisto/trinity/output", mode: 'copy'
+    
+
 
     input:
     tuple path(trinity_fasta), path(R1), path(R2)
@@ -487,14 +488,16 @@ process stats {
 // Process 18: Interproscan
 process Interproscan {
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
-
-    publishDir "results/Interproscan", mode: 'copy'
-    
     errorStrategy 'retry'
     maxRetries 2
     cpus { task.attempt * 2 }
     memory { (task.attempt * 2) * 1.9.GB }
+
+    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+
+    publishDir "results/Interproscan", mode: 'copy'
+    
+
 
     input:
     path (Transdecoder_pep)
@@ -682,6 +685,6 @@ if (params.genomefasta != 'NULL') {
    GenomeBlasts ( transdecodercomplete_cds, GenomeBlastdatabasecreation.out.genomedb )
 }
 
-final ()
+final()
 
 }
