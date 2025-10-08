@@ -2,26 +2,6 @@
 
 def launchDir = System.getProperty('user.dir')
 
-process final {
-
-  publishDir "Metadata", mode: 'copy'
-  
-  output:
-  path("metadata.txt")
-
-  script:
-  """
-  cat <<EOF > metadata.txt
-  ${params.manifest.author}
-  ${params.manifest.version}
-  ${workflow.workDir}
-  ${workflow.userName}
-  ${workflow.start}
-  """
-}
-
-
-
 
 // Process 1: PostTrimFastqc
 process PostTrimFastqc {
