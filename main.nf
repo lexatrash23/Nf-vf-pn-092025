@@ -562,6 +562,21 @@ process GenomeBlasts {
 }
 
 
+process final {
+  
+  output:
+  path("metadata.txt")
+
+  script:
+  """
+  cat <<EOF > metadata.txt
+  ${params.manifest.author}
+  ${params.manifest.version}
+  ${workflow.workDir}
+  ${workflow.userName}
+  ${workflow.start}
+  """
+}
 
 
 
@@ -575,19 +590,7 @@ params.manifest=manifest
 
 workflow {
 
-log.info """\
-         ${params.manifest.name} v${params.manifest.version}
-         ==========================
-         input from   : ${params.input_file}
-         output to    : ${params.output_dir}
-         --
-         run as       : ${workflow.commandLine}
-         started at   : ${workflow.start}
-         config files : ${workflow.configFiles}
-         container    : ${workflow.containerEngine}:${workflow.container}
-         """
-         .stripIndent()
-         
+
 def R1 = Channel.fromPath(params.R1)
 def R2 = Channel.fromPath(params.R2)
 def R1R2 = R1.combine(R2)
