@@ -2,6 +2,31 @@
 
 def launchDir = System.getProperty('user.dir')
 
+
+
+if ( params.help ) {
+    help = """main.nf: Nextflow pipeline that takes as inputs paired trimmed reads and a trinity assembly. Processes inputs through Fastqc, Transdecoder, SignalP, Blast and other analysis to identify putative venom transcripts. For more information please refer to [Insert Final Github link] for README file
+             |Required arguments:
+             |  --trinity_fasta  Path to trinity fasta file
+                --R1 Path to Trimmed Reads 1
+                --R2 Path to Trimmed Reads 2
+                --TRANSDECODER_PATH Path to Transdecoder directory containing the .longorfs and .predict scripts
+                --SIGNALP_PATH Path to SignalP script
+                --INTERPROSCAN_PATH Path to Interproscan
+                --Sample_name Sample name
+                --metazoa Path to BUSCO lineages files 1
+                --mollusca Path to BUSCO lineages files 2
+                --database_fasta Path to protein fasta file to be used for BLAST
+                --database_name Database name (with fasta suffix)
+                --stranded_input Library strand orientation (can be 'fr', 'rf', or '')
+                --genomefasta Genome fasta (NULL if not available)
+                --genomefastaname Genome fasta database name (with fasta suffix, NULL if not available)""".stripMargin()
+    // Print the help with the stripped margin and exit
+    println(help)
+    exit(0)
+}
+
+
 // Process 1: PostTrimFastqc
 process PostTrimFastqc {
 
@@ -24,7 +49,8 @@ process PostTrimFastqc {
 
 // Process 2: MultiQC
 process MultiQC {
-
+    errorStrategy 'ignore'
+    
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Fastqc/posttrim/", mode: 'copy'
@@ -45,6 +71,7 @@ process MultiQC {
 
 // Process 3: TrinityStats
 process TrinityStats {
+
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
@@ -68,6 +95,8 @@ process TrinityStats {
 // Process 4: BUSCO_transcriptome_metazoa
 process BUSCO_transcriptome_metazoa {
 
+    errorStrategy 'ignore'
+
     conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
     publishDir "results/BUSCO/transcriptome/", mode: 'copy'
@@ -90,6 +119,8 @@ process BUSCO_transcriptome_metazoa {
 
 // Process 5: BUSCO_transcriptome_mollusca
 process BUSCO_transcriptome_mollusca {
+
+    errorStrategy 'ignore'
 
     conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
@@ -119,6 +150,11 @@ process Kallisto_Trinity {
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/kallisto/trinity/output", mode: 'copy'
+    
+    errorStrategy 'retry'
+    maxRetries 2
+    cpus { task.attempt * 2 }
+    memory { (task.attempt * 2) * 1.9.GB }
 
     input:
     tuple path(trinity_fasta), path(R1), path(R2)
@@ -147,6 +183,7 @@ process Kallisto_Trinity {
 
 // Process 8a: Blastdatabasecreation
 process Blastdatabasecreation {
+    errorStrategy 'ignore'
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
@@ -167,6 +204,8 @@ process Blastdatabasecreation {
 
 // Process 8: Blastx
 process Blastx {
+
+    errorStrategy 'ignore'
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
@@ -195,6 +234,8 @@ process Blastx {
 // Process 9: Transdecoder
 process Transdecoder {
 
+    errorStrategy 'ignore'
+
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Transdecoder", mode: 'copy'
@@ -219,6 +260,9 @@ process Transdecoder {
 
 // Process 10: BUSCO_translatome_metazoa
 process BUSCO_translatome_metazoa {
+
+
+    errorStrategy 'ignore'
 
     conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
@@ -245,6 +289,8 @@ process BUSCO_translatome_metazoa {
 // Process 11: BUSCO_translatome_mollusca
 process BUSCO_translatome_mollusca {
 
+    errorStrategy 'ignore'
+
     conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
     publishDir "results/BUSCO/translatome/", mode: 'copy'
@@ -270,6 +316,8 @@ process BUSCO_translatome_mollusca {
 
 // Process 12: Kallisto_Transdecoder
 process Kallisto_Transdecoder {
+
+    errorStrategy 'ignore'
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
@@ -301,6 +349,8 @@ process Kallisto_Transdecoder {
 // Process 13: Blastp
 process Blastp {
 
+    errorStrategy 'ignore'
+
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Blast/Blastp/", mode: 'copy'
@@ -327,6 +377,8 @@ process Blastp {
 // Process 14: Transdecoder_complete
 process Transdecoder_complete {
 
+    errorStrategy 'ignore'
+
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Transdecoder", mode: 'copy'
@@ -349,6 +401,8 @@ process Transdecoder_complete {
 
 // Process 15: SignalP
 process SignalP {
+
+    errorStrategy 'ignore'
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
@@ -381,7 +435,7 @@ process SignalP {
 
 // Process 16: Filter2
 process Filter2 {
-
+    errorStrategy 'ignore'
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Transdecoder", mode: 'copy'
@@ -403,7 +457,7 @@ process Filter2 {
 
 // Process 17: STATS
 process stats {
-
+    errorStrategy 'ignore'
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Stats", mode: 'copy'
@@ -435,6 +489,11 @@ process Interproscan {
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Interproscan", mode: 'copy'
+    
+    errorStrategy 'retry'
+    maxRetries 2
+    cpus { task.attempt * 2 }
+    memory { (task.attempt * 2) * 1.9.GB }
 
     input:
     path (Transdecoder_pep)
@@ -458,7 +517,7 @@ process Interproscan {
 
 // Process 19a: GenomeBlastdatabasecreation
 process GenomeBlastdatabasecreation {
-
+    errorStrategy 'ignore'
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     input:
@@ -478,6 +537,7 @@ process GenomeBlastdatabasecreation {
 
 // Process 19: GenomeBlasts
 process GenomeBlasts {
+    errorStrategy 'ignore'
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Blast/Blastn/", mode: 'copy'
@@ -501,17 +561,48 @@ process GenomeBlasts {
 }
 
 
+process final{
+
+  publishDir "Metadata", mode: 'copy'
+  
+  output:
+  path("metadata.txt")
+
+  script:
+  """
+  cat <<EOF > metadata.txt
+  ${params.manifest.author}
+  ${params.manifest.version}
+  ${workflow.workDir}
+  ${workflow.userName}
+  ${workflow.start}
+  """
+}
+
 
 
 
 
 
 // PARAMETERS DEFINED IN CONFIG FILE
-
+params.manifest=manifest
 
 //WorkFlow
 
 workflow {
+log.info """\
+         ${params.manifest.name} v${params.manifest.version}
+         ==========================
+         input from   : ${params.input_file}
+         output to    : ${params.output_dir}
+         --
+         run as       : ${workflow.commandLine}
+         started at   : ${workflow.start}
+         config files : ${workflow.configFiles}
+         container    : ${workflow.containerEngine}:${workflow.container}
+         """
+         .stripIndent()
+         
 def R1 = Channel.fromPath(params.R1)
 def R2 = Channel.fromPath(params.R2)
 def R1R2 = R1.combine(R2)
@@ -591,6 +682,6 @@ if (params.genomefasta != 'NULL') {
    GenomeBlasts ( transdecodercomplete_cds, GenomeBlastdatabasecreation.out.genomedb )
 }
 
-
+final()
 
 }
