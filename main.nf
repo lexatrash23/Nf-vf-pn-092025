@@ -2,30 +2,6 @@
 
 def launchDir = System.getProperty('user.dir')
 
-
-
-if ( params.help ) {
-    help = """main.nf: Nextflow pipeline that takes as inputs paired trimmed reads and a trinity assembly. Processes inputs through Fastqc, Transdecoder, SignalP, Blast and other analysis to identify putative venom transcripts. For more information please refer to [Insert Final Github link] for README file
-             |Required arguments:
-             |  --trinity_fasta  Path to trinity fasta file
-                --R1 Path to Trimmed Reads 1
-                --R2 Path to Trimmed Reads 2
-                --TRANSDECODER_PATH Path to Transdecoder directory containing the .longorfs and .predict scripts
-                --SIGNALP_PATH Path to SignalP script
-                --INTERPROSCAN_PATH Path to Interproscan
-                --Sample_name Sample name
-                --metazoa Path to BUSCO lineages files 1
-                --mollusca Path to BUSCO lineages files 2
-                --database_fasta Path to protein fasta file to be used for BLAST
-                --database_name Database name (with fasta suffix)
-                --stranded_input Library strand orientation (can be 'fr', 'rf', or '')
-                --genomefasta Genome fasta (NULL if not available)
-                --genomefastaname Genome fasta database name (with fasta suffix, NULL if not available)""".stripMargin()
-    // Print the help with the stripped margin and exit
-    println(help)
-    exit(0)
-}
-
 process final {
 
   publishDir "Metadata", mode: 'copy'
@@ -43,6 +19,9 @@ process final {
   ${workflow.start}
   """
 }
+
+
+
 
 // Process 1: PostTrimFastqc
 process PostTrimFastqc {
@@ -587,6 +566,30 @@ process GenomeBlasts {
 
 // PARAMETERS DEFINED IN CONFIG FILE
 params.manifest=manifest
+
+
+if ( params.help ) {
+    help = """main.nf: Nextflow pipeline that takes as inputs paired trimmed reads and a trinity assembly. Processes inputs through Fastqc, Transdecoder, SignalP, Blast and other analysis to identify putative venom transcripts. For more information please refer to [Insert Final Github link] for README file
+             |Required arguments:
+             |  --trinity_fasta  Path to trinity fasta file
+                --R1 Path to Trimmed Reads 1
+                --R2 Path to Trimmed Reads 2
+                --TRANSDECODER_PATH Path to Transdecoder directory containing the .longorfs and .predict scripts
+                --SIGNALP_PATH Path to SignalP script
+                --INTERPROSCAN_PATH Path to Interproscan
+                --Sample_name Sample name
+                --metazoa Path to BUSCO lineages files 1
+                --mollusca Path to BUSCO lineages files 2
+                --database_fasta Path to protein fasta file to be used for BLAST
+                --database_name Database name (with fasta suffix)
+                --stranded_input Library strand orientation (can be 'fr', 'rf', or '')
+                --genomefasta Genome fasta (NULL if not available)
+                --genomefastaname Genome fasta database name (with fasta suffix, NULL if not available)""".stripMargin()
+    // Print the help with the stripped margin and exit
+    println(help)
+    exit(0)
+}
+
 
 //WorkFlow
 
