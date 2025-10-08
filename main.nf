@@ -561,9 +561,7 @@ process GenomeBlasts {
 }
 
 
-process final{
-
-  publishDir "Metadata", mode: 'copy'
+process final {
   
   output:
   path("metadata.txt")
