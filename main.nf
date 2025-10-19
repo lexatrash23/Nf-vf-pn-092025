@@ -181,7 +181,9 @@ process Blastdatabasecreation {
 // Process 8: Blastx
 process Blastx {
 
-    errorStrategy 'ignore'
+    errorStrategy 'retry'
+    maxRetries 2
+    cpus { task.attempt * 2 }
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
