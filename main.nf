@@ -120,7 +120,7 @@ process BUSCO_transcriptome_mollusca {
 
 
 
-// Process 7: Kallisto_Trinity
+// Process 6: Kallisto_Trinity
 process Kallisto_Trinity {
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
@@ -157,7 +157,7 @@ process Kallisto_Trinity {
 
 }
 
-// Process 8a: Blastdatabasecreation
+// Process 7: Blastdatabasecreation
 process Blastdatabasecreation {
     errorStrategy 'ignore'
 
@@ -493,7 +493,7 @@ process Interproscan {
 
 }
 
-// Process 19a: GenomeBlastdatabasecreation
+// Process 19: GenomeBlastdatabasecreation
 process GenomeBlastdatabasecreation {
     errorStrategy 'ignore'
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
@@ -513,7 +513,7 @@ process GenomeBlastdatabasecreation {
 
 }
 
-// Process 19: GenomeBlasts
+// Process 20: GenomeBlasts
 process GenomeBlasts {
     errorStrategy 'ignore'
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"

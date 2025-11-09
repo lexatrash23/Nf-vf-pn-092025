@@ -28,8 +28,8 @@ Check slurm output file (if using sbatch script) to ensure all tasks were run su
 -If slurm job running nextflow pipeline is cancelled prior to completion, and subsequent run fails, work directory may need to be deleted prior to rerunning to ensure proper conda environment installation 
 ___
 Pipeline image : 
-![Pipelineimage](Venomflow_pipeline.png)
-
+![Pipelineimage](pipeline_figures/Venomflow_pipeline.png)
+![Pipelineimage](pipeline_figures/venomflowwithoutputs.png)
 ___
 ## Files
 ### Required Inputs
