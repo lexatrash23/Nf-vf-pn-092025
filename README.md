@@ -44,11 +44,12 @@ This Nextflow pipeline has 4 required input files and 1 optional input file. The
 
 ### Provided test files
 Test run can be down with the following provided test files:  
-1. DP3_PD_test: A subset(200 sequences) of the trinity assembly from a Doryteuthis pealeii Posterior Salivary Gland tissue
-2. R1_test: A subset(100 sequences) of the trimmed reads from the same sample
-3. R2_test: A subset(100 sequences) of the trimmed reads from the same sample
+1. trinity_test: A subset(200 sequences) of the trinity assembly from a Doryteuthis pealeii Posterior Salivary Gland tissue
+2. left_test: A subset(200 sequences) of the trimmed reads from the same sample
+3. right_test: A subset(200 sequences) of the trimmed reads from the same sample
 4. unitox_fasta: Fasta file of ToxProt reviewed sequences [Accessed in August 2025]  
 Download Test_files folder and specify respective file paths in local config file.
+Due to size limitations, these are only sample fasta and hence the results will be limited  
 
 ### Output files
 All Output files can be found in the results subfolder of the directory the script was run from.  
