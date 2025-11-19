@@ -4,7 +4,7 @@ ___
 
 ## Quick Start:   
 
-**1.** Install [Transdecoder](https://github.com/TransDecoder/TransDecoder/wiki), [BUSCO](https://busco.ezlab.org/busco_userguide.html), [SignalP](https://services.healthtech.dtu.dk/services/SignalP-5.0/)and [Interproscan](https://www.ebi.ac.uk/interpro/about/interproscan/) accordingly  
+**1.** Install [Transdecoder](https://github.com/TransDecoder/TransDecoder/wiki), [BUSCO](https://busco.ezlab.org/busco_userguide.html), [SignalP](https://services.healthtech.dtu.dk/services/SignalP-5.0/) and [Interproscan](https://www.ebi.ac.uk/interpro/about/interproscan/) accordingly  
 **2.** Download nextflow.config file from lexatrash-vf-092025  
 **3.** Edit config file by providing appropriate input for each described parameter. config file must be in the same directory that the script is run from  
 **4.** (Optional)Edit config file by providing appropriate memory allocation for each described parameters  
