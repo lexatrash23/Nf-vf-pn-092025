@@ -1,4 +1,6 @@
-This Nextflow pipeline and documentation is still in development
+This Nextflow pipeline and documentation is still in development  
+
+[On Installing Nextflow](https://www.nextflow.io/docs/latest/install.html)
 # Overview
 ___
 
