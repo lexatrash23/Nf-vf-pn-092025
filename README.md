@@ -31,7 +31,7 @@ Check slurm output file (if using sbatch script) to ensure all tasks were run su
 ___
 Pipeline image : 
 ![Pipelineimage](pipeline_figures/Venomflow_pipeline.png)
-![Pipelineimage](pipeline_figures/venomflowwithoutputs.png)
+
 ___
 ## Files
 ### Required Inputs
