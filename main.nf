@@ -41,7 +41,7 @@ process MultiQC {
 process TrinityStats {
 
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    conda "seqkit=2.12.0"
 
     publishDir "${sample}/results/Stats/", mode: 'copy'
 
@@ -323,7 +323,7 @@ process Transdecoder_complete {
 
     errorStrategy 'ignore'
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    conda "seqkit=2.12.0"
 
     publishDir "${sample}/results/Transdecoder", mode: 'copy'
 
