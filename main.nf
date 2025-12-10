@@ -514,16 +514,16 @@ workflow {
 
     def R1 = Channel.fromPath(params.R1)
     def R2 = Channel.fromPath(params.R2)
-    def R1R2 = R1.combine(R2)
+    def R1R2 = R1.join(R2)
     def trinity_fasta = Channel.fromPath(params.trinity_fasta)
     R1R2 | PostTrimFastqc
 
     def fastqc_zips = PostTrimFastqc.out.fastqc_zips
     def metazoa = Channel.fromPath(params.metazoa)
     def mollusca = Channel.fromPath(params.mollusca)
-    def buscoTranscriptome_met = trinity_fasta.combine(metazoa)
-    def buscoTranscriptome_mol = trinity_fasta.combine(mollusca)
-    def TrinityR1R2 = trinity_fasta.combine(R1).combine(R2)
+    def buscoTranscriptome_met = trinity_fasta.join(metazoa)
+    def buscoTranscriptome_mol = trinity_fasta.join(mollusca)
+    def TrinityR1R2 = trinity_fasta.join(R1).join(R2)
     def database_fasta = Channel.fromPath(params.database_fasta)
 
     database_fasta | Blastdatabasecreation
@@ -532,31 +532,31 @@ workflow {
 
     trinity_fasta | Transdecoder
     def Transdecoder_pep = Transdecoder.out.pep
-    def buscoTranslatome_met = Transdecoder_pep.combine(metazoa)
-    def buscoTranslatome_mol = Transdecoder_pep.combine(mollusca)
+    def buscoTranslatome_met = Transdecoder_pep.join(metazoa)
+    def buscoTranslatome_mol = Transdecoder_pep.join(mollusca)
     def Transdecoder_cds = Transdecoder.out.cds
-    def TransdecoderR1R2 = Transdecoder_cds.combine(R1).combine(R2)
+    def TransdecoderR1R2 = Transdecoder_cds.join(R1).join(R2)
 
 
     Blastp(Transdecoder_pep, Blastdatabasecreation.out.proteindb)
 
 
-    def Transdecoder_pep_cds = Transdecoder_pep.combine(Transdecoder_cds)
+    def Transdecoder_pep_cds = Transdecoder_pep.join(Transdecoder_cds)
     Transdecoder_pep_cds | Transdecoder_complete
     def transdecodercomplete_pep = Transdecoder_complete.out.transdecodercomplete_pep
     transdecodercomplete_pep | SignalP
     def maturesequences = SignalP.out.maturesequences
-    def mature_complete = maturesequences.combine(transdecodercomplete_pep)
+    def mature_complete = maturesequences.join(transdecodercomplete_pep)
     def transdecodercomplete_cds = Transdecoder_complete.out.transdecodercomplete_cds
     mature_complete | Filter2
     def transdecoderpep_signalp = Filter2.out.transdecoderpep_signalp
 
-    def stats_combine = Transdecoder_pep
-        .combine(Transdecoder_cds)
-        .combine(transdecodercomplete_pep)
-        .combine(transdecodercomplete_cds)
-        .combine(maturesequences)
-        .combine(transdecoderpep_signalp)
+    def stats_join = Transdecoder_pep
+        .join(Transdecoder_cds)
+        .join(transdecodercomplete_pep)
+        .join(transdecodercomplete_cds)
+        .join(maturesequences)
+        .join(transdecoderpep_signalp)
 
 
 
@@ -581,7 +581,7 @@ workflow {
 
 
 
-    stats_combine | stats
+    stats_join | stats
 
     Transdecoder_pep | Interproscan
 
