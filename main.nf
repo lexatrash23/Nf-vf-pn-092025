@@ -26,10 +26,10 @@ process MultiQC {
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
-    publishDir "results/Fastqc/posttrim/", mode: 'copy'
+    publishDir "${sample}/results/Fastqc/posttrim/", mode: 'copy'
 
     input:
-    path fastqc_zips
+    tuple val(sample), path(fastqc_zips)
 
     output:
     path 'multiqc_report.html', emit: multiqc
@@ -47,10 +47,10 @@ process TrinityStats {
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
-    publishDir "results/Stats/", mode: 'copy'
+    publishDir "${sample}/results/Stats/", mode: 'copy'
 
     input:
-    path trinity_fasta
+    tuple val(sample), path(trinity_fasta)
 
     output:
     path "*.txt", emit: trinity_stats
@@ -58,7 +58,7 @@ process TrinityStats {
     script:
 
     """
-    seqkit stats ${trinity_fasta} > ${params.Sample_name}_Trinity.stats.txt
+    seqkit stats ${trinity_fasta} > ${sample}_Trinity.stats.txt
 
     """
 }
@@ -69,10 +69,10 @@ process BUSCO_transcriptome_metazoa {
 
     conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
-    publishDir "results/BUSCO/transcriptome/", mode: 'copy'
+    publishDir "${sample}/results/BUSCO/transcriptome/", mode: 'copy'
 
     input:
-    tuple path(trinity_fasta), path(metazoa)
+    tuple val(sample), path(trinity_fasta), path(metazoa)
 
     output:
     path "*.txt", emit: busco_transcriptome_met
@@ -80,8 +80,8 @@ process BUSCO_transcriptome_metazoa {
     script:
 
     """
-    busco -i ${trinity_fasta} -l ${metazoa} -c 10 -o ${params.Sample_name}_met.transcriptome -m transcriptome -e 1e-5 -f
-    mv ${params.Sample_name}_met.transcriptome/*.txt "."
+    busco -i ${trinity_fasta} -l ${metazoa} -c 10 -o ${sample}_met.transcriptome -m transcriptome -e 1e-5 -f
+    mv ${sample}_met.transcriptome/*.txt "."
     """
 }
 
@@ -92,10 +92,10 @@ process BUSCO_transcriptome_mollusca {
 
     conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
-    publishDir "results/BUSCO/transcriptome/", mode: 'copy'
+    publishDir "${sample}/results/BUSCO/transcriptome/", mode: 'copy'
 
     input:
-    tuple path(trinity_fasta), path(mollusca)
+    tuple val(sample), path(trinity_fasta), path(mollusca)
 
     output:
     path "*.txt", emit: busco_transcriptome_mollusca
@@ -103,8 +103,8 @@ process BUSCO_transcriptome_mollusca {
     script:
 
     """
-    busco -i ${trinity_fasta} -l ${mollusca} -c 10 -o ${params.Sample_name}_mol.transcriptome -m transcriptome -e 1e-5 -f
-    mv ${params.Sample_name}_mol.transcriptome/*.txt "."
+    busco -i ${trinity_fasta} -l ${mollusca} -c 10 -o ${sample}_mol.transcriptome -m transcriptome -e 1e-5 -f
+    mv ${sample}_mol.transcriptome/*.txt "."
     """
 }
 
@@ -115,7 +115,7 @@ process Kallisto_Trinity {
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
-    publishDir "results/kallisto/trinity/output", mode: 'copy'
+    publishDir "${sample}/results/kallisto/trinity/output", mode: 'copy'
 
     errorStrategy 'retry'
     maxRetries 2
@@ -123,18 +123,18 @@ process Kallisto_Trinity {
     memory { (task.attempt * 2) * 1.9.GB }
 
     input:
-    tuple path(trinity_fasta), path(R1), path(R2)
+    tuple val(sample), path(trinity_fasta), path(R1), path(R2), val(Strandedness)
 
     output:
     path "abundance.tsv", emit: KallistoTrinityAbundance
 
     script:
     """
-    stranded_input="${params.stranded_input}"
+    stranded_input="${Strandedness}"
 
-    if [ "\$stranded_input" == "fr" ]; then
+    if [ ${Strandedness} == "fr" ]; then
         stranded_flag="--fr-stranded"
-    elif [ "\$stranded_input" == "rf" ]; then
+    elif [ ${Strandedness} == "rf" ]; then
         stranded_flag="--rf-stranded"
     else
         stranded_flag=""
@@ -174,21 +174,20 @@ process Blastx {
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
-    publishDir "results/Blast/Blastx/", mode: 'copy'
+    publishDir "${sample}/results/Blast/Blastx/", mode: 'copy'
 
     input:
-    path trinity_fasta
-    path proteindb
+    tuple val(sample), path(trinity_fasta), path(proteindb), val(proteindbdbname)
 
     output:
-    path "${params.Sample_name}.blastx.db.0.txt", emit: blastx0
-    path "${params.Sample_name}.blastx.db.6.txt", emit: blastx6
+    path "${sample}.blastx.db.0.txt", emit: blastx0
+    path "${sample}.blastx.db.6.txt", emit: blastx6
 
     script:
     """
    
-    blastx -query ${trinity_fasta} -db ${params.database_name} -out ${params.Sample_name}.blastx.db.6.txt -evalue 1e-5 -num_threads 10 -outfmt "6 qseqid sseqid pident length mismatch evalue bitscore qframe"
-    blastx -query ${trinity_fasta} -db ${params.database_name} -out ${params.Sample_name}.blastx.db.0.txt -evalue 1e-5 -num_threads 10 -outfmt '0'
+    blastx -query ${trinity_fasta} -db ${proteindbdbname} -out ${sample}.blastx.db.6.txt -evalue 1e-5 -num_threads 10 -outfmt "6 qseqid sseqid pident length mismatch evalue bitscore qframe"
+    blastx -query ${trinity_fasta} -db ${proteindbdbname} -out ${sample}.blastx.db.0.txt -evalue 1e-5 -num_threads 10 -outfmt '0'
 
     """
 }
@@ -198,12 +197,10 @@ process Transdecoder {
 
     errorStrategy 'ignore'
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
-
-    publishDir "results/Transdecoder", mode: 'copy'
+    publishDir "${sample}/results/Transdecoder", mode: 'copy'
 
     input:
-    path trinity_fasta
+    tuple val(sample), path(trinity_fasta)
 
     output:
     path "*.pep", emit: pep
@@ -212,8 +209,8 @@ process Transdecoder {
     script:
 
     """
-    ${params.TRANSDECODER_PATH}/TransDecoder.LongOrfs -t ${trinity_fasta}
-    ${params.TRANSDECODER_PATH}/TransDecoder.Predict -t ${trinity_fasta}
+    TransDecoder.LongOrfs -t ${trinity_fasta}
+    TransDecoder.Predict -t ${trinity_fasta}
 
     """
 }
@@ -226,10 +223,10 @@ process BUSCO_translatome_metazoa {
 
     conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
-    publishDir "results/BUSCO/translatome/", mode: 'copy'
+    publishDir "${sample}/results/BUSCO/translatome/", mode: 'copy'
 
     input:
-    tuple path(Transdecoder_pep), path(metazoa)
+    tuple val(sample), path(Transdecoder_pep), path(metazoa)
 
     output:
     path "*.txt", emit: busco_translatome_met
@@ -237,8 +234,8 @@ process BUSCO_translatome_metazoa {
     script:
 
     """
-    busco -i ${Transdecoder_pep} -l ${metazoa} -c 10 -o ${params.Sample_name}_met.protein -m protein -e 1e-5 -f
-    mv ${params.Sample_name}_met.protein/*.txt "."
+    busco -i ${Transdecoder_pep} -l ${metazoa} -c 10 -o ${sample}_met.protein -m protein -e 1e-5 -f
+    mv ${sample}_met.protein/*.txt "."
     
     """
 }
@@ -250,10 +247,10 @@ process BUSCO_translatome_mollusca {
 
     conda "${workflow.projectDir}/bin/Setup/busco.yaml"
 
-    publishDir "results/BUSCO/translatome/", mode: 'copy'
+    publishDir "${sample}/results/BUSCO/translatome/", mode: 'copy'
 
     input:
-    tuple path(Transdecoder_pep), path(mollusca)
+    tuple val(sample), path(Transdecoder_pep), path(mollusca)
 
     output:
     path "*.txt", emit: busco_translatome_met
@@ -261,8 +258,8 @@ process BUSCO_translatome_mollusca {
     script:
 
     """
-    busco -i ${Transdecoder_pep} -l ${mollusca} -c 10 -o ${params.Sample_name}_mol.protein -m protein -e 1e-5 -f
-    mv ${params.Sample_name}_mol.protein/*.txt "."
+    busco -i ${Transdecoder_pep} -l ${mollusca} -c 10 -o ${sample}_mol.protein -m protein -e 1e-5 -f
+    mv ${sample}_mol.protein/*.txt "."
     
     """
 }
@@ -275,27 +272,27 @@ process Kallisto_Transdecoder {
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
-    publishDir "results/kallisto/transdecoder/output", mode: 'copy'
+    publishDir "${sample}/results/kallisto/transdecoder/output", mode: 'copy'
 
     input:
-    tuple path(Transdecoder_cds), path(R1), path(R2)
+    tuple val(sample), path(Transdecoder_cds), path(R1), path(R2), val(Strandedness)
 
     output:
     path "abundance.tsv", emit: KallistoTransdecoderAbundance
 
     script:
-    if (params.stranded_input == 'fr') {
-        stranded_flag = '--fr-stranded'
-    }
-    else if (params.stranded_input == 'rf') {
-        stranded_flag = '--rf-stranded'
-    }
-    else {
-        stranded_flag = ''
-    }
+
     """
+
+    if [ ${Strandedness} == "fr" ]; then
+        stranded_flag="--fr-stranded"
+    elif [ ${Strandedness} == "rf" ]; then
+        stranded_flag="--rf-stranded"
+    else
+        stranded_flag=""
+    fi
     kallisto index -i index ${Transdecoder_cds}
-    kallisto quant -i index -o ./ -b 100 ${stranded_flag} ${R1} ${R2}
+    kallisto quant -i index -o ./ -b 100 ${R1} ${R2} \$stranded_flag
 
     """
 }
@@ -307,21 +304,20 @@ process Blastp {
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
-    publishDir "results/Blast/Blastp/", mode: 'copy'
+    publishDir "${sample}/results/Blast/Blastp/", mode: 'copy'
 
     input:
-    path Transdecoder_pep
-    path proteindb
+    tuple val(sample), path(Transdecoder_pep), path(proteindb), val(proteindbdbname)
 
     output:
-    path "${params.Sample_name}.blastp.db.0.txt", emit: blastp0
-    path "${params.Sample_name}.blastp.db.6.txt", emit: blastp6
+    path "${sample}.blastp.db.0.txt", emit: blastp0
+    path "${sample}.blastp.db.6.txt", emit: blastp6
 
     script:
     """
 
-    blastp -query ${Transdecoder_pep} -db ${params.database_name} -out ${params.Sample_name}.blastp.db.6.txt -evalue 1e-5 -num_threads 10 -outfmt "6 qseqid sseqid pident length mismatch evalue bitscore qframe"
-    blastp -query ${Transdecoder_pep} -db ${params.database_name} -out ${params.Sample_name}.blastp.db.0.txt -evalue 1e-5 -num_threads 10 -outfmt '0'
+    blastp -query ${Transdecoder_pep} -db ${proteindbdbname} -out ${sample}.blastp.db.6.txt -evalue 1e-5 -num_threads 10 -outfmt "6 qseqid sseqid pident length mismatch evalue bitscore qframe"
+    blastp -query ${Transdecoder_pep} -db ${proteindbdbname} -out ${sample}.blastp.db.0.txt -evalue 1e-5 -num_threads 10 -outfmt '0'
 
     """
 }
@@ -333,10 +329,10 @@ process Transdecoder_complete {
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
-    publishDir "results/Transdecoder", mode: 'copy'
+    publishDir "${sample}/results/Transdecoder", mode: 'copy'
 
     input:
-    tuple path(Transdecoder_pep), path(Transdecoder_cds)
+    tuple val(sample), path(Transdecoder_pep), path(Transdecoder_cds)
 
     output:
     path "*.pep", emit: transdecodercomplete_pep
@@ -345,8 +341,8 @@ process Transdecoder_complete {
     script:
 
     """
-    seqkit grep -n -r -p "ORF type:complete" ${Transdecoder_pep} -o "${params.Sample_name}.trandescoder.complete.pep"
-    seqkit grep -n -r -p "ORF type:complete" ${Transdecoder_cds} -o "${params.Sample_name}.trandescoder.complete.cds"
+    seqkit grep -n -r -p "ORF type:complete" ${Transdecoder_pep} -o "${sample}.trandescoder.complete.pep"
+    seqkit grep -n -r -p "ORF type:complete" ${Transdecoder_cds} -o "${sample}.trandescoder.complete.cds"
     """
 }
 
@@ -355,12 +351,10 @@ process SignalP {
 
     errorStrategy 'ignore'
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
-
-    publishDir "results/Signalp", mode: 'copy'
+    publishDir "${sample}/results/Signalp", mode: 'copy'
 
     input:
-    path transdecodercomplete_pep
+    tuple val(sample), path(transdecodercomplete_pep)
 
     output:
     path "*_mature.fasta", emit: maturesequences
@@ -370,15 +364,7 @@ process SignalP {
 
 
     """
-    CURRENT_WORK_DIR="\$PWD"
-    echo "\$CURRENT_WORK_DIR"
-    input_abs_path=\$(readlink -f "${transdecodercomplete_pep}")
-    cd ${params.SIGNALP_PATH}
-    ./signalp -fasta "\$input_abs_path" -mature -prefix "${params.Sample_name}"
-    echo "\$CURRENT_WORK_DIR"
-    mv "${params.Sample_name}_mature.fasta" "\$CURRENT_WORK_DIR"
-    mv "${params.Sample_name}_summary.signalp5" "\$CURRENT_WORK_DIR"
-    echo "\$CURRENT_WORK_DIR"
+    signalp -fasta ${transdecodercomplete_pep} -mature -prefix "${sample}"
     """
 }
 
@@ -387,10 +373,10 @@ process Filter2 {
     errorStrategy 'ignore'
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
-    publishDir "results/Transdecoder", mode: 'copy'
+    publishDir "${sample}/results/Transdecoder", mode: 'copy'
 
     input:
-    tuple path(maturesequences), path(transdecodercomplete_pep)
+    tuple val(sample), path(maturesequences), path(transdecodercomplete_pep)
 
     output:
     path "*.fasta", emit: transdecoderpep_signalp
@@ -398,7 +384,7 @@ process Filter2 {
     script:
 
     """
-    seqkit grep -f <(seqkit seq -n ${maturesequences}) ${transdecodercomplete_pep} > ${params.Sample_name}.Transdecoder.complete.signalp.sequences.fasta
+    seqkit grep -f <(seqkit seq -n ${maturesequences}) ${transdecodercomplete_pep} > ${sample}.Transdecoder.complete.signalp.sequences.fasta
     """
 }
 
@@ -407,10 +393,10 @@ process stats {
     errorStrategy 'ignore'
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
-    publishDir "results/Stats", mode: 'copy'
+    publishDir "${sample}/results/Stats", mode: 'copy'
 
     input:
-    tuple path(Transdecoder_pep), path(Transdecoder_cds), path(transdecodercomplete_pep), path(transdecodercomplete_cds), path(maturesequences), path(transdecoderpep_signalp)
+    tuple val(sample), path(Transdecoder_pep), path(Transdecoder_cds), path(transdecodercomplete_pep), path(transdecodercomplete_cds), path(maturesequences), path(transdecoderpep_signalp)
 
     output:
     path "*"
@@ -418,12 +404,12 @@ process stats {
     script:
 
     """
-    seqkit stats ${Transdecoder_pep} > ${params.Sample_name}_Transdecoder_pep.stats.txt
-    seqkit stats ${Transdecoder_cds} > ${params.Sample_name}_Transdecoder_cds.stats.txt
-    seqkit stats ${transdecodercomplete_pep} > ${params.Sample_name}_complete_pep.stats.txt
-    seqkit stats ${transdecodercomplete_cds} > ${params.Sample_name}_transdecodercomplete_cds.stats.txt
-    seqkit stats ${maturesequences} > ${params.Sample_name}_maturesequences.stats.txt
-        seqkit stats ${transdecoderpep_signalp} > ${params.Sample_name}_transdecoderpep_signalp.stats.txt
+    seqkit stats ${Transdecoder_pep} > ${sample}_Transdecoder_pep.stats.txt
+    seqkit stats ${Transdecoder_cds} > ${sample}_Transdecoder_cds.stats.txt
+    seqkit stats ${transdecodercomplete_pep} > ${sample}_complete_pep.stats.txt
+    seqkit stats ${transdecodercomplete_cds} > ${sample}_transdecodercomplete_cds.stats.txt
+    seqkit stats ${maturesequences} > ${sample}_maturesequences.stats.txt
+    seqkit stats ${transdecoderpep_signalp} > ${sample}_transdecoderpep_signalp.stats.txt
     
     """
 }
@@ -433,7 +419,7 @@ process Interproscan {
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
-    publishDir "results/Interproscan", mode: 'copy'
+    publishDir "${sample}/results/Interproscan", mode: 'copy'
 
     errorStrategy 'retry'
     maxRetries 2
@@ -441,7 +427,7 @@ process Interproscan {
     memory { (task.attempt * 2) * 1.9.GB }
 
     input:
-    path Transdecoder_pep
+    tuple val(sample), path(Transdecoder_pep)
 
     output:
     path "*.tsv", emit: Interproscan
@@ -449,11 +435,10 @@ process Interproscan {
     script:
 
     """
-    awk '{if (\$0 ~ /^>/) print \$0; else {gsub(/\\*/, ""); print \$0}}' ${Transdecoder_pep} > "${params.Sample_name}.Trinity.fasta.transdecoder.cleaned.pep"
+    awk '{if (\$0 ~ /^>/) print \$0; else {gsub(/\\*/, ""); print \$0}}' ${Transdecoder_pep} > "${sample}.Trinity.fasta.transdecoder.cleaned.pep"
 
-    ${params.INTERPROSCAN_PATH} \
-      -goterms \
-      -i "${params.Sample_name}.Trinity.fasta.transdecoder.cleaned.pep" \
+    interproscan.sh
+      -goterms -i "${sample}.Trinity.fasta.transdecoder.cleaned.pep" 
       -pa -t p -d ./ -f TSV
     """
 }
@@ -482,20 +467,19 @@ process GenomeBlasts {
     errorStrategy 'ignore'
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
-    publishDir "results/Blast/Blastn/", mode: 'copy'
+    publishDir "${sample}/results/Blast/Blastn/", mode: 'copy'
 
     input:
-    path transdecodercomplete_cds
-    path genomedb
+    tuple val(sample), path(transdecodercompletecds), path(genomedb), val(genomedbname)
 
     output:
-    path "${params.Sample_name}.blastn.db.0.txt", emit: blastn0
-    path "${params.Sample_name}.blastn.db.6.txt", emit: blastn6
+    path "${sample}.blastn.db.0.txt", emit: blastn0
+    path "${sample}.blastn.db.6.txt", emit: blastn6
 
     script:
     """
-    blastn -query ${transdecodercomplete_cds} -db ${params.genomefastaname} -out ${params.Sample_name}.blastn.db.6.txt -evalue 1e-5 -num_threads 10 -outfmt '6'
-    blastn -query ${transdecodercomplete_cds} -db ${params.genomefastaname} -out ${params.Sample_name}.blastn.db.0.txt -evalue 1e-5 -num_threads 10 -outfmt '0'
+    blastn -query ${transdecodercompletecds} -db ${genomedbname} -out ${sample}.blastn.db.6.txt -evalue 1e-5 -num_threads 10 -outfmt '6'
+    blastn -query ${transdecodercompletecds} -db ${genomedbname} -out ${sample}.blastn.db.0.txt -evalue 1e-5 -num_threads 10 -outfmt '0'
 
     """
 }
@@ -511,83 +495,135 @@ process GenomeBlasts {
 //WorkFlow
 
 workflow {
+    // Define CSV channel 
+    csv_channel = Channel.fromPath(params.input_csv).splitCsv(header: true, sep: ',')
 
-    def R1 = Channel.fromPath(params.R1)
-    def R2 = Channel.fromPath(params.R2)
-    def R1R2 = R1.join(R2)
-    def trinity_fasta = Channel.fromPath(params.trinity_fasta)
-    R1R2 | PostTrimFastqc
+    //Define Sample_name 
+    Sample_name = csv_channel.map { row -> row.Sample_name }
 
-    def fastqc_zips = PostTrimFastqc.out.fastqc_zips
-    def metazoa = Channel.fromPath(params.metazoa)
-    def mollusca = Channel.fromPath(params.mollusca)
-    def buscoTranscriptome_met = trinity_fasta.join(metazoa)
-    def buscoTranscriptome_mol = trinity_fasta.join(mollusca)
-    def TrinityR1R2 = trinity_fasta.join(R1).join(R2)
-    def database_fasta = Channel.fromPath(params.database_fasta)
+    // Define Input: Paired Trimmed reads Tuple 
+    input_R1R2 = csv_channel.map { row -> tuple(file(row.R1), file(row.R2)) }
 
-    database_fasta | Blastdatabasecreation
+    // Run Process: Fastqc
+    input_R1R2 | PostTrimFastqc
 
-    Blastx(trinity_fasta, Blastdatabasecreation.out.proteindb)
+    //Define Input: Fastqc htmls
+    def fastqc_output = PostTrimFastqc.out.fastqc_zips
+    def fastqc_zips = Sample_name.join(fastqc_output)
+    //Run Process: MultQC
+    fastqc_zips | MultiQC
 
-    trinity_fasta | Transdecoder
+    //Define Input: Trinity Fasta 
+    input_trinity_fasta = csv_channel.map { row -> tuple(row.Sample_name, file(row.Trinity_fasta)) }
+
+    //Run Process: TrinityStats
+    input_trinity_fasta | TrinityStats
+
+    //Define Input: Trinity Fasta + BUSCOlin1 tuple 
+    input_BUSCOlin1 = csv_channel.map { row -> tuple(row.Sample_name, file(row.Trinity_fasta), file(row.BUSCO_lin1)) }
+
+    //Run Process: BUSCO_lin1
+    input_BUSCOlin1 | BUSCO_transcriptome_metazoa
+
+    //Define Input: Trinity Fasta + BUSCOlin2 tuple 
+    input_BUSCOlin2 = csv_channel.map { row -> tuple(row.Sample_name, file(row.Trinity_fasta), file(row.BUSCO_lin2)) }
+
+    //Run Process: BUSCO_lin2
+    input_BUSCOlin2 | BUSCO_transcriptome_mollusca
+
+    //Define Input: Trinity fasta + R1 + R2 tuple 
+    input_TrinityKallisto = csv_channel.map { row -> tuple(row.Sample_name, file(row.Trinity_fasta), file(row.R1), file(row.R2), row.Strandedness) }
+
+    //Run Process: TrinityKallisto
+    input_TrinityKallisto | Kallisto_Trinity
+
+    //Define Input: Database_Fasta 
+    input_databasefasta = csv_channel.map { row -> file(row.Protein_fasta_path_for_Blast) }
+
+    //Run Process: DatabaseCreation
+    input_databasefasta | Blastdatabasecreation
+
+    //Define Input: Blastx //FILE OR PATH FOR DATABASE FILES
+    input_Blastx = csv_channel.map { row -> tuple(row.Sample_name, file(row.Trinity_fasta), file(Blastdatabasecreation.out.proteindb), row.Protein_fasta_name) }
+
+    //Run Process: Blastx
+    input_Blastx | Blastx
+
+    //Run Process: Transdecoder
+    input_trinity_fasta | Transdecoder
+
+    //Define Input: Transdecoder pep + BUSCOlin1 tuple 
     def Transdecoder_pep = Transdecoder.out.pep
-    def buscoTranslatome_met = Transdecoder_pep.join(metazoa)
-    def buscoTranslatome_mol = Transdecoder_pep.join(mollusca)
+    input_BUSCOlin1_L = csv_channel.map { row -> tuple(row.Sample_name, file(Transdecoder_pep), file(row.BUSCO_lin1)) }
+
+    //Run Process: BUSCO_lin1
+    input_BUSCOlin1_L | BUSCO_translatome_metazoa
+
+    //Define Input: Transdecoder pep + BUSCOlin1 tuple 
+    input_BUSCOlin2_L = csv_channel.map { row -> tuple(row.Sample_name, file(Transdecoder_pep), file(row.BUSCO_lin2)) }
+
+    //Run Process: BUSCO_lin2
+    input_BUSCOlin2_L | BUSCO_translatome_mollusca
+
+    //Define Input: Transdecoder cds + R1 + R2 + Strandedness tuple 
     def Transdecoder_cds = Transdecoder.out.cds
-    def TransdecoderR1R2 = Transdecoder_cds.join(R1).join(R2)
+    input_TransKallisto = csv_channel.map { row -> tuple(row.Sample_name, file(Transdecoder_cds), file(row.R1), file(row.R2), row.Strandedness) }
+
+    //Run Process: TransKallisto
+    input_TransKallisto | Kallisto_Transdecoder
+
+    //Define Input: Blastp //FILE OR PATH FOR DATABASE FILES
+    input_Blastp = csv_channel.map { row -> tuple(row.Sample_name, file(Transdecoder_pep), file(Blastdatabasecreation.out.proteindb)) }
+
+    //Run Process: Blastp
+    input_Blastp | Blastp
+
+    //Define Input: Sample name + PEP + CDS tuple
+    def Transdecoder_complete = Sample_name.join(Transdecoder_pep).join(Transdecoder_cds)
+    //Run Process: Transdecoder filter for complete ORFs
+    Transdecoder_complete | Transdecoder_complete
 
 
-    Blastp(Transdecoder_pep, Blastdatabasecreation.out.proteindb)
-
-
-    def Transdecoder_pep_cds = Transdecoder_pep.join(Transdecoder_cds)
-    Transdecoder_pep_cds | Transdecoder_complete
+    //Define Input: Sample name + completepep  tuple
     def transdecodercomplete_pep = Transdecoder_complete.out.transdecodercomplete_pep
-    transdecodercomplete_pep | SignalP
-    def maturesequences = SignalP.out.maturesequences
-    def mature_complete = maturesequences.join(transdecodercomplete_pep)
-    def transdecodercomplete_cds = Transdecoder_complete.out.transdecodercomplete_cds
-    mature_complete | Filter2
-    def transdecoderpep_signalp = Filter2.out.transdecoderpep_signalp
+    def transdecodercomplete_pep_sampleid = Sample_name.join(transdecodercomplete_pep)
 
-    def stats_join = Transdecoder_pep
+    //Run Process: SignalP
+    transdecodercomplete_pep_sampleid | SignalP
+
+    //Define Input: sample name + mature sequences + completepep tuple 
+    def maturesequences = SignalP.out.maturesequences
+    maturecomplete = Sample_name.join(maturesequences).join(transdecodercomplete_pep)
+
+    //Run Process: Filter2   
+    maturecomplete | Filter2
+
+    //Define Input: stats sample name + pep + cds + completepep + completecds + mature +signalp  tuple 
+    def transdecoderpep_signalp = Filter2.out.transdecoderpep_signalp
+    def transdecodercomplete_cds = Transdecoder_complete.out.transdecodercomplete_cds
+    stats_join = Sample_name
+        .join(Transdecoder_pep)
         .join(Transdecoder_cds)
         .join(transdecodercomplete_pep)
         .join(transdecodercomplete_cds)
         .join(maturesequences)
         .join(transdecoderpep_signalp)
-
-
-
-    fastqc_zips | MultiQC
-
-    trinity_fasta | TrinityStats
-
-    buscoTranscriptome_met | BUSCO_transcriptome_metazoa
-
-    buscoTranscriptome_mol | BUSCO_transcriptome_mollusca
-
-
-    TrinityR1R2 | Kallisto_Trinity
-
-
-
-    buscoTranslatome_met | BUSCO_translatome_metazoa
-
-    buscoTranslatome_mol | BUSCO_translatome_mollusca
-
-    TransdecoderR1R2 | Kallisto_Transdecoder
-
-
-
+    //Run Process: STATS   
     stats_join | stats
 
-    Transdecoder_pep | Interproscan
+    //Define Input: sample name + pep tuple 
+    inputInterpro = Sample_name.join(Transdecoder_pep)
 
-    if (params.genomefasta != 'NULL') {
-        def genomefasta = Channel.fromPath(params.genomefasta)
-        genomefasta | GenomeBlastdatabasecreation
-        GenomeBlasts(transdecodercomplete_cds, GenomeBlastdatabasecreation.out.genomedb)
+    //Run Process: Interproscan   
+    inputInterpro | Interproscan
+
+    //Define Input: genomefasta 
+    Genomefasta = csv_channel.map { row -> file(row.Genome_fasta_path) }
+    BLASTntuple = csv_channel.map { row -> tuple(row.Sample_name, file(transdecodercomplete_cds), file(row.Genome_fasta_path), row.Genome_fasta_name) }
+    //Run Process: BlastnGenome   
+
+    if (Genomefasta != 'NULL') {
+        Genomefasta | GenomeBlastdatabasecreation
+        BLASTntuple | GenomeBlasts
     }
 }
