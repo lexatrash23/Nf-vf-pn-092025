@@ -151,18 +151,18 @@ process Blastdatabasecreation {
     errorStrategy 'ignore'
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    
+    tag "${db_path}"  // Better logging to track which database
 
     input:
-    path database_fasta
+    tuple val(db_path), path(database_fasta)
 
     output:
-    path "*", emit: proteindb
+    tuple val(db_path), path("*"), emit: proteindb
 
     script:
     """
-
     makeblastdb -in "${database_fasta}" -dbtype prot
-
     """
 }
 
@@ -450,18 +450,18 @@ process Interproscan {
 process GenomeBlastdatabasecreation {
     errorStrategy 'ignore'
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    
+    tag "${genome_path}"  // Better logging
 
     input:
-    path genome_fasta
+    tuple val(genome_path), path(genome_fasta)
 
     output:
-    path "*", emit: genomedb
+    tuple val(genome_path), path("*"), emit: genomedb
 
     script:
     """
-
     makeblastdb -in "${genome_fasta}" -dbtype nucl
-
     """
 }
 
@@ -540,18 +540,32 @@ workflow {
     //Run Process: TrinityKallisto
     input_TrinityKallisto | Kallisto_Trinity
 
-    //Define Input: Database_Fasta 
-    input_databasefasta = csv_channel.map { row -> file(row.Protein_fasta_path_for_Blast) }
+    //Define Input: Database_Fasta (with path tracking for multiple databases)
+    input_databasefasta = csv_channel
+        .map { row -> tuple(row.Protein_fasta_path_for_Blast, file(row.Protein_fasta_path_for_Blast)) }
+        .unique { it[0] }  // Only create unique databases
 
     //Run Process: DatabaseCreation
     input_databasefasta | Blastdatabasecreation
 
-    //Define Input: Blastx //FILE OR PATH FOR DATABASE FILES
-    input_Blastx = input_trinity_fasta
+    //Define Input: Blastx - Map each sample to its correct database
+    // Step 1: Create mapping [sample, db_path, db_name]
+    sample_to_db_path = csv_channel.map { row ->
+        tuple(row.Sample_name, row.Protein_fasta_path_for_Blast, row.Protein_fasta_name)
+    }
+    
+    // Step 2: Join sample info [sample, trinity_fasta, db_path, db_name]
+    sample_with_db_info = input_trinity_fasta.join(sample_to_db_path)
+    
+    // Step 3: Match with actual database files and filter
+    input_Blastx = sample_with_db_info
         .combine(Blastdatabasecreation.out.proteindb)
-        .combine(csv_channel.map { row -> tuple(row.Sample_name, row.Protein_fasta_name) })
-        .filter { it[0] == it[3] }
-        .map { sample, trinity_fasta, proteindb, _sample2, dbname -> tuple(sample, trinity_fasta, proteindb, dbname) }
+        .filter { _sample, _trinity_fasta, db_path_wanted, _db_name, db_path_available, _db_files ->
+            db_path_wanted == db_path_available
+        }
+        .map { sample, trinity_fasta, _db_path_wanted, db_name, _db_path_available, db_files ->
+            tuple(sample, trinity_fasta, db_files, db_name)
+        }
 
     //Run Process: Blastx
     input_Blastx | Blastx
@@ -592,12 +606,24 @@ workflow {
     //Run Process: TransKallisto
     input_TransKallisto | Kallisto_Transdecoder
 
-    //Define Input: Blastp //FILE OR PATH FOR DATABASE FILES
-    input_Blastp = Sample_transdecoder
+    //Define Input: Blastp - Match Transdecoder output with databases
+    // Recreate the mapping to avoid channel consumption issues
+    input_Blastp = Transdecoder.out.pep
+        .map { pep_file -> 
+            // Extract sample name from the pep filename
+            def sample = pep_file.getSimpleName().replaceAll(/\.Trinity.*/, '')
+            tuple(sample, pep_file)
+        }
+        .combine(csv_channel.map { row -> tuple(row.Sample_name, row.Protein_fasta_path_for_Blast, row.Protein_fasta_name) })
+        .filter { sample1, _pep, sample2, _db_path, _db_name -> sample1 == sample2 }
+        .map { sample1, pep, _sample2, db_path, db_name -> tuple(sample1, pep, db_path, db_name) }
         .combine(Blastdatabasecreation.out.proteindb)
-        .combine(csv_channel.map { row -> tuple(row.Sample_name, row.Protein_fasta_name) })
-        .filter { it[0] == it[3] }
-        .map { sample, pep, proteindb, _sample2, dbname -> tuple(sample, pep, proteindb, dbname) }
+        .filter { _sample, _pep, db_path_wanted, _db_name, db_path_available, _db_files ->
+            db_path_wanted == db_path_available
+        }
+        .map { sample, pep, _db_path_wanted, db_name, _db_path_available, db_files ->
+            tuple(sample, pep, db_files, db_name)
+        }
 
     //Run Process: Blastp
     input_Blastp | Blastp
@@ -641,22 +667,40 @@ workflow {
     //Run Process: Interproscan   
     inputInterpro | Interproscan
 
-    //Define Input: genomefasta 
+    //Define Input: genomefasta (with path tracking)
     Genomefasta = csv_channel
-        .map { row -> file(row.Genome_fasta_path) }
-        .unique()
-        
-    BLASTntuple = Sample_name
+        .map { row -> tuple(row.Genome_fasta_path, file(row.Genome_fasta_path)) }
+        .unique { it[0] }
+        .filter { genome_path, _genome_file -> 
+            genome_path != 'NULL' && genome_path.toString() != 'NULL' 
+        }
+    
+    //Run Process: BlastnGenome database creation
+    Genomefasta | GenomeBlastdatabasecreation
+    
+    //Define Input: Genome BLAST - Map each sample to its correct genome database
+    // Step 1: Create mapping [sample, genome_path, genome_name]
+    sample_to_genome_path = csv_channel
+        .map { row -> tuple(row.Sample_name, row.Genome_fasta_path, row.Genome_fasta_name) }
+        .filter { _sample, genome_path, _genome_name -> 
+            genome_path != 'NULL' && genome_path.toString() != 'NULL' 
+        }
+    
+    // Step 2: Join with transdecodercomplete_cds [sample, cds, genome_path, genome_name]
+    sample_cds_with_genome_info = Sample_name
         .join(transdecodercomplete_cds)
+        .join(sample_to_genome_path)
+    
+    // Step 3: Match with actual genome database files
+    BLASTntuple = sample_cds_with_genome_info
         .combine(GenomeBlastdatabasecreation.out.genomedb)
-        .combine(csv_channel.map { row -> tuple(row.Sample_name, row.Genome_fasta_name) })
-        .filter { it[0] == it[3] }
-        .map { sample, cds, genomedb, _sample2, genomename -> tuple(sample, cds, genomedb, genomename) }
+        .filter { _sample, _cds, genome_path_wanted, _genome_name, genome_path_available, _genome_db ->
+            genome_path_wanted == genome_path_available
+        }
+        .map { sample, cds, _genome_path_wanted, genome_name, _genome_path_available, genome_db ->
+            tuple(sample, cds, genome_db, genome_name)
+        }
     
-    //Run Process: BlastnGenome   
-    Genomefasta
-        .filter { it.name != 'NULL' && it.toString() != 'NULL' }
-        | GenomeBlastdatabasecreation
-    
+    //Run Process: BlastnGenome
     BLASTntuple | GenomeBlasts
 }
