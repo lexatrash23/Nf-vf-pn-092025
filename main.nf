@@ -1,19 +1,14 @@
 #!/usr/bin/env nextflow
-
-
-
 // Process 1: PostTrimFastqc
 process PostTrimFastqc {
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
-    publishDir "results/Fastqc/posttrim/fastqc_zips/", mode: 'copy'
-
     input:
-    tuple path(R1), path(R2)
+    tuple val(sample), path(R1), path(R2)
 
     output:
-    path '*.zip', emit: fastqc_zips
+    tuple val(sample), path("*.zip"), emit: fastqc_zips
 
     script:
     """
@@ -151,14 +146,12 @@ process Blastdatabasecreation {
     errorStrategy 'ignore'
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
-    
-    tag "${db_path}"  // Better logging to track which database
 
     input:
-    tuple val(db_path), path(database_fasta)
+    tuple val(sample), path(database_fasta)
 
     output:
-    tuple val(db_path), path("*"), emit: proteindb
+    tuple val(sample), path("*"), emit: proteindb
 
     script:
     """
@@ -178,7 +171,7 @@ process Blastx {
     publishDir "${sample}/results/Blast/Blastx/", mode: 'copy'
 
     input:
-    tuple val(sample), path(trinity_fasta), path(proteindb), val(proteindbdbname)
+    tuple val(sample), val(proteindbdbname), path(trinity_fasta), path(proteindb)
 
     output:
     path "${sample}.blastx.db.0.txt", emit: blastx0
@@ -206,8 +199,8 @@ process Transdecoder {
     tuple val(sample), path(trinity_fasta)
 
     output:
-    path "*.pep", emit: pep
-    path "*.cds", emit: cds
+    tuple val(sample), path("*.pep"), emit: pep
+    tuple val(sample), path("*.cds"), emit: cds
 
     script:
 
@@ -338,8 +331,8 @@ process Transdecoder_complete {
     tuple val(sample), path(Transdecoder_pep), path(Transdecoder_cds)
 
     output:
-    path "*.pep", emit: transdecodercomplete_pep
-    path "*.cds", emit: transdecodercomplete_cds
+    tuple val(sample), path("*.pep"), emit: transdecodercomplete_pep
+    tuple val(sample), path("*.cds"), emit: transdecodercomplete_cds
 
     script:
 
@@ -360,7 +353,7 @@ process SignalP {
     tuple val(sample), path(transdecodercomplete_pep)
 
     output:
-    path "*_mature.fasta", emit: maturesequences
+    tuple val(sample), path("*_mature.fasta"), emit: maturesequences
     path "*.signalp5", emit: signalpsummary
 
     script:
@@ -382,7 +375,7 @@ process Filter2 {
     tuple val(sample), path(maturesequences), path(transdecodercomplete_pep)
 
     output:
-    path "*.fasta", emit: transdecoderpep_signalp
+    tuple val(sample), path("*.fasta"), emit: transdecoderpep_signalp
 
     script:
 
@@ -450,14 +443,12 @@ process Interproscan {
 process GenomeBlastdatabasecreation {
     errorStrategy 'ignore'
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
-    
-    tag "${genome_path}"  // Better logging
 
     input:
-    tuple val(genome_path), path(genome_fasta)
+    tuple val(sample), path(genome_fasta)
 
     output:
-    tuple val(genome_path), path("*"), emit: genomedb
+    tuple val(sample), path("*"), emit: genomedbfiles
 
     script:
     """
@@ -473,7 +464,7 @@ process GenomeBlasts {
     publishDir "${sample}/results/Blast/Blastn/", mode: 'copy'
 
     input:
-    tuple val(sample), path(transdecodercompletecds), path(genomedb), val(genomedbname)
+    tuple val(sample), val(genomedbname), path(transdecodercompletecds), path(genomedb)
 
     output:
     path "${sample}.blastn.db.0.txt", emit: blastn0
@@ -498,23 +489,19 @@ process GenomeBlasts {
 //WorkFlow
 
 workflow {
-    // Define CSV channel 
+    // Define CSV channel. Chanel factory creates a channel from a csv file. This csv can be defined in the config or the command line with --input_csv. The CSV is spilt row by row where each row is emitted as a Map (key-value pairs) where column names are news. 
     csv_channel = Channel.fromPath(params.input_csv).splitCsv(header: true, sep: ',')
 
-    //Define Sample_name 
-    Sample_name = csv_channel.map { row -> row.Sample_name }
-
-    // Define Input: Paired Trimmed reads Tuple 
-    input_R1R2 = csv_channel.map { row -> tuple(file(row.R1), file(row.R2)) }
+    // Define Input: Paired Trimmed reads Tuple. Extracts as tuple the sample name and the trimmed reads
+    input_R1R2 = csv_channel.map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2)) }
 
     // Run Process: Fastqc
     input_R1R2 | PostTrimFastqc
 
-    //Define Input: Fastqc htmls
-    def fastqc_output = PostTrimFastqc.out.fastqc_zips
-    def fastqc_zips = Sample_name.join(fastqc_output)
+    //Define Input: Fastqc htmls. Using the output of Fastqc as an input for MultiQC
+    fastqc_output = PostTrimFastqc.out.fastqc_zips
     //Run Process: MultQC
-    fastqc_zips | MultiQC
+    fastqc_output | MultiQC
 
     //Define Input: Trinity Fasta 
     input_trinity_fasta = csv_channel.map { row -> tuple(row.Sample_name, file(row.Trinity_fasta)) }
@@ -540,167 +527,109 @@ workflow {
     //Run Process: TrinityKallisto
     input_TrinityKallisto | Kallisto_Trinity
 
-    //Define Input: Database_Fasta (with path tracking for multiple databases)
-    input_databasefasta = csv_channel
-        .map { row -> tuple(row.Protein_fasta_path_for_Blast, file(row.Protein_fasta_path_for_Blast)) }
-        .unique { it[0] }  // Only create unique databases
+    //Define Input: Database_Fasta. This is set up to allow for multiple different databases if needed.
+    input_databasefasta = csv_channel.map { row -> tuple(row.Sample_name, file(row.Protein_fasta_path_for_Blast)) }
+
 
     //Run Process: DatabaseCreation
     input_databasefasta | Blastdatabasecreation
 
-    //Define Input: Blastx - Map each sample to its correct database
-    // Step 1: Create mapping [sample, db_path, db_name]
-    sample_to_db_path = csv_channel.map { row ->
-        tuple(row.Sample_name, row.Protein_fasta_path_for_Blast, row.Protein_fasta_name)
+    //Define Input: Blastx 
+    Blastxinputfasta = csv_channel.map { row ->
+        tuple(row.Sample_name, row.Protein_fasta_name, file(row.Trinity_fasta))
     }
-    
-    // Step 2: Join sample info [sample, trinity_fasta, db_path, db_name]
-    sample_with_db_info = input_trinity_fasta.join(sample_to_db_path)
-    
-    // Step 3: Match with actual database files and filter
-    input_Blastx = sample_with_db_info
-        .combine(Blastdatabasecreation.out.proteindb)
-        .filter { _sample, _trinity_fasta, db_path_wanted, _db_name, db_path_available, _db_files ->
-            db_path_wanted == db_path_available
-        }
-        .map { sample, trinity_fasta, _db_path_wanted, db_name, _db_path_available, db_files ->
-            tuple(sample, trinity_fasta, db_files, db_name)
-        }
+    Blastxinputwithdb = Blastxinputfasta.join(Blastdatabasecreation.out.proteindb)
+
 
     //Run Process: Blastx
-    input_Blastx | Blastx
+    Blastxinputwithdb | Blastx
 
     //Run Process: Transdecoder
     input_trinity_fasta | Transdecoder
 
     //Define Input: Transdecoder pep + BUSCOlin1 tuple 
-    def Transdecoder_pep = Transdecoder.out.pep
-    def Sample_transdecoder = Sample_name.join(Transdecoder_pep)
-    
-    input_BUSCOlin1_L = Sample_transdecoder
-        .combine(csv_channel.map { row -> tuple(row.Sample_name, file(row.BUSCO_lin1)) })
-        .filter { it[0] == it[2] }
-        .map { sample, pep, _sample2, busco_lin1 -> tuple(sample, pep, busco_lin1) }
+    Transdecoder_pep = Transdecoder.out.pep
+    BUSCOlin1 = csv_channel.map { row -> tuple(row.Sample_name, file(row.BUSCO_lin1)) }
+    input_BUSCOlin1_L = Transdecoder_pep.join(BUSCOlin1)
 
     //Run Process: BUSCO_lin1
     input_BUSCOlin1_L | BUSCO_translatome_metazoa
 
     //Define Input: Transdecoder pep + BUSCOlin2 tuple 
-    input_BUSCOlin2_L = Sample_transdecoder
-        .combine(csv_channel.map { row -> tuple(row.Sample_name, file(row.BUSCO_lin2)) })
-        .filter { it[0] == it[2] }
-        .map { sample, pep, _sample2, busco_lin2 -> tuple(sample, pep, busco_lin2) }
+    BUSCOlin2 = csv_channel.map { row -> tuple(row.Sample_name, file(row.BUSCO_lin2)) }
+    input_BUSCOlin2_L = Transdecoder_pep.join(BUSCOlin2)
 
     //Run Process: BUSCO_lin2
     input_BUSCOlin2_L | BUSCO_translatome_mollusca
 
     //Define Input: Transdecoder cds + R1 + R2 + Strandedness tuple 
-    def Transdecoder_cds = Transdecoder.out.cds
-    def Sample_transdecoder_cds = Sample_name.join(Transdecoder_cds)
-    
-    input_TransKallisto = Sample_transdecoder_cds
-        .combine(csv_channel.map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2), row.Strandedness) })
-        .filter { it[0] == it[2] }
-        .map { sample, cds, _sample2, r1, r2, strand -> tuple(sample, cds, r1, r2, strand) }
+    Transdecoder_cds = Transdecoder.out.cds
+    KallistoTransdecoderR1R2S = csv_channel.map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2), row.Strandedness) }
+    input_TransKallisto = Transdecoder_cds.join(KallistoTransdecoderR1R2S)
 
     //Run Process: TransKallisto
     input_TransKallisto | Kallisto_Transdecoder
 
     //Define Input: Blastp - Match Transdecoder output with databases
-    // Recreate the mapping to avoid channel consumption issues
-    input_Blastp = Transdecoder.out.pep
-        .map { pep_file -> 
-            // Extract sample name from the pep filename
-            def sample = pep_file.getSimpleName().replaceAll(/\.Trinity.*/, '')
-            tuple(sample, pep_file)
-        }
-        .combine(csv_channel.map { row -> tuple(row.Sample_name, row.Protein_fasta_path_for_Blast, row.Protein_fasta_name) })
-        .filter { sample1, _pep, sample2, _db_path, _db_name -> sample1 == sample2 }
-        .map { sample1, pep, _sample2, db_path, db_name -> tuple(sample1, pep, db_path, db_name) }
-        .combine(Blastdatabasecreation.out.proteindb)
-        .filter { _sample, _pep, db_path_wanted, _db_name, db_path_available, _db_files ->
-            db_path_wanted == db_path_available
-        }
-        .map { sample, pep, _db_path_wanted, db_name, _db_path_available, db_files ->
-            tuple(sample, pep, db_files, db_name)
-        }
+    Blastpdb = csv_channel.map { row ->
+        tuple(row.Sample_name, row.Protein_fasta_name)
+    }
+    input_Blastp = Transdecoder_pep.join(Blastdatabasecreation.out.proteindb).join(Blastpdb)
 
     //Run Process: Blastp
     input_Blastp | Blastp
 
     //Define Input: Sample name + PEP + CDS tuple
-    def Transdecoder_complete = Sample_name.join(Transdecoder_pep).join(Transdecoder_cds)
+    input_Transdecoder_complete = Transdecoder_pep.join(Transdecoder_cds)
+
     //Run Process: Transdecoder filter for complete ORFs
-    Transdecoder_complete | Transdecoder_complete
+    input_Transdecoder_complete | Transdecoder_complete
 
 
     //Define Input: Sample name + completepep tuple
-    def transdecodercomplete_pep = Transdecoder_complete.out.transdecodercomplete_pep
-    def transdecodercomplete_pep_sampleid = Sample_name.join(transdecodercomplete_pep)
+    transdecodercomplete_pep = Transdecoder_complete.out.transdecodercomplete_pep
 
     //Run Process: SignalP
-    transdecodercomplete_pep_sampleid | SignalP
+    transdecodercomplete_pep | SignalP
 
     //Define Input: sample name + mature sequences + completepep tuple 
-    def maturesequences = SignalP.out.maturesequences
-    maturecomplete = Sample_name.join(maturesequences).join(transdecodercomplete_pep)
+    maturesequences = SignalP.out.maturesequences
+    maturecomplete = maturesequences.join(transdecodercomplete_pep)
 
     //Run Process: Filter2   
     maturecomplete | Filter2
 
     //Define Input: stats sample name + pep + cds + completepep + completecds + mature +signalp  tuple 
-    def transdecoderpep_signalp = Filter2.out.transdecoderpep_signalp
-    def transdecodercomplete_cds = Transdecoder_complete.out.transdecodercomplete_cds
-    stats_join = Sample_name
-        .join(Transdecoder_pep)
-        .join(Transdecoder_cds)
-        .join(transdecodercomplete_pep)
-        .join(transdecodercomplete_cds)
+    stats_join = input_Transdecoder_complete
+        .join(Transdecoder_complete.out.transdecodercomplete_pep)
+        .join(Transdecoder_complete.out.transdecodercomplete_cds)
         .join(maturesequences)
-        .join(transdecoderpep_signalp)
+        .join(Filter2.out.transdecoderpep_signalp)
     //Run Process: STATS   
     stats_join | stats
 
-    //Define Input: sample name + pep tuple 
-    inputInterpro = Sample_name.join(Transdecoder_pep)
-
-    //Run Process: Interproscan   
-    inputInterpro | Interproscan
+    //Run Process: Interproscan  (Input was previously defined)
+    Transdecoder_pep | Interproscan
 
     //Define Input: genomefasta (with path tracking)
     Genomefasta = csv_channel
         .map { row -> tuple(row.Genome_fasta_path, file(row.Genome_fasta_path)) }
         .unique { it[0] }
-        .filter { genome_path, _genome_file -> 
-            genome_path != 'NULL' && genome_path.toString() != 'NULL' 
+        .filter { genome_path, _genome_file ->
+            genome_path != 'NULL' && genome_path.toString() != 'NULL'
         }
-    
+
     //Run Process: BlastnGenome database creation
     Genomefasta | GenomeBlastdatabasecreation
-    
-    //Define Input: Genome BLAST - Map each sample to its correct genome database
-    // Step 1: Create mapping [sample, genome_path, genome_name]
-    sample_to_genome_path = csv_channel
-        .map { row -> tuple(row.Sample_name, row.Genome_fasta_path, row.Genome_fasta_name) }
-        .filter { _sample, genome_path, _genome_name -> 
-            genome_path != 'NULL' && genome_path.toString() != 'NULL' 
-        }
-    
-    // Step 2: Join with transdecodercomplete_cds [sample, cds, genome_path, genome_name]
-    sample_cds_with_genome_info = Sample_name
-        .join(transdecodercomplete_cds)
-        .join(sample_to_genome_path)
-    
-    // Step 3: Match with actual genome database files
-    BLASTntuple = sample_cds_with_genome_info
-        .combine(GenomeBlastdatabasecreation.out.genomedb)
-        .filter { _sample, _cds, genome_path_wanted, _genome_name, genome_path_available, _genome_db ->
-            genome_path_wanted == genome_path_available
-        }
-        .map { sample, cds, _genome_path_wanted, genome_name, _genome_path_available, genome_db ->
-            tuple(sample, cds, genome_db, genome_name)
-        }
-    
+
+    //Define Input: Genome BLAST 
+    genomedb = GenomeBlastdatabasecreation.out.genomedbfiles
+    Blastncds = csv_channel.map { row -> tuple(row.Sample_name, file(row.Genome_fasta_name)) }
+
+    BlastnInput = Blastncds
+        .join(Transdecoder_complete.out.transdecodercomplete_cds)
+        .join(genomedb)
+
     //Run Process: BlastnGenome
-    BLASTntuple | GenomeBlasts
+    BlastnInput | GenomeBlasts
 }
