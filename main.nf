@@ -7,6 +7,8 @@ process PostTrimFastqc {
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
+    publishDir "results/Fastqc/posttrim/fastqc_zips/", mode: 'copy'
+
     input:
     tuple path(R1), path(R2)
 
@@ -14,7 +16,6 @@ process PostTrimFastqc {
     path '*.zip', emit: fastqc_zips
 
     script:
-
     """
     fastqc ${R1} ${R2}
     """
@@ -120,7 +121,7 @@ process Kallisto_Trinity {
     errorStrategy 'retry'
     maxRetries 2
     cpus { task.attempt * 2 }
-    memory { (task.attempt * 2) * 1.9.GB }
+    memory { task.attempt * 2.GB }
 
     input:
     tuple val(sample), path(trinity_fasta), path(R1), path(R2), val(Strandedness)
@@ -194,6 +195,8 @@ process Blastx {
 
 // Process 9: Transdecoder
 process Transdecoder {
+
+    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     errorStrategy 'ignore'
 
@@ -424,7 +427,7 @@ process Interproscan {
     errorStrategy 'retry'
     maxRetries 2
     cpus { task.attempt * 2 }
-    memory { (task.attempt * 2) * 1.9.GB }
+    memory { task.attempt * 2.GB }
 
     input:
     tuple val(sample), path(Transdecoder_pep)
@@ -544,7 +547,11 @@ workflow {
     input_databasefasta | Blastdatabasecreation
 
     //Define Input: Blastx //FILE OR PATH FOR DATABASE FILES
-    input_Blastx = csv_channel.map { row -> tuple(row.Sample_name, file(row.Trinity_fasta), file(Blastdatabasecreation.out.proteindb), row.Protein_fasta_name) }
+    input_Blastx = input_trinity_fasta
+        .combine(Blastdatabasecreation.out.proteindb)
+        .combine(csv_channel.map { row -> tuple(row.Sample_name, row.Protein_fasta_name) })
+        .filter { it[0] == it[3] }
+        .map { sample, trinity_fasta, proteindb, _sample2, dbname -> tuple(sample, trinity_fasta, proteindb, dbname) }
 
     //Run Process: Blastx
     input_Blastx | Blastx
@@ -554,26 +561,43 @@ workflow {
 
     //Define Input: Transdecoder pep + BUSCOlin1 tuple 
     def Transdecoder_pep = Transdecoder.out.pep
-    input_BUSCOlin1_L = csv_channel.map { row -> tuple(row.Sample_name, file(Transdecoder_pep), file(row.BUSCO_lin1)) }
+    def Sample_transdecoder = Sample_name.join(Transdecoder_pep)
+    
+    input_BUSCOlin1_L = Sample_transdecoder
+        .combine(csv_channel.map { row -> tuple(row.Sample_name, file(row.BUSCO_lin1)) })
+        .filter { it[0] == it[2] }
+        .map { sample, pep, _sample2, busco_lin1 -> tuple(sample, pep, busco_lin1) }
 
     //Run Process: BUSCO_lin1
     input_BUSCOlin1_L | BUSCO_translatome_metazoa
 
-    //Define Input: Transdecoder pep + BUSCOlin1 tuple 
-    input_BUSCOlin2_L = csv_channel.map { row -> tuple(row.Sample_name, file(Transdecoder_pep), file(row.BUSCO_lin2)) }
+    //Define Input: Transdecoder pep + BUSCOlin2 tuple 
+    input_BUSCOlin2_L = Sample_transdecoder
+        .combine(csv_channel.map { row -> tuple(row.Sample_name, file(row.BUSCO_lin2)) })
+        .filter { it[0] == it[2] }
+        .map { sample, pep, _sample2, busco_lin2 -> tuple(sample, pep, busco_lin2) }
 
     //Run Process: BUSCO_lin2
     input_BUSCOlin2_L | BUSCO_translatome_mollusca
 
     //Define Input: Transdecoder cds + R1 + R2 + Strandedness tuple 
     def Transdecoder_cds = Transdecoder.out.cds
-    input_TransKallisto = csv_channel.map { row -> tuple(row.Sample_name, file(Transdecoder_cds), file(row.R1), file(row.R2), row.Strandedness) }
+    def Sample_transdecoder_cds = Sample_name.join(Transdecoder_cds)
+    
+    input_TransKallisto = Sample_transdecoder_cds
+        .combine(csv_channel.map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2), row.Strandedness) })
+        .filter { it[0] == it[2] }
+        .map { sample, cds, _sample2, r1, r2, strand -> tuple(sample, cds, r1, r2, strand) }
 
     //Run Process: TransKallisto
     input_TransKallisto | Kallisto_Transdecoder
 
     //Define Input: Blastp //FILE OR PATH FOR DATABASE FILES
-    input_Blastp = csv_channel.map { row -> tuple(row.Sample_name, file(Transdecoder_pep), file(Blastdatabasecreation.out.proteindb)) }
+    input_Blastp = Sample_transdecoder
+        .combine(Blastdatabasecreation.out.proteindb)
+        .combine(csv_channel.map { row -> tuple(row.Sample_name, row.Protein_fasta_name) })
+        .filter { it[0] == it[3] }
+        .map { sample, pep, proteindb, _sample2, dbname -> tuple(sample, pep, proteindb, dbname) }
 
     //Run Process: Blastp
     input_Blastp | Blastp
@@ -584,7 +608,7 @@ workflow {
     Transdecoder_complete | Transdecoder_complete
 
 
-    //Define Input: Sample name + completepep  tuple
+    //Define Input: Sample name + completepep tuple
     def transdecodercomplete_pep = Transdecoder_complete.out.transdecodercomplete_pep
     def transdecodercomplete_pep_sampleid = Sample_name.join(transdecodercomplete_pep)
 
@@ -618,12 +642,21 @@ workflow {
     inputInterpro | Interproscan
 
     //Define Input: genomefasta 
-    Genomefasta = csv_channel.map { row -> file(row.Genome_fasta_path) }
-    BLASTntuple = csv_channel.map { row -> tuple(row.Sample_name, file(transdecodercomplete_cds), file(row.Genome_fasta_path), row.Genome_fasta_name) }
+    Genomefasta = csv_channel
+        .map { row -> file(row.Genome_fasta_path) }
+        .unique()
+        
+    BLASTntuple = Sample_name
+        .join(transdecodercomplete_cds)
+        .combine(GenomeBlastdatabasecreation.out.genomedb)
+        .combine(csv_channel.map { row -> tuple(row.Sample_name, row.Genome_fasta_name) })
+        .filter { it[0] == it[3] }
+        .map { sample, cds, genomedb, _sample2, genomename -> tuple(sample, cds, genomedb, genomename) }
+    
     //Run Process: BlastnGenome   
-
-    if (Genomefasta != 'NULL') {
-        Genomefasta | GenomeBlastdatabasecreation
-        BLASTntuple | GenomeBlasts
-    }
+    Genomefasta
+        .filter { it.name != 'NULL' && it.toString() != 'NULL' }
+        | GenomeBlastdatabasecreation
+    
+    BLASTntuple | GenomeBlasts
 }
