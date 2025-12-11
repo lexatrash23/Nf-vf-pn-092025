@@ -4,7 +4,7 @@ This document details what I have done to troubleshoot issues with the venomflow
 
 ## TO DO
 
-[ ] Fix interproscan and signalP
+[x] Fix interproscan and signalP
 [ ] Don't use combine, use metadata and tuples with join
 [ ] Change input to be able to take multiple samples 
 [ ] Make the process names more descriptive
@@ -71,6 +71,8 @@ Command error:
   BLAST Database error: No alias or index file found for protein database [unitox_curated] in search path [/tmp/nxf.4VffydRGHg:/blast/blastdb:/blast/blastdb_custom:]. Please verify the spelling of the BLAST database and its molecule type.
 ```
 
+For some reason the db files are not being staged into the work directory. 
+
 Also the busco container is failing to be mounted properly
 
 ```
@@ -79,3 +81,30 @@ FATAL:   container creation failed: mount /lineages->/lineages error: while moun
 cp: cannot stat '.command.trace': No such file or directory
 ```
 
+When I pulled the busco container locally, I found that the container is malformed :(
+
+```
+$ singularity exec busco_v5.8.2_cv1.sif busco
+Error processing line 1 of /n/home11/lei/.local/lib/python3.10/site-packages/matplotlib-3.7.1-py3.10-nspkg.pth:
+
+  Traceback (most recent call last):
+    File "/usr/local/lib/python3.10/site.py", line 195, in addpackage
+      exec(line)
+    File "<string>", line 1, in <module>
+    File "<frozen importlib._bootstrap>", line 568, in module_from_spec
+  AttributeError: 'NoneType' object has no attribute 'loader'
+
+Remainder of file ignored
+No module named 'pandas.compat'
+There was a problem installing BUSCO or importing one of its dependencies. See the user guide and the GitLab issue board (https://gitlab.com/ezlab/busco/issues) if you need further assistance.
+```
+
+Downloaded the latest version busco_v6.0.0_cv1.sif and busco works. 
+
+## 2025-12-11 - Lei
+
+Fixed the blast issue by changin the db name to `unitox_curated.fasta` from `unitox_curated`.
+
+Gave interproscan more memory in the nextflow.config file.
+
+Everything seems to be working now?

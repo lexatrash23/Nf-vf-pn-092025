@@ -67,7 +67,7 @@ process BUSCO_transcriptome_metazoa {
 
     errorStrategy 'ignore'
 
-    container "docker://ezlabgva/busco:v5.8.2_cv1"
+    container "docker://ezlabgva/busco:v6.0.0_cv1"
 
     publishDir "results/BUSCO/transcriptome/", mode: 'copy'
 
@@ -90,7 +90,7 @@ process BUSCO_transcriptome_mollusca {
 
     errorStrategy 'ignore'
 
-    container "docker://ezlabgva/busco:v5.8.2_cv1"
+    container "docker://ezlabgva/busco:v6.0.0_cv1"
 
     publishDir "results/BUSCO/transcriptome/", mode: 'copy'
 
@@ -168,7 +168,7 @@ process Blastdatabasecreation {
 // Process 8: Blastx
 process Blastx {
 
-    errorStrategy 'retry'
+    //errorStrategy 'retry'
     maxRetries 2
     cpus { task.attempt * 2 }
 
@@ -224,7 +224,7 @@ process BUSCO_translatome_metazoa {
 
     errorStrategy 'ignore'
 
-    container "docker://ezlabgva/busco:v5.8.2_cv1"
+    container "docker://ezlabgva/busco:v6.0.0_cv1"
 
     publishDir "results/BUSCO/translatome/", mode: 'copy'
 
@@ -248,7 +248,7 @@ process BUSCO_translatome_mollusca {
 
     errorStrategy 'ignore'
 
-    container "docker://ezlabgva/busco:v5.8.2_cv1"
+    container "docker://ezlabgva/busco:v6.0.0_cv1"
 
     publishDir "results/BUSCO/translatome/", mode: 'copy'
 
@@ -516,6 +516,8 @@ workflow {
     def TrinityR1R2 = trinity_fasta.combine(R1).combine(R2)
     def database_fasta = channel.fromPath(params.database_fasta)
     database_fasta | Blastdatabasecreation
+
+    Blastdatabasecreation.out.proteindb.view()
 
     Blastx(trinity_fasta, Blastdatabasecreation.out.proteindb)
 

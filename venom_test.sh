@@ -12,7 +12,8 @@ module load python
 # optionally, load your nextflow conda environment using the conda
 # source activate nextflow
 
-nextflow run main.nf -with-conda -profile cannon \
+nextflow run main.nf -profile cannon \
+    -resume \
     -with-timeline results/timeline.html \
     -with-report results/report.html \
     -with-trace results/trace.txt \
