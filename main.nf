@@ -2,7 +2,7 @@
 // Process 1: PostTrimFastqc
 process PostTrimFastqc {
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    conda "fastqc=0.12.1"
 
     input:
     tuple val(sample), path(R1), path(R2)
@@ -20,7 +20,7 @@ process PostTrimFastqc {
 process MultiQC {
     errorStrategy 'ignore'
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    conda "multiqc=1.33"
 
     publishDir "${sample}/results/Fastqc/posttrim/", mode: 'copy'
 
@@ -109,7 +109,7 @@ process BUSCO_transcriptome_mollusca {
 // Process 6: Kallisto_Trinity
 process Kallisto_Trinity {
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    conda "kallisto=0.51.1"
 
     publishDir "${sample}/results/kallisto/trinity/output", mode: 'copy'
 
@@ -145,7 +145,7 @@ process Kallisto_Trinity {
 process Blastdatabasecreation {
     errorStrategy 'ignore'
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    conda "blast=2.17.0"
 
     input:
     tuple val(sample), path(database_fasta)
@@ -166,7 +166,7 @@ process Blastx {
     maxRetries 2
     cpus { task.attempt * 2 }
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    conda "blast=2.17.0"
 
     publishDir "${sample}/results/Blast/Blastx/", mode: 'copy'
 
@@ -189,7 +189,7 @@ process Blastx {
 // Process 9: Transdecoder
 process Transdecoder {
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    conda "transdecoder=5.7.1"
 
     errorStrategy 'ignore'
 
@@ -266,7 +266,7 @@ process Kallisto_Transdecoder {
 
     errorStrategy 'ignore'
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    conda "kallisto=0.51.1"
 
     publishDir "${sample}/results/kallisto/transdecoder/output", mode: 'copy'
 
@@ -298,7 +298,7 @@ process Blastp {
 
     errorStrategy 'ignore'
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    conda "blast=2.17.0"
 
     publishDir "${sample}/results/Blast/Blastp/", mode: 'copy'
 
@@ -367,7 +367,7 @@ process SignalP {
 // Process 16: Filter2
 process Filter2 {
     errorStrategy 'ignore'
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    conda "seqkit=2.12.0"
 
     publishDir "${sample}/results/Transdecoder", mode: 'copy'
 
@@ -387,7 +387,7 @@ process Filter2 {
 // Process 17: STATS
 process stats {
     errorStrategy 'ignore'
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    conda "seqkit=2.12.0"
 
     publishDir "${sample}/results/Stats", mode: 'copy'
 
@@ -417,10 +417,7 @@ process Interproscan {
 
     publishDir "${sample}/results/Interproscan", mode: 'copy'
 
-    errorStrategy 'retry'
-    maxRetries 2
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+    errorStrategy 'ignore'
 
     input:
     tuple val(sample), path(Transdecoder_pep)
@@ -442,7 +439,7 @@ process Interproscan {
 // Process 19: GenomeBlastdatabasecreation
 process GenomeBlastdatabasecreation {
     errorStrategy 'ignore'
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    conda "blast=2.17.0"
 
     input:
     tuple val(sample), path(genome_fasta)
@@ -459,7 +456,7 @@ process GenomeBlastdatabasecreation {
 // Process 20: GenomeBlasts
 process GenomeBlasts {
     errorStrategy 'ignore'
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    conda "blast=2.17.0"
 
     publishDir "${sample}/results/Blast/Blastn/", mode: 'copy'
 
