@@ -63,7 +63,7 @@ process BUSCO_transcriptome_metazoa {
 
     errorStrategy 'ignore'
 
-    conda "${workflow.projectDir}/bin/Setup/busco.yaml"
+    conda "busco=6.0.0"
 
     publishDir "${sample}/results/BUSCO/transcriptome/", mode: 'copy'
 
@@ -86,7 +86,7 @@ process BUSCO_transcriptome_mollusca {
 
     errorStrategy 'ignore'
 
-    conda "${workflow.projectDir}/bin/Setup/busco.yaml"
+    conda "busco=6.0.0"
 
     publishDir "${sample}/results/BUSCO/transcriptome/", mode: 'copy'
 
@@ -217,7 +217,7 @@ process BUSCO_translatome_metazoa {
 
     errorStrategy 'ignore'
 
-    conda "${workflow.projectDir}/bin/Setup/busco.yaml"
+    conda "busco=6.0.0"
 
     publishDir "${sample}/results/BUSCO/translatome/", mode: 'copy'
 
@@ -241,7 +241,7 @@ process BUSCO_translatome_mollusca {
 
     errorStrategy 'ignore'
 
-    conda "${workflow.projectDir}/bin/Setup/busco.yaml"
+    conda "busco=6.0.0"
 
     publishDir "${sample}/results/BUSCO/translatome/", mode: 'copy'
 
