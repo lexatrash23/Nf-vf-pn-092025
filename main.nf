@@ -1,6 +1,7 @@
 #!/usr/bin/env nextflow
 // Process 1: PostTrimFastqc
 process PostTrimFastqc {
+    errorStrategy 'ignore'
 
     conda "fastqc=0.12.1"
 
@@ -22,7 +23,7 @@ process MultiQC {
 
     conda "multiqc=1.33"
 
-    publishDir "${sample}/results/Fastqc/posttrim/", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Fastqc/posttrim/", mode: 'copy'
 
     input:
     tuple val(sample), path(fastqc_zips)
@@ -40,10 +41,11 @@ process MultiQC {
 // Process 3: TrinityStats
 process TrinityStats {
 
+    errorStrategy 'ignore'
 
     conda "seqkit=2.12.0"
 
-    publishDir "${sample}/results/Stats/", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Stats/", mode: 'copy'
 
     input:
     tuple val(sample), path(trinity_fasta)
@@ -65,7 +67,7 @@ process BUSCO_transcriptome_metazoa {
 
     conda "busco=6.0.0"
 
-    publishDir "${sample}/results/BUSCO/transcriptome/", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/BUSCO/transcriptome/", mode: 'copy'
 
     input:
     tuple val(sample), path(trinity_fasta), path(metazoa)
@@ -88,7 +90,7 @@ process BUSCO_transcriptome_mollusca {
 
     conda "busco=6.0.0"
 
-    publishDir "${sample}/results/BUSCO/transcriptome/", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/BUSCO/transcriptome/", mode: 'copy'
 
     input:
     tuple val(sample), path(trinity_fasta), path(mollusca)
@@ -111,7 +113,7 @@ process Kallisto_Trinity {
 
     conda "kallisto=0.51.1"
 
-    publishDir "${sample}/results/kallisto/trinity/output", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/kallisto/trinity/output", mode: 'copy'
 
     errorStrategy 'retry'
     maxRetries 2
@@ -168,7 +170,7 @@ process Blastx {
 
     conda "blast=2.17.0"
 
-    publishDir "${sample}/results/Blast/Blastx/", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Blast/Blastx/", mode: 'copy'
 
     input:
     tuple val(sample), val(proteindbdbname), path(trinity_fasta), path(proteindb)
@@ -191,9 +193,7 @@ process Transdecoder {
 
     conda "transdecoder=5.7.1"
 
-    errorStrategy 'ignore'
-
-    publishDir "${sample}/results/Transdecoder", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Transdecoder", mode: 'copy'
 
     input:
     tuple val(sample), path(trinity_fasta)
@@ -219,7 +219,7 @@ process BUSCO_translatome_metazoa {
 
     conda "busco=6.0.0"
 
-    publishDir "${sample}/results/BUSCO/translatome/", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/BUSCO/translatome/", mode: 'copy'
 
     input:
     tuple val(sample), path(Transdecoder_pep), path(metazoa)
@@ -243,7 +243,7 @@ process BUSCO_translatome_mollusca {
 
     conda "busco=6.0.0"
 
-    publishDir "${sample}/results/BUSCO/translatome/", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/BUSCO/translatome/", mode: 'copy'
 
     input:
     tuple val(sample), path(Transdecoder_pep), path(mollusca)
@@ -268,7 +268,7 @@ process Kallisto_Transdecoder {
 
     conda "kallisto=0.51.1"
 
-    publishDir "${sample}/results/kallisto/transdecoder/output", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/kallisto/transdecoder/output", mode: 'copy'
 
     input:
     tuple val(sample), path(Transdecoder_cds), path(R1), path(R2), val(Strandedness)
@@ -300,7 +300,7 @@ process Blastp {
 
     conda "blast=2.17.0"
 
-    publishDir "${sample}/results/Blast/Blastp/", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Blast/Blastp/", mode: 'copy'
 
     input:
     tuple val(sample), path(Transdecoder_pep), path(proteindb), val(proteindbdbname)
@@ -325,7 +325,7 @@ process Transdecoder_complete {
 
     conda "seqkit=2.12.0"
 
-    publishDir "${sample}/results/Transdecoder", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Transdecoder", mode: 'copy'
 
     input:
     tuple val(sample), path(Transdecoder_pep), path(Transdecoder_cds)
@@ -347,7 +347,7 @@ process SignalP {
 
     errorStrategy 'ignore'
 
-    publishDir "${sample}/results/Signalp", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Signalp", mode: 'copy'
 
     input:
     tuple val(sample), path(transdecodercomplete_pep)
@@ -369,7 +369,7 @@ process Filter2 {
     errorStrategy 'ignore'
     conda "seqkit=2.12.0"
 
-    publishDir "${sample}/results/Transdecoder", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Transdecoder", mode: 'copy'
 
     input:
     tuple val(sample), path(maturesequences), path(transdecodercomplete_pep)
@@ -389,7 +389,7 @@ process stats {
     errorStrategy 'ignore'
     conda "seqkit=2.12.0"
 
-    publishDir "${sample}/results/Stats", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Stats", mode: 'copy'
 
     input:
     tuple val(sample), path(Transdecoder_pep), path(Transdecoder_cds), path(transdecodercomplete_pep), path(transdecodercomplete_cds), path(maturesequences), path(transdecoderpep_signalp)
@@ -412,10 +412,15 @@ process stats {
 
 // Process 18: Interproscan
 process Interproscan {
+   
+    errorStrategy 'retry'
+    maxRetries 2
+    cpus { task.attempt * 2 }
+    memory { task.attempt * 2.GB }
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
-    publishDir "${sample}/results/Interproscan", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Interproscan", mode: 'copy'
 
     input:
     tuple val(sample), path(Transdecoder_pep)
@@ -454,7 +459,7 @@ process GenomeBlasts {
     errorStrategy 'ignore'
     conda "blast=2.17.0"
 
-    publishDir "${sample}/results/Blast/Blastn/", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Blast/Blastn/", mode: 'copy'
 
     input:
     tuple val(sample), val(genomedbname), path(transdecodercompletecds), path(genomedb)
