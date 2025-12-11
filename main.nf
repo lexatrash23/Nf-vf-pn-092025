@@ -430,7 +430,7 @@ process Interproscan {
 
     interproscan.sh
       -goterms -i "${sample}.Trinity.fasta.transdecoder.cleaned.pep" 
-      -pa -t p -d ./ -f TSV
+      -pa -t p -d ./ -f TSV -verbose
     """
 }
 
