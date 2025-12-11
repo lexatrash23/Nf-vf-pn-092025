@@ -428,8 +428,7 @@ process Interproscan {
     """
     awk '{if (\$0 ~ /^>/) print \$0; else {gsub(/\\*/, ""); print \$0}}' ${Transdecoder_pep} > "${sample}.Trinity.fasta.transdecoder.cleaned.pep"
 
-    interproscan.sh -goterms -i "${sample}.Trinity.fasta.transdecoder.cleaned.pep" 
-      -pa -t p -d ./ -f TSV -verbose
+    interproscan.sh -goterms -i "${sample}.Trinity.fasta.transdecoder.cleaned.pep" -pa -t p -d ./ -f TSV 
     """
 }
 
