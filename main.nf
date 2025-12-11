@@ -264,7 +264,7 @@ process BUSCO_translatome_mollusca {
 // Process 12: Kallisto_Transdecoder
 process Kallisto_Transdecoder {
 
-    
+    errorStrategy 'ignore'
 
     conda "kallisto=0.51.1"
 
@@ -416,8 +416,6 @@ process Interproscan {
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "${sample}/results/Interproscan", mode: 'copy'
-
-    errorStrategy 'ignore'
 
     input:
     tuple val(sample), path(Transdecoder_pep)
