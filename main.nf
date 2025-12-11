@@ -264,7 +264,7 @@ process BUSCO_translatome_mollusca {
 // Process 12: Kallisto_Transdecoder
 process Kallisto_Transdecoder {
 
-    errorStrategy 'ignore'
+    
 
     conda "kallisto=0.51.1"
 
