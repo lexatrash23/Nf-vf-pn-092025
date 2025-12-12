@@ -14,10 +14,10 @@ def printhead() {
                                                                 
     ════════════════════════════════════════════════════════════
 
-    Author:                          ${workflow.author}
-    README:                          ${workflow.homePage}
-    Description:                     ${workflow.description}
-    Version:                         ${workflow.version}
+    Author:                          ${workflow.manifest.author}
+    README:                          ${workflow.manifest.homePage}
+    Description:                     ${workflow.manifest.description}
+    Version:                         ${workflow.manifest.version}
     Start:                           ${workflow.start}
 
     ────────────────────────────────────────────────────────────
