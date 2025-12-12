@@ -65,7 +65,7 @@ process BUSCO_transcriptome_metazoa {
 
     errorStrategy 'ignore'
 
-    conda "busco=6.0.0"
+    conda "busco=5.8.3"
 
     publishDir "${sample}/Venomflow/results/BUSCO/transcriptome/", mode: 'copy'
 
@@ -88,7 +88,7 @@ process BUSCO_transcriptome_mollusca {
 
     errorStrategy 'ignore'
 
-    conda "busco=6.0.0"
+    conda "busco=5.8.3"
 
     publishDir "${sample}/Venomflow/results/BUSCO/transcriptome/", mode: 'copy'
 
@@ -217,7 +217,7 @@ process BUSCO_translatome_metazoa {
 
     errorStrategy 'ignore'
 
-    conda "busco=6.0.0"
+    conda "busco=5.8.3"
 
     publishDir "${sample}/Venomflow/results/BUSCO/translatome/", mode: 'copy'
 
@@ -241,7 +241,7 @@ process BUSCO_translatome_mollusca {
 
     errorStrategy 'ignore'
 
-    conda "busco=6.0.0"
+    conda "busco=5.8.3"
 
     publishDir "${sample}/Venomflow/results/BUSCO/translatome/", mode: 'copy'
 
