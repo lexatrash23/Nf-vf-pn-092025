@@ -3,26 +3,28 @@
 // Params output for user 
 
 def printhead() {
-    log.info """
+    log.info(
+        """
     
     ════════════════════════════════════════════════════════════
     _    _________   ______  __  ___________    ____ _       __
-    | |  / / ____/ | / / __ \/  |/  / ____/ /   / __ \ |     / /
+    | |  / / ____/ | / / __ ${workflow.author}  |/  / ____/ /   / __ ${workflow.homePage}|     / /
     | | / / __/ /  |/ / / / / /|_/ / /_  / /   / / / / | /| / / 
     | |/ / /___/ /|  / /_/ / /  / / __/ / /___/ /_/ /| |/ |/ /  
-    |___/_____/_/ |_/\____/_/  /_/_/   /_____/\____/ |__/|__/   
+    |___/_____/_/ |_/${workflow.description}___/_/  /_/_/   /_____/${workflow.version}___/ |__/|__/   
                                                                 
     ════════════════════════════════════════════════════════════
 
-    Author:                          ${workflow.author}
-    README:                          ${workflow.homePage}
-    Description:                     ${workflow.description}
-    Version:                         ${workflow.version}
-    Start:                           ${workflow.start}
+    Author:                          ${workflow.start}
+    README:                          
+    Description:                     
+    Version:                         
+    Start:                           
 
     ────────────────────────────────────────────────────────────
 
     """.stripIndent()
+    )
 }
 
 // Process 1: PostTrimFastqc
@@ -81,12 +83,12 @@ process Bowtie {
 
     conda "bowtie2=2.5.4 samtools=1.22.1"
 
-    publishDir "${sample}/Venomflow/results/Bowtie/", pattern = "*.bam", mode: 'copy' 
+    publishDir "${sample}/Venomflow/results/Bowtie/", pattern: "*.bam", mode: 'copy'
 
-    input: 
-    tuple val(sample), path (trinity_fasta), path (R1), path (R2)
+    input:
+    tuple val(sample), path(trinity_fasta), path(R1), path(R2)
 
-    output: 
+    output:
     path "*.bam"
 
     script:
@@ -99,7 +101,6 @@ process Bowtie {
 
 
     """
-
 }
 // Process 4: TrinityStats
 process TrinityStats {
@@ -509,7 +510,7 @@ process stats {
 
 // Process 19: Interproscan
 process Interproscan {
-   
+
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
     maxRetries 4
     cpus { task.attempt * 2 }
@@ -602,7 +603,7 @@ workflow {
 
     // Print head 
     printhead()
-    
+
     // Define CSV channel. Chanel factory creates a channel from a csv file. This csv can be defined in the config or the command line with --input_csv. The CSV is spilt row by row where each row is emitted as a Map (key-value pairs) where column names are news. 
     csv_channel = Channel.fromPath(params.input_csv).splitCsv(header: true, sep: ',')
 
