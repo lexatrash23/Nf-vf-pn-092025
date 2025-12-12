@@ -3,26 +3,24 @@
 // Params output for user 
 
 def printhead() {
-    log.info """
-    
-    ════════════════════════════════════════════════════════════
-    _    _________   ______  __  ___________    ____ _       __
-    | |  / / ____/ | / / __ \/  |/  / ____/ /   / __ \ |     / /
-    | | / / __/ /  |/ / / / / /|_/ / /_  / /   / / / / | /| / / 
-    | |/ / /___/ /|  / /_/ / /  / / __/ / /___/ /_/ /| |/ |/ /  
-    |___/_____/_/ |_/\____/_/  /_/_/   /_____/\____/ |__/|__/   
-                                                                
-    ════════════════════════════════════════════════════════════
-
-    Author:                          ${workflow.manifest.author}
-    README:                          ${workflow.manifest.homePage}
-    Description:                     ${workflow.manifest.description}
-    Version:                         ${workflow.manifest.version}
-    Start:                           ${workflow.start}
-
-    ────────────────────────────────────────────────────────────
-
-    """.stripIndent()
+    log.info ""
+    log.info "════════════════════════════════════════════════════════════"
+    log.info "_    _________   ______  __  ___________    ____ _       __"
+    log.info "| |  / / ____/ | / / __ \\/  |/  / ____/ /   / __ \\ |     / /"
+    log.info "| | / / __/ /  |/ / / / / /|_/ / /_  / /   / / / / | /| / /"
+    log.info "| |/ / /___/ /|  / /_/ / /  / / __/ / /___/ /_/ /| |/ |/ /"
+    log.info "|___/_____/_/ |_/\\____/_/  /_/_/   /_____/\\____/ |__/|__/"
+    log.info ""
+    log.info "════════════════════════════════════════════════════════════"
+    log.info ""
+    log.info "Author:                          ${workflow.manifest.author}"
+    log.info "README:                          ${workflow.manifest.homePage}"
+    log.info "Description:                     ${workflow.manifest.description}"
+    log.info "Version:                         ${workflow.manifest.version}"
+    log.info "Start:                           ${workflow.start}"
+    log.info ""
+    log.info "────────────────────────────────────────────────────────────"
+    log.info ""
 }
 
 // Process 1: PostTrimFastqc
