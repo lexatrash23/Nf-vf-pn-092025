@@ -38,7 +38,33 @@ process MultiQC {
     """
 }
 
-// Process 3: TrinityStats
+// Process 3: Bowtie build and index 
+process Bowtie {
+    errorStrategy 'ignore'
+
+    conda "bowtie2=2.5.4 samtools=1.22.1"
+
+    publishDir "${sample}/Venomflow/results/Bowtie/", pattern = "*.bam", mode: 'copy' 
+
+    input: 
+    tuple val(sample), path (trinity_fasta), path (R1), path (R2)
+
+    output: 
+    path "*.bam"
+
+    script:
+
+    """
+    bowtie2-build ${trinity_fasta} ${sample}_transcriptome_index
+    bowtie2 -x ${sample}_transcriptome_index -1 ${R1} -2 ${R2} -S ${sample}_mapped_reads.sam -p 8 --no-unal
+    samtools view -bS ${sample}_mapped_reads.sam | samtools sort -o ${sample}_mapped_reads.bam
+
+
+
+    """
+
+}
+// Process 4: TrinityStats
 process TrinityStats {
 
     errorStrategy 'ignore'
@@ -60,7 +86,7 @@ process TrinityStats {
 
     """
 }
-// Process 4: BUSCO_transcriptome_metazoa
+// Process 5: BUSCO_transcriptome_metazoa
 process BUSCO_transcriptome_metazoa {
 
     errorStrategy 'ignore'
@@ -83,7 +109,7 @@ process BUSCO_transcriptome_metazoa {
     """
 }
 
-// Process 5: BUSCO_transcriptome_mollusca
+// Process 6: BUSCO_transcriptome_mollusca
 process BUSCO_transcriptome_mollusca {
 
     errorStrategy 'ignore'
@@ -108,7 +134,7 @@ process BUSCO_transcriptome_mollusca {
 
 
 
-// Process 6: Kallisto_Trinity
+// Process 7: Kallisto_Trinity
 process Kallisto_Trinity {
 
     conda "kallisto=0.51.1"
@@ -143,7 +169,7 @@ process Kallisto_Trinity {
     """
 }
 
-// Process 7: Blastdatabasecreation
+// Process 8: Blastdatabasecreation
 process Blastdatabasecreation {
     errorStrategy 'ignore'
 
@@ -161,7 +187,7 @@ process Blastdatabasecreation {
     """
 }
 
-// Process 8: Blastx
+// Process 9: Blastx
 process Blastx {
 
     errorStrategy 'retry'
@@ -188,7 +214,7 @@ process Blastx {
     """
 }
 
-// Process 9: Transdecoder
+// Process 10: Transdecoder
 process Transdecoder {
 
     conda "transdecoder=5.7.1"
@@ -211,7 +237,7 @@ process Transdecoder {
     """
 }
 
-// Process 10: BUSCO_translatome_metazoa
+// Process 11: BUSCO_translatome_metazoa
 process BUSCO_translatome_metazoa {
 
 
@@ -236,7 +262,7 @@ process BUSCO_translatome_metazoa {
     """
 }
 
-// Process 11: BUSCO_translatome_mollusca
+// Process 12: BUSCO_translatome_mollusca
 process BUSCO_translatome_mollusca {
 
     errorStrategy 'ignore'
@@ -261,7 +287,7 @@ process BUSCO_translatome_mollusca {
 }
 
 
-// Process 12: Kallisto_Transdecoder
+// Process 13: Kallisto_Transdecoder
 process Kallisto_Transdecoder {
 
     errorStrategy 'ignore'
@@ -293,7 +319,7 @@ process Kallisto_Transdecoder {
     """
 }
 
-// Process 13: Blastp
+// Process 14: Blastp
 process Blastp {
 
     errorStrategy 'ignore'
@@ -318,7 +344,7 @@ process Blastp {
     """
 }
 
-// Process 14: Transdecoder_complete
+// Process 15: Transdecoder_complete
 process Transdecoder_complete {
 
     errorStrategy 'ignore'
@@ -342,7 +368,7 @@ process Transdecoder_complete {
     """
 }
 
-// Process 15: SignalP
+// Process 16: SignalP
 process SignalP {
 
     errorStrategy 'ignore'
@@ -364,7 +390,7 @@ process SignalP {
     """
 }
 
-// Process 16: Filter2
+// Process 17: Filter2
 process Filter2 {
     errorStrategy 'ignore'
     conda "seqkit=2.12.0"
@@ -384,7 +410,7 @@ process Filter2 {
     """
 }
 
-// Process 17: STATS
+// Process 18: STATS
 process stats {
     errorStrategy 'ignore'
     conda "seqkit=2.12.0"
@@ -410,7 +436,7 @@ process stats {
     """
 }
 
-// Process 18: Interproscan
+// Process 19: Interproscan
 process Interproscan {
    
     errorStrategy 'retry'
@@ -437,7 +463,7 @@ process Interproscan {
     """
 }
 
-// Process 19: GenomeBlastdatabasecreation
+// Process 20: GenomeBlastdatabasecreation
 process GenomeBlastdatabasecreation {
     errorStrategy 'ignore'
     conda "blast=2.17.0"
@@ -454,7 +480,7 @@ process GenomeBlastdatabasecreation {
     """
 }
 
-// Process 20: GenomeBlasts
+// Process 21: GenomeBlasts
 process GenomeBlasts {
     errorStrategy 'ignore'
     conda "blast=2.17.0"
@@ -482,7 +508,7 @@ process GenomeBlasts {
 
 
 
-// PARAMETERS DEFINED IN CONFIG FILE
+// PARAMETERS DEFINED IN CONFIG AND SAMPLESHEET FILE
 
 //WorkFlow
 
