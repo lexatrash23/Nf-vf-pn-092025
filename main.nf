@@ -1,7 +1,35 @@
 #!/usr/bin/env nextflow
+
+// Params output for user 
+
+def printhead() {
+    log.info """
+    
+    ════════════════════════════════════════════════════════════
+    _    _________   ______  __  ___________    ____ _       __
+    | |  / / ____/ | / / __ \/  |/  / ____/ /   / __ \ |     / /
+    | | / / __/ /  |/ / / / / /|_/ / /_  / /   / / / / | /| / / 
+    | |/ / /___/ /|  / /_/ / /  / / __/ / /___/ /_/ /| |/ |/ /  
+    |___/_____/_/ |_/\____/_/  /_/_/   /_____/\____/ |__/|__/   
+                                                                
+    ════════════════════════════════════════════════════════════
+
+    Author:                          ${workflow.author}
+    README:                          ${workflow.homePage}
+    Description:                     ${workflow.description}
+    Version:                         ${workflow.version}
+    Start:                           ${workflow.start}
+
+    ────────────────────────────────────────────────────────────
+
+    """.stripIndent()
+}
+
 // Process 1: PostTrimFastqc
 process PostTrimFastqc {
     errorStrategy 'ignore'
+
+    label 'process_low'
 
     conda "fastqc=0.12.1"
 
@@ -20,6 +48,8 @@ process PostTrimFastqc {
 // Process 2: MultiQC
 process MultiQC {
     errorStrategy 'ignore'
+
+    label 'process_single'
 
     conda "multiqc=1.33"
 
@@ -40,7 +70,14 @@ process MultiQC {
 
 // Process 3: Bowtie build and index 
 process Bowtie {
-    errorStrategy 'ignore'
+
+    label 'process_high'
+    label 'process_long'
+
+    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    maxRetries 4
+    cpus { task.attempt * 2 }
+    memory { task.attempt * 2.GB }
 
     conda "bowtie2=2.5.4 samtools=1.22.1"
 
@@ -69,6 +106,8 @@ process TrinityStats {
 
     errorStrategy 'ignore'
 
+    label 'process_single'
+
     conda "seqkit=2.12.0"
 
     publishDir "${sample}/Venomflow/results/Stats/", mode: 'copy'
@@ -90,6 +129,8 @@ process TrinityStats {
 process BUSCO_transcriptome_metazoa {
 
     errorStrategy 'ignore'
+
+    label 'process_low'
 
     conda "busco=6.0.3"
 
@@ -113,6 +154,8 @@ process BUSCO_transcriptome_metazoa {
 process BUSCO_transcriptome_mollusca {
 
     errorStrategy 'ignore'
+
+    label 'process_low'
 
     conda "busco=6.0.3"
 
@@ -139,10 +182,13 @@ process Kallisto_Trinity {
 
     conda "kallisto=0.51.1"
 
+    label 'process_low'
+    label 'process_long'
+
     publishDir "${sample}/Venomflow/results/kallisto/trinity/output", mode: 'copy'
 
-    errorStrategy 'retry'
-    maxRetries 2
+    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
 
@@ -173,6 +219,8 @@ process Kallisto_Trinity {
 process Blastdatabasecreation {
     errorStrategy 'ignore'
 
+    label 'process_single'
+
     conda "blast=2.17.0"
 
     input:
@@ -190,9 +238,13 @@ process Blastdatabasecreation {
 // Process 9: Blastx
 process Blastx {
 
-    errorStrategy 'retry'
-    maxRetries 2
+    label 'process_medium'
+    label 'process_long'
+
+    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    maxRetries 4
     cpus { task.attempt * 2 }
+    memory { task.attempt * 2.GB }
 
     conda "blast=2.17.0"
 
@@ -217,6 +269,8 @@ process Blastx {
 // Process 10: Transdecoder
 process Transdecoder {
 
+    label 'process_single'
+
     conda "transdecoder=5.7.1"
 
     publishDir "${sample}/Venomflow/results/Transdecoder", mode: 'copy'
@@ -240,6 +294,7 @@ process Transdecoder {
 // Process 11: BUSCO_translatome_metazoa
 process BUSCO_translatome_metazoa {
 
+    label 'process_medium'
 
     errorStrategy 'ignore'
 
@@ -264,6 +319,8 @@ process BUSCO_translatome_metazoa {
 
 // Process 12: BUSCO_translatome_mollusca
 process BUSCO_translatome_mollusca {
+
+    label 'process_medium'
 
     errorStrategy 'ignore'
 
@@ -291,6 +348,8 @@ process BUSCO_translatome_mollusca {
 process Kallisto_Transdecoder {
 
     errorStrategy 'ignore'
+
+    label 'process_medium'
 
     conda "kallisto=0.51.1"
 
@@ -324,6 +383,8 @@ process Blastp {
 
     errorStrategy 'ignore'
 
+    label 'process_low'
+
     conda "blast=2.17.0"
 
     publishDir "${sample}/Venomflow/results/Blast/Blastp/", mode: 'copy'
@@ -349,6 +410,8 @@ process Transdecoder_complete {
 
     errorStrategy 'ignore'
 
+    label 'process_single'
+
     conda "seqkit=2.12.0"
 
     publishDir "${sample}/Venomflow/results/Transdecoder", mode: 'copy'
@@ -373,6 +436,8 @@ process SignalP {
 
     errorStrategy 'ignore'
 
+    label 'process_low'
+
     publishDir "${sample}/Venomflow/results/Signalp", mode: 'copy'
 
     input:
@@ -393,6 +458,9 @@ process SignalP {
 // Process 17: Filter2
 process Filter2 {
     errorStrategy 'ignore'
+
+    label 'process_single'
+
     conda "seqkit=2.12.0"
 
     publishDir "${sample}/Venomflow/results/Transdecoder", mode: 'copy'
@@ -413,6 +481,9 @@ process Filter2 {
 // Process 18: STATS
 process stats {
     errorStrategy 'ignore'
+
+    label 'process_single'
+
     conda "seqkit=2.12.0"
 
     publishDir "${sample}/Venomflow/results/Stats", mode: 'copy'
@@ -439,10 +510,13 @@ process stats {
 // Process 19: Interproscan
 process Interproscan {
    
-    errorStrategy 'retry'
-    maxRetries 2
+    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
+
+    label 'process_high'
+    label 'process_long'
 
     conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
@@ -465,8 +539,12 @@ process Interproscan {
 
 // Process 20: GenomeBlastdatabasecreation
 process GenomeBlastdatabasecreation {
+
     errorStrategy 'ignore'
+
     conda "blast=2.17.0"
+
+    label 'process_single'
 
     input:
     tuple val(sample), path(genome_fasta)
@@ -482,8 +560,16 @@ process GenomeBlastdatabasecreation {
 
 // Process 21: GenomeBlasts
 process GenomeBlasts {
-    errorStrategy 'ignore'
+
+    label 'process_high'
+    label 'process_long'
+
     conda "blast=2.17.0"
+
+    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    maxRetries 4
+    cpus { task.attempt * 2 }
+    memory { task.attempt * 2.GB }
 
     publishDir "${sample}/Venomflow/results/Blast/Blastn/", mode: 'copy'
 
@@ -513,6 +599,10 @@ process GenomeBlasts {
 //WorkFlow
 
 workflow {
+
+    // Print head 
+    printhead()
+    
     // Define CSV channel. Chanel factory creates a channel from a csv file. This csv can be defined in the config or the command line with --input_csv. The CSV is spilt row by row where each row is emitted as a Map (key-value pairs) where column names are news. 
     csv_channel = Channel.fromPath(params.input_csv).splitCsv(header: true, sep: ',')
 
