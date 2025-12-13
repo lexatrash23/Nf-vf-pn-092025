@@ -79,7 +79,9 @@ process Bowtie {
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
 
-    conda "bowtie2=2.5.4 samtools=1.22.1"
+    conda "bowtie2=2.5.4"
+    container "docker://biocontainers/io/biocontainers/bowtie2:v2.4.1_cv1
+"
 
     publishDir "${sample}/Venomflow/results/Bowtie/", pattern: "*.log", mode: 'copy'
 
@@ -107,6 +109,7 @@ process TrinityStats {
     label 'process_single'
 
     conda "seqkit=2.12.0"
+    container "docker://gfanz/seqkit"
 
     publishDir "${sample}/Venomflow/results/Stats/", mode: 'copy'
 
@@ -131,6 +134,8 @@ process BUSCO_transcriptome_metazoa {
     label 'process_low'
 
     conda "busco=5.8.3"
+    container "docker://ezlabgva/busco:v5.8.2_cv1"
+    
 
     publishDir "${sample}/Venomflow/results/BUSCO/transcriptome/", mode: 'copy'
 
@@ -156,6 +161,7 @@ process BUSCO_transcriptome_mollusca {
     label 'process_low'
 
     conda "busco=5.8.3"
+    container "docker://ezlabgva/busco:v5.8.2_cv1"
 
     publishDir "${sample}/Venomflow/results/BUSCO/transcriptome/", mode: 'copy'
 
@@ -179,6 +185,8 @@ process BUSCO_transcriptome_mollusca {
 process Kallisto_Trinity {
 
     conda "kallisto=0.51.1"
+    container "docker://quay.io/biocontainers/kallisto:0.51.1--h2b92561_2"
+    
 
     label 'process_low'
     label 'process_long'
@@ -220,6 +228,7 @@ process Blastdatabasecreation {
     label 'process_single'
 
     conda "blast=2.17.0"
+    container "docker://ncbi/blast:2.17.0"
 
     input:
     tuple val(sample), path(database_fasta)
@@ -245,6 +254,7 @@ process Blastx {
     memory { task.attempt * 2.GB }
 
     conda "blast=2.17.0"
+    container "docker://ncbi/blast:2.17.0"
 
     publishDir "${sample}/Venomflow/results/Blast/Blastx/", mode: 'copy'
 
@@ -270,6 +280,7 @@ process Transdecoder {
     label 'process_single'
 
     conda "transdecoder=5.7.1"
+    container "docker://biocontainers/transdecoder:v5.0.1-2-deb_cv1"
 
     publishDir "${sample}/Venomflow/results/Transdecoder", mode: 'copy'
 
@@ -297,6 +308,8 @@ process BUSCO_translatome_metazoa {
     errorStrategy 'ignore'
 
     conda "busco=5.8.3"
+    container "docker://ezlabgva/busco:v5.8.2_cv1"
+    
 
     publishDir "${sample}/Venomflow/results/BUSCO/translatome/", mode: 'copy'
 
@@ -323,6 +336,7 @@ process BUSCO_translatome_mollusca {
     errorStrategy 'ignore'
 
     conda "busco=5.8.3"
+    container "docker://ezlabgva/busco:v5.8.2_cv1"
 
     publishDir "${sample}/Venomflow/results/BUSCO/translatome/", mode: 'copy'
 
@@ -350,6 +364,7 @@ process Kallisto_Transdecoder {
     label 'process_medium'
 
     conda "kallisto=0.51.1"
+    container "docker://quay.io/biocontainers/kallisto:0.51.1--h2b92561_2"
 
     publishDir "${sample}/Venomflow/results/kallisto/transdecoder/output", mode: 'copy'
 
@@ -384,6 +399,7 @@ process Blastp {
     label 'process_low'
 
     conda "blast=2.17.0"
+    container "docker://ncbi/blast:2.17.0"
 
     publishDir "${sample}/Venomflow/results/Blast/Blastp/", mode: 'copy'
 
@@ -411,6 +427,7 @@ process Transdecoder_complete {
     label 'process_single'
 
     conda "seqkit=2.12.0"
+    container "docker://gfanz/seqkit"
 
     publishDir "${sample}/Venomflow/results/Transdecoder", mode: 'copy'
 
@@ -460,6 +477,7 @@ process Filter2 {
     label 'process_single'
 
     conda "seqkit=2.12.0"
+    container "docker://gfanz/seqkit"
 
     publishDir "${sample}/Venomflow/results/Transdecoder", mode: 'copy'
 
@@ -483,6 +501,7 @@ process stats {
     label 'process_single'
 
     conda "seqkit=2.12.0"
+    container "docker://gfanz/seqkit"
 
     publishDir "${sample}/Venomflow/results/Stats", mode: 'copy'
 
@@ -516,8 +535,6 @@ process Interproscan {
     label 'process_high'
     label 'process_long'
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
-
     publishDir "${sample}/Venomflow/results/Interproscan", mode: 'copy'
 
     input:
@@ -541,6 +558,7 @@ process GenomeBlastdatabasecreation {
     errorStrategy 'ignore'
 
     conda "blast=2.17.0"
+    container "docker://ncbi/blast:2.17.0"
 
     label 'process_single'
 
@@ -563,6 +581,7 @@ process GenomeBlasts {
     label 'process_long'
 
     conda "blast=2.17.0"
+    container "docker://ncbi/blast:2.17.0"
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
     maxRetries 4
