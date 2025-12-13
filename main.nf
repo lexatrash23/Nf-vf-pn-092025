@@ -87,14 +87,13 @@ process Bowtie {
     tuple val(sample), path(trinity_fasta), path(R1), path(R2)
 
     output:
-    path "*.bam"
+    path "*.log"
 
     script:
 
     """
     bowtie2-build ${trinity_fasta} ${sample}_transcriptome_index
-    bowtie2 -x ${sample}_transcriptome_index -1 ${R1} -2 ${R2} -S ${sample}_mapped_reads.sam -p 8 --no-unal
-    samtools view -bS ${sample}_mapped_reads.sam | samtools sort -o ${sample}_mapped_reads.bam
+    bowtie2 -x ${sample}_transcriptome_index -1 ${R1} -2 ${R2} -S ${sample}_mapped_reads.sam -p 8 --no-unal 2> stats.log
 
 
 
@@ -627,13 +626,13 @@ workflow {
     input_trinity_fasta | TrinityStats
 
     //Define Input: Trinity Fasta + BUSCOlin1 tuple 
-    input_BUSCOlin1 = csv_channel.map { row -> tuple(row.Sample_name, file(row.Trinity_fasta), file(row.BUSCO_lin1)) }
+    input_BUSCOlin1 = csv_channel.map { row -> tuple(row.Sample_name, file(row.Trinity_fasta), row.BUSCO_lin1) }
 
     //Run Process: BUSCO_lin1
     input_BUSCOlin1 | BUSCO_transcriptome_metazoa
 
     //Define Input: Trinity Fasta + BUSCOlin2 tuple 
-    input_BUSCOlin2 = csv_channel.map { row -> tuple(row.Sample_name, file(row.Trinity_fasta), file(row.BUSCO_lin2)) }
+    input_BUSCOlin2 = csv_channel.map { row -> tuple(row.Sample_name, file(row.Trinity_fasta), row.BUSCO_lin2) }
 
     //Run Process: BUSCO_lin2
     input_BUSCOlin2 | BUSCO_transcriptome_mollusca
