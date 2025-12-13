@@ -602,7 +602,7 @@ workflow {
     printhead()
     
     // Define CSV channel. Chanel factory creates a channel from a csv file. This csv can be defined in the config or the command line with --input_csv. The CSV is spilt row by row where each row is emitted as a Map (key-value pairs) where column names are news. 
-    csv_channel = Channel.fromPath(params.input_csv).splitCsv(header: true, sep: ',')
+    csv_channel = Channel.fromPath(params.input_csv).splitCsv(header: true, sep: ',').filter { row -> row.Sample_name }
 
     // Define Input: Paired Trimmed reads Tuple. Extracts as tuple the sample name and the trimmed reads
     input_R1R2 = csv_channel.map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2)) }
