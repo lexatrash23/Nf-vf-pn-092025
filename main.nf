@@ -81,7 +81,7 @@ process Bowtie {
 
     conda "bowtie2=2.5.4 samtools=1.22.1"
 
-    publishDir "${sample}/Venomflow/results/Bowtie/", pattern: "*.bam", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Bowtie/", pattern: "*.log", mode: 'copy'
 
     input:
     tuple val(sample), path(trinity_fasta), path(R1), path(R2)
