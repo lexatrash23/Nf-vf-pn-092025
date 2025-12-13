@@ -5,7 +5,7 @@
 // Process 1: PostTrimFastqc
 process PostTrimFastqc {
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    container "docker://biocontainers/fastqc:v0.11.9_cv8"
 
     input:
     tuple path(R1), path(R2)
@@ -24,7 +24,7 @@ process PostTrimFastqc {
 process MultiQC {
     errorStrategy 'ignore'
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    container "docker://multiqc/multiqc:v1.32"
 
     publishDir "results/Fastqc/posttrim/", mode: 'copy'
 
@@ -45,7 +45,7 @@ process MultiQC {
 process TrinityStats {
 
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    conda "seqkit=2.10.1"
 
     publishDir "results/Stats/", mode: 'copy'
 
@@ -67,7 +67,7 @@ process BUSCO_transcriptome_metazoa {
 
     errorStrategy 'ignore'
 
-    conda "${workflow.projectDir}/bin/Setup/busco.yaml"
+    container "docker://ezlabgva/busco:v6.0.0_cv1"
 
     publishDir "results/BUSCO/transcriptome/", mode: 'copy'
 
@@ -90,7 +90,7 @@ process BUSCO_transcriptome_mollusca {
 
     errorStrategy 'ignore'
 
-    conda "${workflow.projectDir}/bin/Setup/busco.yaml"
+    container "docker://ezlabgva/busco:v6.0.0_cv1"
 
     publishDir "results/BUSCO/transcriptome/", mode: 'copy'
 
@@ -113,7 +113,7 @@ process BUSCO_transcriptome_mollusca {
 // Process 6: Kallisto_Trinity
 process Kallisto_Trinity {
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    container "docker://quay.io/biocontainers/kallisto:0.51.1--h2b92561_2"
 
     publishDir "results/kallisto/trinity/output", mode: 'copy'
 
@@ -149,7 +149,7 @@ process Kallisto_Trinity {
 process Blastdatabasecreation {
     errorStrategy 'ignore'
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    container "docker://ncbi/blast:2.17.0"
 
     input:
     path database_fasta
@@ -168,11 +168,11 @@ process Blastdatabasecreation {
 // Process 8: Blastx
 process Blastx {
 
-    errorStrategy 'retry'
+    //errorStrategy 'retry'
     maxRetries 2
     cpus { task.attempt * 2 }
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    container "docker://ncbi/blast:2.17.0"
 
     publishDir "results/Blast/Blastx/", mode: 'copy'
 
@@ -196,9 +196,9 @@ process Blastx {
 // Process 9: Transdecoder
 process Transdecoder {
 
-    errorStrategy 'ignore'
+    container "docker://trinityrnaseq/transdecoder"
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    errorStrategy 'ignore'
 
     publishDir "results/Transdecoder", mode: 'copy'
 
@@ -212,8 +212,8 @@ process Transdecoder {
     script:
 
     """
-    ${params.TRANSDECODER_PATH}/TransDecoder.LongOrfs -t ${trinity_fasta}
-    ${params.TRANSDECODER_PATH}/TransDecoder.Predict -t ${trinity_fasta}
+    TransDecoder.LongOrfs -t ${trinity_fasta}
+    TransDecoder.Predict -t ${trinity_fasta}
 
     """
 }
@@ -224,7 +224,7 @@ process BUSCO_translatome_metazoa {
 
     errorStrategy 'ignore'
 
-    conda "${workflow.projectDir}/bin/Setup/busco.yaml"
+    container "docker://ezlabgva/busco:v6.0.0_cv1"
 
     publishDir "results/BUSCO/translatome/", mode: 'copy'
 
@@ -248,7 +248,7 @@ process BUSCO_translatome_mollusca {
 
     errorStrategy 'ignore'
 
-    conda "${workflow.projectDir}/bin/Setup/busco.yaml"
+    container "docker://ezlabgva/busco:v6.0.0_cv1"
 
     publishDir "results/BUSCO/translatome/", mode: 'copy'
 
@@ -273,7 +273,7 @@ process Kallisto_Transdecoder {
 
     errorStrategy 'ignore'
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    container "docker://quay.io/biocontainers/kallisto:0.51.1--h2b92561_2"
 
     publishDir "results/kallisto/transdecoder/output", mode: 'copy'
 
@@ -305,7 +305,7 @@ process Blastp {
 
     errorStrategy 'ignore'
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    container "docker://ncbi/blast:2.17.0"
 
     publishDir "results/Blast/Blastp/", mode: 'copy'
 
@@ -331,7 +331,7 @@ process Transdecoder_complete {
 
     errorStrategy 'ignore'
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    conda "seqkit=2.10.1"
 
     publishDir "results/Transdecoder", mode: 'copy'
 
@@ -355,7 +355,7 @@ process SignalP {
 
     errorStrategy 'ignore'
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    //conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Signalp", mode: 'copy'
 
@@ -370,22 +370,15 @@ process SignalP {
 
 
     """
-    CURRENT_WORK_DIR="\$PWD"
-    echo "\$CURRENT_WORK_DIR"
-    input_abs_path=\$(readlink -f "${transdecodercomplete_pep}")
-    cd ${params.SIGNALP_PATH}
-    ./signalp -fasta "\$input_abs_path" -mature -prefix "${params.Sample_name}"
-    echo "\$CURRENT_WORK_DIR"
-    mv "${params.Sample_name}_mature.fasta" "\$CURRENT_WORK_DIR"
-    mv "${params.Sample_name}_summary.signalp5" "\$CURRENT_WORK_DIR"
-    echo "\$CURRENT_WORK_DIR"
+    signalp -fasta ${transdecodercomplete_pep} -mature -prefix "${params.Sample_name}"
     """
 }
 
 // Process 16: Filter2
 process Filter2 {
     errorStrategy 'ignore'
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    
+    conda "seqkit=2.10.1"
 
     publishDir "results/Transdecoder", mode: 'copy'
 
@@ -405,7 +398,8 @@ process Filter2 {
 // Process 17: STATS
 process stats {
     errorStrategy 'ignore'
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    
+    conda "seqkit=2.10.1"
 
     publishDir "results/Stats", mode: 'copy'
 
@@ -423,7 +417,7 @@ process stats {
     seqkit stats ${transdecodercomplete_pep} > ${params.Sample_name}_complete_pep.stats.txt
     seqkit stats ${transdecodercomplete_cds} > ${params.Sample_name}_transdecodercomplete_cds.stats.txt
     seqkit stats ${maturesequences} > ${params.Sample_name}_maturesequences.stats.txt
-        seqkit stats ${transdecoderpep_signalp} > ${params.Sample_name}_transdecoderpep_signalp.stats.txt
+    seqkit stats ${transdecoderpep_signalp} > ${params.Sample_name}_transdecoderpep_signalp.stats.txt
     
     """
 }
@@ -431,7 +425,7 @@ process stats {
 // Process 18: Interproscan
 process Interproscan {
 
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    //conda "${workflow.projectDir}/bin/Setup/VF.yaml"
 
     publishDir "results/Interproscan", mode: 'copy'
 
@@ -451,7 +445,7 @@ process Interproscan {
     """
     awk '{if (\$0 ~ /^>/) print \$0; else {gsub(/\\*/, ""); print \$0}}' ${Transdecoder_pep} > "${params.Sample_name}.Trinity.fasta.transdecoder.cleaned.pep"
 
-    ${params.INTERPROSCAN_PATH} \
+    interproscan.sh \
       -goterms \
       -i "${params.Sample_name}.Trinity.fasta.transdecoder.cleaned.pep" \
       -pa -t p -d ./ -f TSV
@@ -461,7 +455,8 @@ process Interproscan {
 // Process 19: GenomeBlastdatabasecreation
 process GenomeBlastdatabasecreation {
     errorStrategy 'ignore'
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    
+    container "docker://ncbi/blast:2.17.0"
 
     input:
     path genome_fasta
@@ -480,7 +475,8 @@ process GenomeBlastdatabasecreation {
 // Process 20: GenomeBlasts
 process GenomeBlasts {
     errorStrategy 'ignore'
-    conda "${workflow.projectDir}/bin/Setup/VF.yaml"
+    
+    container "docker://ncbi/blast:2.17.0"
 
     publishDir "results/Blast/Blastn/", mode: 'copy'
 
@@ -500,33 +496,28 @@ process GenomeBlasts {
     """
 }
 
-
-
-
-
-
-
 // PARAMETERS DEFINED IN CONFIG FILE
 
 //WorkFlow
 
 workflow {
 
-    def R1 = Channel.fromPath(params.R1)
-    def R2 = Channel.fromPath(params.R2)
+    def R1 = channel.fromPath(params.R1)
+    def R2 = channel.fromPath(params.R2)
     def R1R2 = R1.combine(R2)
-    def trinity_fasta = Channel.fromPath(params.trinity_fasta)
+    def trinity_fasta = channel.fromPath(params.trinity_fasta)
     R1R2 | PostTrimFastqc
 
     def fastqc_zips = PostTrimFastqc.out.fastqc_zips
-    def metazoa = Channel.fromPath(params.metazoa)
-    def mollusca = Channel.fromPath(params.mollusca)
+    def metazoa = channel.fromPath(params.metazoa)
+    def mollusca = channel.fromPath(params.mollusca)
     def buscoTranscriptome_met = trinity_fasta.combine(metazoa)
     def buscoTranscriptome_mol = trinity_fasta.combine(mollusca)
     def TrinityR1R2 = trinity_fasta.combine(R1).combine(R2)
-    def database_fasta = Channel.fromPath(params.database_fasta)
-
+    def database_fasta = channel.fromPath(params.database_fasta)
     database_fasta | Blastdatabasecreation
+
+    Blastdatabasecreation.out.proteindb.view()
 
     Blastx(trinity_fasta, Blastdatabasecreation.out.proteindb)
 
@@ -586,7 +577,7 @@ workflow {
     Transdecoder_pep | Interproscan
 
     if (params.genomefasta != 'NULL') {
-        def genomefasta = Channel.fromPath(params.genomefasta)
+        def genomefasta = channel.fromPath(params.genomefasta)
         genomefasta | GenomeBlastdatabasecreation
         GenomeBlasts(transdecodercomplete_cds, GenomeBlastdatabasecreation.out.genomedb)
     }
