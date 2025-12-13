@@ -137,7 +137,7 @@ process BUSCO_transcriptome_metazoa {
     publishDir "${sample}/Venomflow/results/BUSCO/transcriptome/", mode: 'copy'
 
     input:
-    tuple val(sample), path(trinity_fasta), path(metazoa)
+    tuple val(sample), path(trinity_fasta), val(metazoa)
 
     output:
     path "*.txt", emit: busco_transcriptome_met
@@ -162,7 +162,7 @@ process BUSCO_transcriptome_mollusca {
     publishDir "${sample}/Venomflow/results/BUSCO/transcriptome/", mode: 'copy'
 
     input:
-    tuple val(sample), path(trinity_fasta), path(mollusca)
+    tuple val(sample), path(trinity_fasta), val(mollusca)
 
     output:
     path "*.txt", emit: busco_transcriptome_mollusca
@@ -303,7 +303,7 @@ process BUSCO_translatome_metazoa {
     publishDir "${sample}/Venomflow/results/BUSCO/translatome/", mode: 'copy'
 
     input:
-    tuple val(sample), path(Transdecoder_pep), path(metazoa)
+    tuple val(sample), path(Transdecoder_pep), val(metazoa)
 
     output:
     path "*.txt", emit: busco_translatome_met
@@ -329,7 +329,7 @@ process BUSCO_translatome_mollusca {
     publishDir "${sample}/Venomflow/results/BUSCO/translatome/", mode: 'copy'
 
     input:
-    tuple val(sample), path(Transdecoder_pep), path(mollusca)
+    tuple val(sample), path(Transdecoder_pep), val(mollusca)
 
     output:
     path "*.txt", emit: busco_translatome_met
@@ -617,9 +617,13 @@ workflow {
     //Run Process: MultQC
     fastqc_output | MultiQC
 
+    // Define Input: Bowtie 
+    input_bowtie = csv_channel.map { row -> tuple(row.Sample_name, file(row.Trinity_fasta), file(row.R1), file(row.R2)}
+    //Run Process: Bowtie
+    input_bowtie | Bowtie
+
     //Define Input: Trinity Fasta 
     input_trinity_fasta = csv_channel.map { row -> tuple(row.Sample_name, file(row.Trinity_fasta)) }
-
     //Run Process: TrinityStats
     input_trinity_fasta | TrinityStats
 
