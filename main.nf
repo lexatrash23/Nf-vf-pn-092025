@@ -80,8 +80,7 @@ process Bowtie {
     memory { task.attempt * 2.GB }
 
     conda "bowtie2=2.5.4"
-    container "docker://biocontainers/io/biocontainers/bowtie2:v2.4.1_cv1
-"
+    container "docker://quay.io/biocontainers/bowtie2:2.5.4--he20e202_1"
 
     publishDir "${sample}/Venomflow/results/Bowtie/", pattern: "*.log", mode: 'copy'
 
@@ -109,7 +108,7 @@ process TrinityStats {
     label 'process_single'
 
     conda "seqkit=2.12.0"
-    container "docker://gfanz/seqkit"
+    container "docker://quay.io/biocontainers/seqkit:2.8.2--h9ee0642_0"
 
     publishDir "${sample}/Venomflow/results/Stats/", mode: 'copy'
 
@@ -135,7 +134,7 @@ process BUSCO_transcriptome_metazoa {
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
-    
+
 
     publishDir "${sample}/Venomflow/results/BUSCO/transcriptome/", mode: 'copy'
 
@@ -186,7 +185,7 @@ process Kallisto_Trinity {
 
     conda "kallisto=0.51.1"
     container "docker://quay.io/biocontainers/kallisto:0.51.1--h2b92561_2"
-    
+
 
     label 'process_low'
     label 'process_long'
@@ -309,7 +308,7 @@ process BUSCO_translatome_metazoa {
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
-    
+
 
     publishDir "${sample}/Venomflow/results/BUSCO/translatome/", mode: 'copy'
 
