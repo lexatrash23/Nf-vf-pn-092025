@@ -661,14 +661,14 @@ workflow {
 
     //Define Input: Transdecoder pep + BUSCOlin1 tuple 
     Transdecoder_pep = Transdecoder.out.pep
-    BUSCOlin1 = csv_channel.map { row -> tuple(row.Sample_name, file(row.BUSCO_lin1)) }
+    BUSCOlin1 = csv_channel.map { row -> tuple(row.Sample_name, row.BUSCO_lin1) }
     input_BUSCOlin1_L = Transdecoder_pep.join(BUSCOlin1)
 
     //Run Process: BUSCO_lin1
     input_BUSCOlin1_L | BUSCO_translatome_metazoa
 
     //Define Input: Transdecoder pep + BUSCOlin2 tuple 
-    BUSCOlin2 = csv_channel.map { row -> tuple(row.Sample_name, file(row.BUSCO_lin2)) }
+    BUSCOlin2 = csv_channel.map { row -> tuple(row.Sample_name, row.BUSCO_lin2) }
     input_BUSCOlin2_L = Transdecoder_pep.join(BUSCOlin2)
 
     //Run Process: BUSCO_lin2
