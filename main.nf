@@ -3,24 +3,24 @@
 // Params output for user 
 
 def printhead() {
-    log.info ""
-    log.info "════════════════════════════════════════════════════════════"
-    log.info "_    _________   ______  __  ___________    ____ _       __"
-    log.info "| |  / / ____/ | / / __ \\/  |/  / ____/ /   / __ \\ |     / /"
-    log.info "| | / / __/ /  |/ / / / / /|_/ / /_  / /   / / / / | /| / /"
-    log.info "| |/ / /___/ /|  / /_/ / /  / / __/ / /___/ /_/ /| |/ |/ /"
-    log.info "|___/_____/_/ |_/\\____/_/  /_/_/   /_____/\\____/ |__/|__/"
-    log.info ""
-    log.info "════════════════════════════════════════════════════════════"
-    log.info ""
-    log.info "Author:                          ${workflow.manifest.author}"
-    log.info "README:                          ${workflow.manifest.homePage}"
-    log.info "Description:                     ${workflow.manifest.description}"
-    log.info "Version:                         ${workflow.manifest.version}"
-    log.info "Start:                           ${workflow.start}"
-    log.info ""
-    log.info "────────────────────────────────────────────────────────────"
-    log.info ""
+    log.info("")
+    log.info("════════════════════════════════════════════════════════════")
+    log.info("_    _________   ______  __  ___________    ____ _       __")
+    log.info("| |  / / ____/ | / / __ \\/  |/  / ____/ /   / __ \\ |     / /")
+    log.info("| | / / __/ /  |/ / / / / /|_/ / /_  / /   / / / / | /| / /")
+    log.info("| |/ / /___/ /|  / /_/ / /  / / __/ / /___/ /_/ /| |/ |/ /")
+    log.info("|___/_____/_/ |_/\\____/_/  /_/_/   /_____/\\____/ |__/|__/")
+    log.info("")
+    log.info("════════════════════════════════════════════════════════════")
+    log.info("")
+    log.info("Author:                          ${workflow.manifest.author}")
+    log.info("README:                          ${workflow.manifest.homePage}")
+    log.info("Description:                     ${workflow.manifest.description}")
+    log.info("Version:                         ${workflow.manifest.version}")
+    log.info("Start:                           ${workflow.start}")
+    log.info("")
+    log.info("────────────────────────────────────────────────────────────")
+    log.info("")
 }
 
 // Process 1: PostTrimFastqc
@@ -81,12 +81,12 @@ process Bowtie {
 
     conda "bowtie2=2.5.4 samtools=1.22.1"
 
-    publishDir "${sample}/Venomflow/results/Bowtie/", pattern:"*.bam", mode: 'copy' 
+    publishDir "${sample}/Venomflow/results/Bowtie/", pattern: "*.bam", mode: 'copy'
 
-    input: 
-    tuple val(sample), path (trinity_fasta), path (R1), path (R2)
+    input:
+    tuple val(sample), path(trinity_fasta), path(R1), path(R2)
 
-    output: 
+    output:
     path "*.bam"
 
     script:
@@ -99,7 +99,6 @@ process Bowtie {
 
 
     """
-
 }
 // Process 4: TrinityStats
 process TrinityStats {
@@ -509,7 +508,7 @@ process stats {
 
 // Process 19: Interproscan
 process Interproscan {
-   
+
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
     maxRetries 4
     cpus { task.attempt * 2 }
@@ -602,7 +601,7 @@ workflow {
 
     // Print head 
     printhead()
-    
+
     // Define CSV channel. Chanel factory creates a channel from a csv file. This csv can be defined in the config or the command line with --input_csv. The CSV is spilt row by row where each row is emitted as a Map (key-value pairs) where column names are news. 
     csv_channel = Channel.fromPath(params.input_csv).splitCsv(header: true, sep: ',')
 
@@ -618,7 +617,7 @@ workflow {
     fastqc_output | MultiQC
 
     // Define Input: Bowtie 
-    input_bowtie = csv_channel.map { row -> tuple(row.Sample_name, file(row.Trinity_fasta), file(row.R1), file(row.R2)}
+    input_bowtie = csv_channel.map { row -> tuple(row.Sample_name, file(row.Trinity_fasta), file(row.R1), file(row.R2)) }
     //Run Process: Bowtie
     input_bowtie | Bowtie
 
