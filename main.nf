@@ -587,11 +587,6 @@ process GenomeBlasts {
 }
 
 
-
-
-
-
-
 // PARAMETERS DEFINED IN CONFIG AND SAMPLESHEET FILE
 
 //WorkFlow
