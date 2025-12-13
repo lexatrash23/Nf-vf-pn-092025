@@ -30,6 +30,7 @@ process PostTrimFastqc {
     label 'process_low'
 
     conda "fastqc=0.12.1"
+    container "docker://biocontainers/fastqc:v0.11.9_cv8"
 
     input:
     tuple val(sample), path(R1), path(R2)
@@ -50,6 +51,7 @@ process MultiQC {
     label 'process_single'
 
     conda "multiqc=1.33"
+    container "docker://multiqc/multiqc:v1.32"
 
     publishDir "${sample}/Venomflow/results/Fastqc/posttrim/", mode: 'copy'
 
@@ -668,7 +670,7 @@ workflow {
     input_BUSCOlin1_L | BUSCO_translatome_metazoa
 
     //Define Input: Transdecoder pep + BUSCOlin2 tuple 
-    BUSCOlin2 = csv_channel.map { row -> tuple(row.Sample_name, row.BUSCO_lin2)) }
+    BUSCOlin2 = csv_channel.map { row -> tuple(row.Sample_name, row.BUSCO_lin2) }
     input_BUSCOlin2_L = Transdecoder_pep.join(BUSCOlin2)
 
     //Run Process: BUSCO_lin2
