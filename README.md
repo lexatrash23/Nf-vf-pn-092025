@@ -1,4 +1,5 @@
-This Nextflow pipeline and documentation is still in development  
+This Nextflow pipeline and documentation is still in development! 
+
 
 [On Installing Nextflow](https://www.nextflow.io/docs/latest/install.html)
 # Overview
@@ -6,8 +7,9 @@ ___
 
 ## Quick Start:   
 
-**1.** Install [Transdecoder](https://github.com/TransDecoder/TransDecoder/wiki), [BUSCO](https://busco.ezlab.org/busco_userguide.html), [SignalP](https://services.healthtech.dtu.dk/services/SignalP-5.0/) and [Interproscan](https://www.ebi.ac.uk/interpro/about/interproscan/) accordingly  
-**2.** Download nextflow.config file from lexatrash-vf-092025  
+**1.** Install [BUSCO](https://busco.ezlab.org/busco_userguide.html), [SignalP](https://services.healthtech.dtu.dk/services/SignalP-5.0/) and [Interproscan](https://www.ebi.ac.uk/interpro/about/interproscan/) accordingly  - insert hyperlink to section below on how to install each of these and add to PATH.
+
+**2.** Download nextflow.config file from lexatrash-vf-092025  - change to samplesheet.csv with multisample merge
 **3.** Edit config file by providing appropriate input for each described parameter. config file must be in the same directory that the script is run from  
 **4.** (Optional)Edit config file by providing appropriate memory allocation for each described parameters  
 **5.** run on command line:  

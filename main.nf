@@ -49,6 +49,7 @@ process MultiQC {
     errorStrategy 'ignore'
 
     label 'process_single'
+    container "docker://multiqc/multiqc:v1.32"
 
     conda "multiqc=1.33"
     container "docker://multiqc/multiqc:v1.32"
@@ -281,6 +282,9 @@ process Transdecoder {
     conda "transdecoder=5.7.1"
     container "docker://biocontainers/transdecoder:v5.0.1-2-deb_cv1"
 
+
+    errorStrategy 'ignore'
+
     publishDir "${sample}/Venomflow/results/Transdecoder", mode: 'copy'
 
     input:
@@ -308,7 +312,6 @@ process BUSCO_translatome_metazoa {
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
-
 
     publishDir "${sample}/Venomflow/results/BUSCO/translatome/", mode: 'copy'
 
@@ -519,7 +522,7 @@ process stats {
     seqkit stats ${transdecodercomplete_cds} > ${sample}_transdecodercomplete_cds.stats.txt
     seqkit stats ${maturesequences} > ${sample}_maturesequences.stats.txt
     seqkit stats ${transdecoderpep_signalp} > ${sample}_transdecoderpep_signalp.stats.txt
-    
+
     """
 }
 
@@ -548,6 +551,7 @@ process Interproscan {
     awk '{if (\$0 ~ /^>/) print \$0; else {gsub(/\\*/, ""); print \$0}}' ${Transdecoder_pep} > "${sample}.Trinity.fasta.transdecoder.cleaned.pep"
 
     interproscan.sh -goterms -i "${sample}.Trinity.fasta.transdecoder.cleaned.pep" -pa -t p -d ./ -f TSV 
+
     """
 }
 
@@ -607,6 +611,7 @@ process GenomeBlasts {
 
 // PARAMETERS DEFINED IN CONFIG AND SAMPLESHEET FILE
 
+
 //WorkFlow
 
 workflow {
@@ -614,7 +619,7 @@ workflow {
     // Print head 
     printhead()
 
-    // Define CSV channel. Chanel factory creates a channel from a csv file. This csv can be defined in the config or the command line with --input_csv. The CSV is spilt row by row where each row is emitted as a Map (key-value pairs) where column names are news. 
+    // Define CSV channel
     csv_channel = Channel.fromPath(params.input_csv).splitCsv(header: true, sep: ',')
 
     // Define Input: Paired Trimmed reads Tuple. Extracts as tuple the sample name and the trimmed reads
@@ -625,16 +630,20 @@ workflow {
 
     //Define Input: Fastqc htmls. Using the output of Fastqc as an input for MultiQC
     fastqc_output = PostTrimFastqc.out.fastqc_zips
+
+
     //Run Process: MultQC
     fastqc_output | MultiQC
 
     // Define Input: Bowtie 
     input_bowtie = csv_channel.map { row -> tuple(row.Sample_name, file(row.Trinity_fasta), file(row.R1), file(row.R2)) }
+
     //Run Process: Bowtie
     input_bowtie | Bowtie
 
     //Define Input: Trinity Fasta 
     input_trinity_fasta = csv_channel.map { row -> tuple(row.Sample_name, file(row.Trinity_fasta)) }
+
     //Run Process: TrinityStats
     input_trinity_fasta | TrinityStats
 
