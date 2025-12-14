@@ -1,4 +1,5 @@
 This Nextflow pipeline and documentation is still in development! 
+Just updated to accept multiple inputs. ReadMe needs to be updated
 
 
 [On Installing Nextflow](https://www.nextflow.io/docs/latest/install.html)
