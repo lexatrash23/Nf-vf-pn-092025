@@ -621,6 +621,7 @@ workflow {
 
     // Define CSV channel
     csv_channel = Channel.fromPath(params.input_csv).splitCsv(header: true, sep: ',')
+                .map { row -> row.collectEntries { key, value -> [key.replaceAll('"', ''), value?.toString()?.replaceAll('"', '')]}}
 
     // Define Input: Paired Trimmed reads Tuple. Extracts as tuple the sample name and the trimmed reads
     input_R1R2 = csv_channel.map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2)) }
