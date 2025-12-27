@@ -750,17 +750,18 @@ workflow {
     //Run Process: Interproscan  (Input was previously defined)
     Transdecoder_pep | Interproscan
 
-    //Define Input: genomefasta (with path tracking)
+    //Define Input: genomefasta 
     Genomefasta = csv_channel
-        .map { row -> tuple(row.Genome_fasta_path, file(row.Genome_fasta_path)) }
-        .unique { it[0] }
-        .filter { genome_path, _genome_file ->
-            genome_path != 'NULL' && genome_path.toString() != 'NULL'
-        }
+    .filter { row ->
+        def path = row.Genome_fasta_path
+        path != null && path != 'NULL' && path.toString() != 'NULL'
+    }
+    .map { row -> tuple(row.Sample_name, file(row.Genome_fasta_path)) }
+    .unique { sample_name, genome_file -> sample_name }
 
-    //Run Process: BlastnGenome database creation
-    Genomefasta | GenomeBlastdatabasecreation
-
+    // Run Process: BlastnGenome database creation
+    GenomeBlastdatabasecreation(Genomefasta)   
+     
     //Define Input: Genome BLAST 
     genomedb = GenomeBlastdatabasecreation.out.genomedbfiles
     Blastncds = csv_channel.map { row -> tuple(row.Sample_name, file(row.Genome_fasta_name)) }
