@@ -764,7 +764,7 @@ workflow {
      
     //Define Input: Genome BLAST 
     genomedb = GenomeBlastdatabasecreation.out.genomedbfiles
-    Blastncds = csv_channel.map { row -> tuple(row.Sample_name, file(row.Genome_fasta_name)) }
+    Blastncds = csv_channel.map { row -> tuple(row.Sample_name, row.Genome_fasta_name) }
 
     BlastnInput = Blastncds
         .join(Transdecoder_complete.out.transdecodercomplete_cds)
