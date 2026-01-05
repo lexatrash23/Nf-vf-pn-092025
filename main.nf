@@ -754,7 +754,7 @@ workflow {
     Genomefasta = csv_channel
     .filter { row ->
         def path = row.Genome_fasta_path
-        path != null && path != 'NULL' && path.toString() != 'NULL'
+        path != null && path != 'NULL' && path.toString() != 'NULL' && path.toString().trim() != ''
     }
     .map { row -> tuple(row.Sample_name, file(row.Genome_fasta_path)) }
     .unique { sample_name, genome_file -> sample_name }
