@@ -104,7 +104,10 @@ process Bowtie {
 // Process 4: TrinityStats
 process TrinityStats {
 
-    errorStrategy 'ignore'
+    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    maxRetries 4
+    cpus { task.attempt * 2 }
+    memory { task.attempt * 2.GB }
 
     label 'process_single'
 
@@ -129,7 +132,10 @@ process TrinityStats {
 // Process 5: BUSCO_transcriptome_metazoa
 process BUSCO_transcriptome_metazoa {
 
-    errorStrategy 'ignore'
+    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    maxRetries 4
+    cpus { task.attempt * 2 }
+    memory { task.attempt * 2.GB }
 
     label 'process_low'
 
@@ -156,7 +162,10 @@ process BUSCO_transcriptome_metazoa {
 // Process 6: BUSCO_transcriptome_mollusca
 process BUSCO_transcriptome_mollusca {
 
-    errorStrategy 'ignore'
+    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    maxRetries 4
+    cpus { task.attempt * 2 }
+    memory { task.attempt * 2.GB }
 
     label 'process_low'
 
@@ -308,7 +317,10 @@ process BUSCO_translatome_metazoa {
 
     label 'process_medium'
 
-    errorStrategy 'ignore'
+    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    maxRetries 4
+    cpus { task.attempt * 2 }
+    memory { task.attempt * 2.GB }
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
@@ -335,7 +347,10 @@ process BUSCO_translatome_mollusca {
 
     label 'process_medium'
 
-    errorStrategy 'ignore'
+    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    maxRetries 4
+    cpus { task.attempt * 2 }
+    memory { task.attempt * 2.GB }
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
