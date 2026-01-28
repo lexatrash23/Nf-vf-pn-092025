@@ -299,7 +299,7 @@ process Transdecoder {
     label 'process_single'
 
     conda "transdecoder=5.7.1"
-    container 'quay.io/biocontainers/transdecoder:5.7.1--pl5321hdfd78af_2'
+    container 'quay.io/biocontainers/transdecoder'
 
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
@@ -319,7 +319,7 @@ process Transdecoder {
     script:
 
     """
-    TransDecoder.LongOrfs -t ${trinity_fasta}
+    TransDecoder.LongOrfs -t ${trinity_fasta} -m 3
     TransDecoder.Predict -t ${trinity_fasta}
 
     """
