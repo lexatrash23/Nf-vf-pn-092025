@@ -299,7 +299,7 @@ process Transdecoder {
     label 'process_single'
 
     conda "transdecoder=5.7.1"
-    container "docker://trinityrnaseq/transdecoder"
+    container 'quay.io/biocontainers/transdecoder:5.7.1--pl5321hdfd78af_2'
 
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
