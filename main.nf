@@ -25,7 +25,10 @@ def printhead() {
 
 // Process 1: PostTrimFastqc
 process PostTrimFastqc {
-    errorStrategy 'ignore'
+    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    maxRetries 4
+    cpus { task.attempt * 2 }
+    memory { task.attempt * 2.GB }
 
     label 'process_low'
 
@@ -46,7 +49,10 @@ process PostTrimFastqc {
 
 // Process 2: MultiQC
 process MultiQC {
-    errorStrategy 'ignore'
+    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    maxRetries 4
+    cpus { task.attempt * 2 }
+    memory { task.attempt * 2.GB }
 
     label 'process_single'
     container "docker://multiqc/multiqc:v1.32"
@@ -232,7 +238,11 @@ process Kallisto_Trinity {
 
 // Process 8: Blastdatabasecreation
 process Blastdatabasecreation {
-    errorStrategy 'ignore'
+
+    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    maxRetries 4
+    cpus { task.attempt * 2 }
+    memory { task.attempt * 2.GB }
 
     label 'process_single'
 
@@ -289,10 +299,13 @@ process Transdecoder {
     label 'process_single'
 
     conda "transdecoder=5.7.1"
-    container "docker://biocontainers/transdecoder:v5.0.1-2-deb_cv1"
+    container "docker://trinityrnaseq/transdecoder"
 
 
-    errorStrategy 'ignore'
+    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    maxRetries 4
+    cpus { task.attempt * 2 }
+    memory { task.attempt * 2.GB }
 
     publishDir "${sample}/Venomflow/results/Transdecoder", mode: 'copy'
 
@@ -376,7 +389,10 @@ process BUSCO_translatome_mollusca {
 // Process 13: Kallisto_Transdecoder
 process Kallisto_Transdecoder {
 
-    errorStrategy 'ignore'
+    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    maxRetries 4
+    cpus { task.attempt * 2 }
+    memory { task.attempt * 2.GB }
 
     label 'process_medium'
 
@@ -411,7 +427,10 @@ process Kallisto_Transdecoder {
 // Process 14: Blastp
 process Blastp {
 
-    errorStrategy 'ignore'
+    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    maxRetries 4
+    cpus { task.attempt * 2 }
+    memory { task.attempt * 2.GB }
 
     label 'process_low'
 
@@ -439,7 +458,10 @@ process Blastp {
 // Process 15: Transdecoder_complete
 process Transdecoder_complete {
 
-    errorStrategy 'ignore'
+    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    maxRetries 4
+    cpus { task.attempt * 2 }
+    memory { task.attempt * 2.GB }
 
     label 'process_single'
 
@@ -466,7 +488,10 @@ process Transdecoder_complete {
 // Process 16: SignalP
 process SignalP {
 
-    errorStrategy 'ignore'
+    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    maxRetries 4
+    cpus { task.attempt * 2 }
+    memory { task.attempt * 2.GB }
 
     label 'process_low'
 
@@ -489,7 +514,10 @@ process SignalP {
 
 // Process 17: Filter2
 process Filter2 {
-    errorStrategy 'ignore'
+    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    maxRetries 4
+    cpus { task.attempt * 2 }
+    memory { task.attempt * 2.GB }
 
     label 'process_single'
 
@@ -513,7 +541,10 @@ process Filter2 {
 
 // Process 18: STATS
 process stats {
-    errorStrategy 'ignore'
+    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    maxRetries 4
+    cpus { task.attempt * 2 }
+    memory { task.attempt * 2.GB }
 
     label 'process_single'
 
@@ -573,7 +604,10 @@ process Interproscan {
 // Process 20: GenomeBlastdatabasecreation
 process GenomeBlastdatabasecreation {
 
-    errorStrategy 'ignore'
+    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    maxRetries 4
+    cpus { task.attempt * 2 }
+    memory { task.attempt * 2.GB }
 
     conda "blast=2.17.0"
     container "docker://ncbi/blast:2.17.0"
