@@ -296,7 +296,7 @@ process Blastx {
 // Process 10: Transdecoder
 process Transdecoder {
 
-    label 'process_single'
+    label 'process_medium'
 
     conda "transdecoder=5.7.1"
     container 'quay.io/biocontainers/transdecoder'
