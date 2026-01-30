@@ -319,7 +319,7 @@ process Transdecoder {
     script:
 
     """
-    TransDecoder.LongOrfs -t ${trinity_fasta} -m 3
+    TransDecoder.LongOrfs -t ${trinity_fasta} -m 50
     TransDecoder.Predict -t ${trinity_fasta}
 
     """
@@ -493,7 +493,7 @@ process SignalP {
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
 
-    label 'process_low'
+    label 'process_medium'
 
     publishDir "${sample}/Venomflow/results/Signalp", mode: 'copy'
 
