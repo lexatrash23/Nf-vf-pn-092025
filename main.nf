@@ -1174,16 +1174,21 @@ workflow {
 
 
 
-    //Define Input: Trinity fasta + R1 + R2 tuple 
-    input_TrinityKallisto_single = csv_channel.filter { row -> !row.Transcriptome2?.trim() || row.Transcriptome2.trim().toLowerCase() == 'null' }
+// Define Input: Trinity fasta + R1 + R2 tuple 
+    input_TrinityKallisto_single = csv_channel
+    .filter { row -> !row.Transcriptome2?.trim() || row.Transcriptome2.trim().toLowerCase() == 'null' }
     .map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2), row.Strandedness, file(row.Transcriptome1)) }
 
-    input_TrinityKallisto_combined = csv_channel.filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim().toLowerCase() != 'null' }
-    .map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2), row.Strandedness) } .join (Transcriptome_Combined.out.transcriptome_combined)
+    input_TrinityKallisto_combined = csv_channel
+    .filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim().toLowerCase() != 'null' }
+    .map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2), row.Strandedness) }
+    .join(Transcriptome_Combined.out.transcriptome_combined)
 
-    //Run Process: TrinityKallisto
-    input_TrinityKallisto_single | Kallisto_Trinity
-    input_TrinityKallisto_combined | Kallisto_Trinity
+// Combine both channels using mix() operator
+    input_TrinityKallisto_all = input_TrinityKallisto_single.mix(input_TrinityKallisto_combined)
+
+// Run Process: Kallisto_Trinity
+   input_TrinityKallisto_all | Kallisto_Trinity
     
     
     //Define Input: Database_Fasta. This is set up to allow for multiple different databases if needed.
@@ -1193,22 +1198,27 @@ workflow {
     input_databasefasta | Blastdatabasecreation
 
 
-    //Define Input: Blastx 
-    Blastxinputfasta_single = csv_channel.filter { row -> !row.Transcriptome2?.trim() || row.Transcriptome2.trim().toLowerCase() == 'null' }
+//Define Input: Blastx 
+    Blastxinputfasta_single = csv_channel
+    .filter { row -> !row.Transcriptome2?.trim() || row.Transcriptome2.trim().toLowerCase() == 'null' }
     .map { row ->
         tuple(row.Sample_name, row.Protein_fasta_name, file(row.Transcriptome1))
-    }.join(Blastdatabasecreation.out.proteindb)
+    }
+    .join(Blastdatabasecreation.out.proteindb)
 
-    Blastxinputfasta_combined = csv_channel.filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim().toLowerCase() != 'null' }
+    Blastxinputfasta_combined = csv_channel
+    .filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim().toLowerCase() != 'null' }
     .map { row ->
         tuple(row.Sample_name, row.Protein_fasta_name)
-    }.join(Transcriptome_Combined.out.transcriptome_combined).join(Blastdatabasecreation.out.proteindb)
+    }
+    .join(Transcriptome_Combined.out.transcriptome_combined)
+    .join(Blastdatabasecreation.out.proteindb)
 
+// Combine both channels using mix() operator
+    Blastxinputfasta_all = Blastxinputfasta_single.mix(Blastxinputfasta_combined)
 
-    //Run Process: Blastx
-    Blastxinputfasta_single | Blastx
-    Blastxinputfasta_combined | Blastx
-
+// Run Process: Blastx 
+    Blastxinputfasta_all | Blastx
 
 
     //Run Process: Transdecoder
