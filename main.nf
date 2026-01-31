@@ -1120,13 +1120,13 @@ workflow {
 
     // Transcriptome 1 
     //Define Input: Transcriptome1 Fasta + BUSCOlin1 tuple 
-    input_BUSCOlin1 = csv_channel.map { row -> tuple(row.Sample_name, file(row.Transcriptome1), row.BUSCO_lin1) }
+    input_BUSCOlin1 = csv_channel.map { row -> tuple(row.Sample_name, file(row.Transcriptome1), row.BUSCO_lin1,row.Transcriptome1_label) }
 
     //Run Process: BUSCO_lin1
     input_BUSCOlin1 | BUSCO_transcriptome_metazoa
 
     //Define Input: Transcriptome1 Fasta + BUSCOlin2 tuple 
-    input_BUSCOlin2 = csv_channel.map { row -> tuple(row.Sample_name, file(row.Transcriptome1), row.BUSCO_lin2) }
+    input_BUSCOlin2 = csv_channel.map { row -> tuple(row.Sample_name, file(row.Transcriptome1), row.BUSCO_lin2, row.Transcriptome1_label) }
 
     //Run Process: BUSCO_lin2
     input_BUSCOlin2 | BUSCO_transcriptome_mollusca
@@ -1135,14 +1135,14 @@ workflow {
 
     //Define Input: Transcriptome2 Fasta + BUSCOlin1 tuple 
     input_BUSCOlin1_2 = csv_channel.filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim().toLowerCase() != 'null'}
-    .map { row -> tuple(row.Sample_name, file(row.Transcriptome2), row.BUSCO_lin1) }
+    .map { row -> tuple(row.Sample_name, file(row.Transcriptome2), row.BUSCO_lin1, row.Transcriptome2_label) }
 
     //Run Process: BUSCO_lin1
     input_BUSCOlin1_2 | BUSCO_transcriptome_metazoa2
 
     //Define Input: Transcriptome2 Fasta + BUSCOlin2 tuple 
     input_BUSCOlin2_2 = csv_channel.filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim().toLowerCase() != 'null'}
-    .map { row -> tuple(row.Sample_name, file(row.Transcriptome2), row.BUSCO_lin2) }
+    .map { row -> tuple(row.Sample_name, file(row.Transcriptome2), row.BUSCO_lin2, row.Transcriptome2_label) }
 
     //Run Process: BUSCO_lin2
     input_BUSCOlin2_2 | BUSCO_transcriptome_mollusca2
