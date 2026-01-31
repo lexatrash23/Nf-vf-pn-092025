@@ -1167,7 +1167,7 @@ workflow {
     .map { row -> tuple(row.Sample_name, row.BUSCO_lin2) }.join(Transcriptome_Combined.out.transcriptome_combined)
 
     //Run Process: BUSCO_lin2
-    input_BUSCOlin2_3 | BUSCO_transcriptome_metazoa3
+    input_BUSCOlin2_3 | BUSCO_transcriptome_mollusca3
 
 
 
