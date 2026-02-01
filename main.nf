@@ -578,7 +578,7 @@ process ORFs_Combined {
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
 
-    label 'process_low'
+    label 'process_medium'
 
     conda "seqkit=2.12.0"
     container "docker://gfanz/seqkit"
@@ -589,8 +589,8 @@ process ORFs_Combined {
     tuple val(sample), path(transdecoder_pep), path(transdecoder_cds), path(TD2_pep), path(TD2_cds)
 
     output:
-    tuple val(sample), path ("*.combined.deduplicated.pep"), emit: combined_pep
-    tuple val(sample), path ("*.combined.deduplicated.cds"), emit: combined_cds 
+    tuple val(sample), path ("*combined.deduplicated.pep"), emit: combined_pep
+    tuple val(sample), path ("*combined.deduplicated.cds"), emit: combined_cds 
 
     script:
 
@@ -603,7 +603,7 @@ process ORFs_Combined {
     seqkit replace -p '(.+)' -r 'TD_\$1' ${transdecoder_pep} > transdecoder_labelled.pep
     seqkit replace -p '(.+)' -r 'TD2_\$1' ${TD2_pep} > TD2_labelled.pep
     cat transdecoder_labelled.pep TD2_labelled.pep > orf_combined.pep
-    seqkit rmdup orf_combined.pep -s -o ${sample}_ORF_combined_combined.deduplicated.pep
+    seqkit rmdup orf_combined.pep -s -o ${sample}_ORF_combined.deduplicated.pep
 
     """
 }
