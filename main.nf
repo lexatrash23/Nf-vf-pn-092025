@@ -254,7 +254,7 @@ process BUSCO_transcriptome_mollusca {
 
     """
     busco -i ${trinity_fasta} -l ${mollusca} -c 10 -o ${sample}_${transcriptome1_label}_mol.transcriptome -m transcriptome -e 1e-5 -f
-    mv ${sample}_${transcriptome1_label}_mol.transcriptome*.txt "."
+    mv ${sample}_${transcriptome1_label}_mol.transcriptome/*.txt "."
     """
 }
 
