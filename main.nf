@@ -1098,7 +1098,7 @@ workflow {
     input_bowtie | Bowtie
 
     // Define Input: Bowtie2 
-    input_bowtie2 = csv_channel.filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim().toLowerCase() != 'null'}
+    input_bowtie2 = csv_channel.filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim() != '' && row.Transcriptome2.trim().toLowerCase() != 'null'}
     .map { row -> tuple(row.Sample_name, file(row.Transcriptome2), file(row.R1), file(row.R2)) }
 
     //Run Process: Bowtie2
@@ -1134,21 +1134,21 @@ workflow {
     // Transcriptome 2
 
     //Define Input: Transcriptome2 Fasta + BUSCOlin1 tuple 
-    input_BUSCOlin1_2 = csv_channel.filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim().toLowerCase() != 'null'}
+    input_BUSCOlin1_2 = csv_channel.filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim() != '' && row.Transcriptome2.trim().toLowerCase() != 'null'}
     .map { row -> tuple(row.Sample_name, file(row.Transcriptome2), row.BUSCO_lin1, row.Transcriptome2_label) }
 
     //Run Process: BUSCO_lin1
     input_BUSCOlin1_2 | BUSCO_transcriptome_metazoa2
 
     //Define Input: Transcriptome2 Fasta + BUSCOlin2 tuple 
-    input_BUSCOlin2_2 = csv_channel.filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim().toLowerCase() != 'null'}
+    input_BUSCOlin2_2 = csv_channel.filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim() != '' && row.Transcriptome2.trim().toLowerCase() != 'null'}
     .map { row -> tuple(row.Sample_name, file(row.Transcriptome2), row.BUSCO_lin2, row.Transcriptome2_label) }
 
     //Run Process: BUSCO_lin2
     input_BUSCOlin2_2 | BUSCO_transcriptome_mollusca2
 
     //Define Input:  Transcriptome_Combined 
-    input_Transcriptome_Combined = csv_channel.filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim().toLowerCase() != 'null'}
+    input_Transcriptome_Combined = csv_channel.filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim() != '' && row.Transcriptome2.trim().toLowerCase() != 'null'}
     .map { row -> tuple(row.Sample_name, file(row.Transcriptome1), row.Transcriptome1_label, file(row.Transcriptome2), row.Transcriptome2_label) }
     // Run process ; 
     input_Transcriptome_Combined | Transcriptome_Combined
@@ -1156,14 +1156,14 @@ workflow {
 
     // Transcriptome_Combined
      //Define Input: Combined transcriptome Fasta + BUSCOlin1 tuple 
-   input_BUSCOlin1_3 = csv_channel.filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim().toLowerCase() != 'null'}
+   input_BUSCOlin1_3 = csv_channel.filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim() != '' && row.Transcriptome2.trim().toLowerCase() != 'null'}
     .map { row -> tuple(row.Sample_name, row.BUSCO_lin1) }.join(Transcriptome_Combined.out.transcriptome_combined)
 
     //Run Process: BUSCO_lin1
     input_BUSCOlin1_3 | BUSCO_transcriptome_metazoa3
 
      //Define Input: Combined transcriptome Fasta + BUSCOlin2 tuple 
-   input_BUSCOlin2_3 = csv_channel.filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim().toLowerCase() != 'null'}
+   input_BUSCOlin2_3 = csv_channel.filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim() != '' && row.Transcriptome2.trim().toLowerCase() != 'null'}
     .map { row -> tuple(row.Sample_name, row.BUSCO_lin2) }.join(Transcriptome_Combined.out.transcriptome_combined)
 
     //Run Process: BUSCO_lin2
@@ -1176,11 +1176,11 @@ workflow {
 
 // Define Input: Trinity fasta + R1 + R2 tuple 
     input_TrinityKallisto_single = csv_channel
-    .filter { row -> !row.Transcriptome2?.trim() || row.Transcriptome2.trim().toLowerCase() == 'null' }
+    .filter { row -> !row.Transcriptome2?.trim() ||  row.Transcriptome2.trim() != '' || row.Transcriptome2.trim().toLowerCase() == 'null' }
     .map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2), row.Strandedness, file(row.Transcriptome1)) }
 
     input_TrinityKallisto_combined = csv_channel
-    .filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim().toLowerCase() != 'null' }
+    .filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim() != '' && row.Transcriptome2.trim().toLowerCase() != 'null' }
     .map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2), row.Strandedness) }
     .join(Transcriptome_Combined.out.transcriptome_combined)
 
@@ -1200,14 +1200,14 @@ workflow {
 
 //Define Input: Blastx 
     Blastxinputfasta_single = csv_channel
-    .filter { row -> !row.Transcriptome2?.trim() || row.Transcriptome2.trim().toLowerCase() == 'null' }
+    .filter { row -> !row.Transcriptome2?.trim() || row.Transcriptome2.trim() != '' || row.Transcriptome2.trim().toLowerCase() == 'null' }
     .map { row ->
         tuple(row.Sample_name, row.Protein_fasta_name, file(row.Transcriptome1))
     }
     .join(Blastdatabasecreation.out.proteindb)
 
     Blastxinputfasta_combined = csv_channel
-    .filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim().toLowerCase() != 'null' }
+    .filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim() != '' && row.Transcriptome2.trim().toLowerCase() != 'null' }
     .map { row ->
         tuple(row.Sample_name, row.Protein_fasta_name)
     }
@@ -1222,11 +1222,18 @@ workflow {
 
 
     //Run Process: Transdecoder
-    Transcriptome_Combined.out.transcriptome_combined | Transdecoder
+    Transcriptpome1 = csv_channel
+    .filter { row -> !row.Transcriptome2?.trim() || row.Transcriptome2.trim() != '' || row.Transcriptome2.trim().toLowerCase() == 'null' }
+    .map { row ->
+        tuple(row.Sample_name, file(row.Transcriptome1))
+    }
+
+    input_orf = Transcriptpome1.mix(Transcriptome_Combined.out.transcriptome_combined)
+    input_orf | Transdecoder
 
 
     //Run Process: TD2
-    Transcriptome_Combined.out.transcriptome_combined | TD2
+    input_orf | TD2
 
     // Define input: ORFs_Combined
     input_ORFs_Combined = Transdecoder.out.transdecoder_pep.join(Transdecoder.out.transdecoder_cds).join(TD2.out.TD2_pep).join(TD2.out.TD2_cds)
