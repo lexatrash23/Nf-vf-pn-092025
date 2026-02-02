@@ -61,6 +61,8 @@ process MultiQC {
     container "docker://multiqc/multiqc:v1.32"
 
     publishDir "${sample}/Venomflow/results/Fastqc/posttrim/", mode: 'copy'
+    publishDir "${sample}/Analysis/results/htmls/", mode: 'copy'
+
 
     input:
     tuple val(sample), path(fastqc_zips)
@@ -283,8 +285,8 @@ process BUSCO_transcriptome_metazoa2 {
     script:
 
     """
-    busco -i ${trinity_fasta2} -l ${metazoa} -c 10 -o ${sample}_${transcriptome2_label}.met.transcriptome -m transcriptome -e 1e-5 -f
-    mv ${sample}_${transcriptome2_label}.met.transcriptome/*.txt "."
+    busco -i ${trinity_fasta2} -l ${metazoa} -c 10 -o ${sample}_${transcriptome2_label}_met.transcriptome -m transcriptome -e 1e-5 -f
+    mv ${sample}_${transcriptome2_label}_met.transcriptome/*.txt "."
     """
 }
 
@@ -312,8 +314,8 @@ process BUSCO_transcriptome_mollusca2 {
     script:
 
     """
-    busco -i ${trinity_fasta2} -l ${mollusca} -c 10 -o ${sample}_${transcriptome2_label}.mol.transcriptome -m transcriptome -e 1e-5 -f
-    mv ${sample}_${transcriptome2_label}.mol.transcriptome/*.txt "."
+    busco -i ${trinity_fasta2} -l ${mollusca} -c 10 -o ${sample}_${transcriptome2_label}_mol.transcriptome -m transcriptome -e 1e-5 -f
+    mv ${sample}_${transcriptome2_label}_mol.transcriptome/*.txt "."
     """
 }
 
@@ -870,7 +872,7 @@ process ORF_complete {
     conda "seqkit=2.12.0"
     container "docker://gfanz/seqkit"
 
-    publishDir "${sample}/Venomflow/results/Transdecoder", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/ORFprediction/Combined", mode: 'copy'
 
     input:
     tuple val(sample), path(combined_pep), path(combined_cds)
@@ -882,8 +884,8 @@ process ORF_complete {
     script:
 
     """
-    seqkit grep -n -r -p "ORF type:complete" ${combined_pep} -o "${sample}.trandescoder.complete.pep"
-    seqkit grep -n -r -p "ORF type:complete" ${combined_cds} -o "${sample}.trandescoder.complete.cds"
+    seqkit grep -n -r -p "ORF type:complete" ${combined_pep} -o "${sample}.combine.complete.pep"
+    seqkit grep -n -r -p "ORF type:complete" ${combined_cds} -o "${sample}.combine.complete.cds"
     """
 }
 
@@ -926,7 +928,7 @@ process Filter2 {
     conda "seqkit=2.12.0"
     container "docker://gfanz/seqkit"
 
-    publishDir "${sample}/Venomflow/results/Transdecoder", mode: 'copy'
+    publishDir "${sample}/Venomflow/ORFprediction/Combined/", mode: 'copy'
 
     input:
     tuple val(sample), path(maturesequences), path(complete_pep)
@@ -937,7 +939,7 @@ process Filter2 {
     script:
 
     """
-    seqkit grep -f <(seqkit seq -n ${maturesequences}) ${complete_pep} > ${sample}.Transdecoder.complete.signalp.sequences.fasta
+    seqkit grep -f <(seqkit seq -n ${maturesequences}) ${complete_pep} > ${sample}.complete.signalp.sequences.fasta
     """
 }
 
