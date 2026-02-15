@@ -337,7 +337,7 @@ process Transcriptome_Combined {
     tuple val(sample), path(transcriptome1), val(transcriptome1_label), path(transcriptome2), val(transcriptome2_label)
 
     output:
-    tuple val(sample), path("*.combined.deduplicated.fasta"), emit: transcriptome_combined
+    tuple val(sample), path("*combined.deduplicated.fasta"), emit: transcriptome_combined
 
     script:
 
