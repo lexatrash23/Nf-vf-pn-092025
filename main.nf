@@ -370,7 +370,7 @@ process BUSCO_transcriptome_metazoa3 {
     publishDir "${sample}/Venomflow/results/BUSCO/transcriptome/Combined", mode: 'copy'
 
     input:
-    tuple val(sample), val(metazoa), path(combined_trinity)
+    tuple val(sample), path(combined_trinity),val(metazoa)
 
     output:
     path "*.txt"
@@ -400,7 +400,7 @@ process BUSCO_transcriptome_mollusca3 {
     publishDir "${sample}/Venomflow/results/BUSCO/transcriptome/Combined", mode: 'copy'
 
     input:
-    tuple val(sample), path(combined_trinity), val(mollusca)
+    tuple val(sample), val(mollusca),path(combined_trinity)
 
     output:
     path "*.txt"
