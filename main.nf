@@ -25,7 +25,9 @@ def printhead() {
 
 // Process 1: PostTrimFastqc
 process PostTrimFastqc {
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+
+
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -49,7 +51,7 @@ process PostTrimFastqc {
 
 // Process 2: MultiQC
 process MultiQC {
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -82,7 +84,7 @@ process Bowtie {
     label 'process_high'
     label 'process_long'
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -115,7 +117,7 @@ process Bowtie2 {
     label 'process_high'
     label 'process_long'
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -146,7 +148,7 @@ process Bowtie2 {
 // Process 4: TrinityStats 1 
 process TrinityStats {
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -175,7 +177,7 @@ process TrinityStats {
 // Process 4: TrinityStats 2
 process TrinityStats2 {
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -203,7 +205,7 @@ process TrinityStats2 {
 // Process 5: BUSCO_transcriptome_metazoa
 process BUSCO_transcriptome_metazoa {
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -233,7 +235,7 @@ process BUSCO_transcriptome_metazoa {
 // Process 6: BUSCO_transcriptome_mollusca
 process BUSCO_transcriptome_mollusca {
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -262,7 +264,7 @@ process BUSCO_transcriptome_mollusca {
 // Process 5: BUSCO_transcriptome_metazoa
 process BUSCO_transcriptome_metazoa2 {
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -292,7 +294,7 @@ process BUSCO_transcriptome_metazoa2 {
 // Process 6: BUSCO_transcriptome_mollusca
 process BUSCO_transcriptome_mollusca2 {
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -321,7 +323,7 @@ process BUSCO_transcriptome_mollusca2 {
 // Process 6: Label transcriptomes, combine and remove duplicates 
 process Transcriptome_Combined {
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -354,7 +356,7 @@ process Transcriptome_Combined {
 // Process 5: BUSCO_transcriptome_metazoa Combined transcriptome
 process BUSCO_transcriptome_metazoa3 {
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -384,8 +386,9 @@ process BUSCO_transcriptome_metazoa3 {
 // Process 6: BUSCO_transcriptome_mollusca
 process BUSCO_transcriptome_mollusca3 {
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
+
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
 
@@ -422,7 +425,7 @@ process Kallisto_Trinity {
 
     publishDir "${sample}/Venomflow/results/kallisto/trinity/output", mode: 'copy'
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -453,7 +456,7 @@ process Kallisto_Trinity {
 // Process 8: Blastdatabasecreation
 process Blastdatabasecreation {
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -481,7 +484,7 @@ process Blastx {
     label 'process_medium'
     label 'process_long'
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -516,7 +519,7 @@ process Transdecoder {
     container 'quay.io/biocontainers/transdecoder'
 
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -548,7 +551,7 @@ process TD2 {
     container 'quay.io/biocontainers/td2:1.0.7--pyhdfd78af_0'
 
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -574,7 +577,7 @@ process TD2 {
 // Process 6: Label transcriptomes, combine and remove duplicates 
 process ORFs_Combined {
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -615,7 +618,7 @@ process BUSCO_translatome_metazoa {
 
     label 'process_medium'
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -645,7 +648,7 @@ process BUSCO_translatome_mollusca {
 
     label 'process_medium'
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -675,7 +678,7 @@ process BUSCO_translatome_metazoa2 {
 
     label 'process_medium'
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -705,7 +708,7 @@ process BUSCO_translatome_mollusca2 {
 
     label 'process_medium'
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -735,7 +738,7 @@ process BUSCO_translatome_metazoa3 {
 
     label 'process_medium'
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -765,7 +768,7 @@ process BUSCO_translatome_mollusca3 {
 
     label 'process_medium'
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -794,7 +797,7 @@ process BUSCO_translatome_mollusca3 {
 // Process 13: Kallisto_Transdecoder
 process Kallisto_Transdecoder {
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -832,7 +835,7 @@ process Kallisto_Transdecoder {
 // Process 14: Blastp
 process Blastp {
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -863,7 +866,7 @@ process Blastp {
 // Process 15: ORF_complete
 process ORF_complete {
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -893,7 +896,7 @@ process ORF_complete {
 // Process 16: SignalP
 process SignalP {
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -919,7 +922,8 @@ process SignalP {
 
 // Process 17: Filter2
 process Filter2 {
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -946,7 +950,8 @@ process Filter2 {
 
 // Process 18: STATS
 process stats {
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -984,7 +989,7 @@ process stats {
 // Process 19: Interproscan
 process Interproscan {
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -1013,7 +1018,7 @@ process Interproscan {
 // Process 20: GenomeBlastdatabasecreation
 process GenomeBlastdatabasecreation {
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
@@ -1044,7 +1049,7 @@ process GenomeBlasts {
     conda "blast=2.17.0"
     container "docker://ncbi/blast:2.17.0"
 
-    errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
+    errorStrategy 'retry'
     maxRetries 4
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
