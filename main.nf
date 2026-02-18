@@ -370,7 +370,7 @@ process BUSCO_transcriptome_metazoa3 {
     publishDir "${sample}/Venomflow/results/BUSCO/transcriptome/Combined", mode: 'copy'
 
     input:
-    tuple val(sample), path(combined_trinity),val(metazoa)
+    tuple val(sample),val(metazoa),path(combined_trinity)
 
     output:
     path "*.txt"
