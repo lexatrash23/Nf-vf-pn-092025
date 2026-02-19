@@ -1218,10 +1218,10 @@ workflow {
 
     //Define Input: Blastx 
     Blastxinputfasta_single = csv_channel
-        .filter { row -> !row.Transcriptome2?.trim() || row.Transcriptome2.trim() != '' || row.Transcriptome2.trim().toLowerCase() == 'null' }
+        .filter { row -> !row.Transcriptome2?.trim() || row.Transcriptome2.trim().toLowerCase() == 'null' }
         .map { row ->
-            tuple(row.Sample_name, row.Protein_fasta_name, file(row.Transcriptome1))
-        }
+        tuple(row.Sample_name, row.Protein_fasta_name, file(row.Transcriptome1))
+    }
         .join(Blastdatabasecreation.out.proteindb)
 
     Blastxinputfasta_combined = csv_channel
@@ -1241,7 +1241,7 @@ workflow {
 
     //Run Process: Transdecoder
     Transcriptpome1 = csv_channel
-        .filter { row -> !row.Transcriptome2?.trim() || row.Transcriptome2.trim() != '' || row.Transcriptome2.trim().toLowerCase() == 'null' }
+        .filter { row -> !row.Transcriptome2?.trim() || row.Transcriptome2.trim().toLowerCase() == 'null' }
         .map { row ->
             tuple(row.Sample_name, file(row.Transcriptome1))
         }
