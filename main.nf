@@ -210,7 +210,8 @@ process BUSCO_transcriptome_metazoa {
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
 
-    label 'process_low'
+    label 'process_high'
+    label 'process_long'
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
@@ -240,7 +241,8 @@ process BUSCO_transcriptome_mollusca {
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
 
-    label 'process_low'
+    label 'process_high'
+    label 'process_long'
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
@@ -269,7 +271,8 @@ process BUSCO_transcriptome_metazoa2 {
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
 
-    label 'process_low'
+    label 'process_high'
+    label 'process_long'
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
@@ -299,7 +302,8 @@ process BUSCO_transcriptome_mollusca2 {
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
 
-    label 'process_low'
+    label 'process_high'
+    label 'process_long'
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
@@ -361,7 +365,8 @@ process BUSCO_transcriptome_metazoa3 {
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
 
-    label 'process_low'
+    label 'process_high'
+    label 'process_long'
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
@@ -379,7 +384,7 @@ process BUSCO_transcriptome_metazoa3 {
 
     """
     busco -i ${combined_trinity} -l ${metazoa} -c 10 -o ${sample}_combined.met.transcriptome -m transcriptome -e 1e-5 -f
-    mv ${sample}_combined.met.transcriptome.met.transcriptome/*.txt "."
+    mv ${sample}_combined.met.transcriptome/*.txt "."
     """
 }
 
@@ -392,7 +397,8 @@ process BUSCO_transcriptome_mollusca3 {
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
 
-    label 'process_low'
+    label 'process_high'
+    label 'process_long'
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
@@ -616,7 +622,8 @@ process ORFs_Combined {
 // Process 11: BUSCO_translatome_metazoa
 process BUSCO_translatome_metazoa {
 
-    label 'process_medium'
+    label 'process_high'
+    label 'process_long'
 
     errorStrategy 'retry'
     maxRetries 4
@@ -646,7 +653,8 @@ process BUSCO_translatome_metazoa {
 // Process 12: BUSCO_translatome_mollusca
 process BUSCO_translatome_mollusca {
 
-    label 'process_medium'
+    label 'process_high'
+    label 'process_long'
 
     errorStrategy 'retry'
     maxRetries 4
@@ -676,7 +684,8 @@ process BUSCO_translatome_mollusca {
 // Process 11: BUSCO_translatome_metazoa
 process BUSCO_translatome_metazoa2 {
 
-    label 'process_medium'
+    label 'process_high'
+    label 'process_long'
 
     errorStrategy 'retry'
     maxRetries 4
@@ -706,7 +715,8 @@ process BUSCO_translatome_metazoa2 {
 // Process 12: BUSCO_translatome_mollusca
 process BUSCO_translatome_mollusca2 {
 
-    label 'process_medium'
+    label 'process_high'
+    label 'process_long'
 
     errorStrategy 'retry'
     maxRetries 4
@@ -736,7 +746,8 @@ process BUSCO_translatome_mollusca2 {
 // Process 11: BUSCO_translatome_metazoa
 process BUSCO_translatome_metazoa3 {
 
-    label 'process_medium'
+    label 'process_high'
+    label 'process_long'
 
     errorStrategy 'retry'
     maxRetries 4
@@ -766,7 +777,8 @@ process BUSCO_translatome_metazoa3 {
 // Process 12: BUSCO_translatome_mollusca
 process BUSCO_translatome_mollusca3 {
 
-    label 'process_medium'
+    label 'process_high'
+    label 'process_long'
 
     errorStrategy 'retry'
     maxRetries 4
@@ -1194,7 +1206,7 @@ workflow {
 
     // Define Input: Trinity fasta + R1 + R2 tuple 
     input_TrinityKallisto_single = csv_channel
-        .filter { row -> !row.Transcriptome2?.trim() || row.Transcriptome2.trim() != '' || row.Transcriptome2.trim().toLowerCase() == 'null' }
+        .filter { row -> !row.Transcriptome2?.trim() || row.Transcriptome2.trim().toLowerCase() == 'null' }
         .map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2), row.Strandedness, file(row.Transcriptome1)) }
 
     input_TrinityKallisto_combined = csv_channel
