@@ -574,8 +574,8 @@ process TD2 {
     script:
 
     """
-    TD2.LongOrfs -t ${combined_trinity} -m 15 --precise
-    TD2.Predict -t ${combined_trinity} --precise
+    TD2.LongOrfs -t ${combined_trinity} -m 15 
+    TD2.Predict -t ${combined_trinity} 
 
     """
 }
@@ -601,7 +601,6 @@ process ORFs_Combined {
     output:
     tuple val(sample), path("*combined.deduplicatedCDS.pep"), emit: combined_pep
     tuple val(sample), path("*combined.deduplicated.cds"), emit: combined_cds
-
     script:
 
     """
@@ -613,7 +612,7 @@ process ORFs_Combined {
     seqkit replace -p '(.+)' -r 'TD_\$1' ${transdecoder_pep} > transdecoder_labelled.pep
     seqkit replace -p '(.+)' -r 'TD2_\$1' ${TD2_pep} > TD2_labelled.pep
     cat transdecoder_labelled.pep TD2_labelled.pep > orf_combined.pep
-    seqkit seq -n ${sample}_ORF_combined.deduplicated.cds > ids_from_cds.txt
+    seqkit seq -i ${sample}_ORF_combined.deduplicated.cds > ids_from_cds.txt
     seqkit grep -f ids_from_cds.txt orf_combined.pep -o orf_combined.deduplicatedCDS.pep
 
     """
@@ -888,7 +887,7 @@ process ORF_complete {
     conda "seqkit=2.12.0"
     container "docker://gfanz/seqkit"
 
-    publishDir "${sample}/Venomflow/results/ORFprediction/Combined", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/ORFprediction/Combined/Complete/", mode: 'copy'
 
     input:
     tuple val(sample), path(combined_pep), path(combined_cds)
@@ -913,7 +912,8 @@ process SignalP {
     cpus { task.attempt * 2 }
     memory { task.attempt * 2.GB }
 
-    label 'process_medium'
+    label 'process_low'
+    label 'process_long'
 
     publishDir "${sample}/Venomflow/results/Signalp", mode: 'copy'
 
