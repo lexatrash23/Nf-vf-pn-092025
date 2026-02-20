@@ -604,15 +604,15 @@ process ORFs_Combined {
     script:
 
     """
-    seqkit replace -p '(.+)' -r 'TD_\$1' ${transdecoder_cds} > transdecoder_labelled.cds
-    seqkit replace -p '(.+)' -r 'TD2_\$1' ${TD2_cds} > TD2_labelled.cds
+    seqkit replace -p '(.+)' -r 'TD_'\$1'' ${transdecoder_cds} > transdecoder_labelled.cds
+    seqkit replace -p '(.+)' -r 'TD2_'\$1'' ${TD2_cds} > TD2_labelled.cds
     cat transdecoder_labelled.cds TD2_labelled.cds > orf_combined.cds
     seqkit rmdup orf_combined.cds -s -o ${sample}_ORF_combined.deduplicated.cds
 
-    seqkit replace -p '(.+)' -r 'TD_\$1' ${transdecoder_pep} > transdecoder_labelled.pep
-    seqkit replace -p '(.+)' -r 'TD2_\$1' ${TD2_pep} > TD2_labelled.pep
+    seqkit replace -p '(.+)' -r 'TD_'\$1'' ${transdecoder_pep} > transdecoder_labelled.pep
+    seqkit replace -p '(.+)' -r 'TD2_'\$1'' ${TD2_pep} > TD2_labelled.pep
     cat transdecoder_labelled.pep TD2_labelled.pep > orf_combined.pep
-    seqkit seq -i ${sample}_ORF_combined.deduplicated.cds > ids_from_cds.txt
+    seqkit seq -n -i ${sample}_ORF_combined.deduplicated.cds > ids_from_cds.txt
     seqkit grep -f ids_from_cds.txt orf_combined.pep -o orf_combined.deduplicatedCDS.pep
 
     """
@@ -1012,7 +1012,7 @@ process Interproscan {
     publishDir "${sample}/Venomflow/results/Interproscan", mode: 'copy'
 
     input:
-    tuple val(sample), path(combined_pep)
+    tuple val(sample), path(complete_pep)
 
     output:
     path "*.tsv", emit: Interproscan
@@ -1362,8 +1362,8 @@ workflow {
     //Run Process: STATS   
     stats_join | stats
 
-    //Run Process: Interproscan  (Input was previously defined)
-    Combined_pep | Interproscan
+    //Run Process: Interproscan  (Complete pep ORFs only)
+    input_signalp | Interproscan
 
     //Define Input: genomefasta 
     Genomefasta = csv_channel
