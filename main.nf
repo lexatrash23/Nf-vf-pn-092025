@@ -604,8 +604,8 @@ process ORFs_Combined {
     script:
 
     """
-    seqkit replace -p '(.+)' -r 'TD_'\$1'' ${transdecoder_cds} > transdecoder_labelled.cds
-    seqkit replace -p '(.+)' -r 'TD2_'\$1'' ${TD2_cds} > TD2_labelled.cds
+    seqkit replace -p '(.+)' -r 'TD_\$1' ${transdecoder_cds} > transdecoder_labelled.cds
+    seqkit replace -p '(.+)' -r 'TD2_\$1' ${TD2_cds} > TD2_labelled.cds
     cat transdecoder_labelled.cds TD2_labelled.cds > orf_combined.cds
     seqkit rmdup orf_combined.cds -s -o ${sample}_ORF_combined.deduplicated.cds
 
@@ -613,7 +613,7 @@ process ORFs_Combined {
     seqkit replace -p '(.+)' -r 'TD2_'\$1'' ${TD2_pep} > TD2_labelled.pep
     cat transdecoder_labelled.pep TD2_labelled.pep > orf_combined.pep
     seqkit seq -n -i ${sample}_ORF_combined.deduplicated.cds > ids_from_cds.txt
-    seqkit grep -f ids_from_cds.txt orf_combined.pep -o orf_combined.deduplicatedCDS.pep
+    seqkit grep -f ids_from_cds.txt orf_combined.pep -o ${sample}_orf_combined.deduplicatedCDS.pep
 
     """
 }
