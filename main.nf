@@ -1077,8 +1077,8 @@ process GenomeBlasts {
 
     script:
     """
-    blastn -query ${completecds} -db ${genomedbname} -out ${sample}.blastn.db.6.txt -evalue 1e-5 -num_threads 10 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
-    blastn -query ${completecds} -db ${genomedbname} -out ${sample}.blastn.db.0.txt -evalue 1e-5 -num_threads 10 -outfmt '0'
+    blastn -query ${completecds} -db ${genomedbname} -out ${sample}.blastn.db.6.txt -evalue 1e-5 -num_threads ${task.cpus} -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
+    blastn -query ${completecds} -db ${genomedbname} -out ${sample}.blastn.db.0.txt -evalue 1e-5 -num_threads ${task.cpus} -outfmt '0'
 
     """
 }
