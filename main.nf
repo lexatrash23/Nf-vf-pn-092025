@@ -1020,7 +1020,7 @@ process Interproscan {
     script:
 
     """
-    awk '{if (\$0 ~ /^>/) print \$0; else {gsub(/\\*/, ""); print \$0}}' ${combined_pep} > "${sample}.Trinity.fasta.transdecoder.cleaned.pep"
+    awk '{if (\$0 ~ /^>/) print \$0; else {gsub(/\\*/, ""); print \$0}}' ${complete_pep} > "${sample}.Trinity.fasta.transdecoder.cleaned.pep"
 
     interproscan.sh -goterms -i "${sample}.Trinity.fasta.transdecoder.cleaned.pep" -pa -t p -d ./ -f TSV 
 
