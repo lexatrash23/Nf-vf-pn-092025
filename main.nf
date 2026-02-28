@@ -1018,8 +1018,35 @@ process GenomeBlastdatabasecreation {
     """
 }
 
-// Process 21: GenomeBlasts
-process GenomeBlasts {
+// Process 21: GenomeBlasts6
+process GenomeBlasts6 {
+
+    label 'process_high'
+    label 'process_long'
+
+    conda "blast=2.17.0"
+    container "docker://ncbi/blast:2.17.0"
+
+    errorStrategy 'retry'
+    maxRetries 4
+
+    publishDir "${sample}/Venomflow/results/Blast/Blastn/", mode: 'copy'
+
+    input:
+    tuple val(sample), val(genomedbname), path(completecds), path(genomedb)
+
+    output:
+    path "${sample}.blastn.db.6.txt", emit: blastn6
+
+    script:
+    """
+    blastn -query ${completecds} -db ${genomedbname} -out ${sample}.blastn.db.6.txt -evalue 1e-5 -num_threads ${task.cpus} -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
+
+    """
+}
+
+// Process 21: GenomeBlasts0
+process GenomeBlasts0 {
 
     label 'process_high'
     label 'process_long'
@@ -1037,16 +1064,13 @@ process GenomeBlasts {
 
     output:
     path "${sample}.blastn.db.0.txt", emit: blastn0
-    path "${sample}.blastn.db.6.txt", emit: blastn6
 
     script:
     """
-    blastn -query ${completecds} -db ${genomedbname} -out ${sample}.blastn.db.6.txt -evalue 1e-5 -num_threads ${task.cpus} -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
     blastn -query ${completecds} -db ${genomedbname} -out ${sample}.blastn.db.0.txt -evalue 1e-5 -num_threads ${task.cpus} -outfmt '0'
 
     """
 }
-
 
 // PARAMETERS DEFINED IN CONFIG AND SAMPLESHEET FILE
 
@@ -1350,5 +1374,7 @@ workflow {
         .join(genomedb)
 
     //Run Process: BlastnGenome
-    BlastnInput | GenomeBlasts
+    BlastnInput | GenomeBlasts6
+    //Run Process: BlastnGenome
+    BlastnInput | GenomeBlasts0
 }
