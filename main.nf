@@ -29,8 +29,7 @@ process PostTrimFastqc {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     label 'process_low'
 
@@ -53,8 +52,7 @@ process PostTrimFastqc {
 process MultiQC {
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     label 'process_single'
     container "docker://multiqc/multiqc:v1.32"
@@ -86,8 +84,7 @@ process Bowtie {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     conda "bowtie2=2.5.4"
     container "docker://quay.io/biocontainers/bowtie2:2.5.4--he20e202_1"
@@ -119,8 +116,7 @@ process Bowtie2 {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     conda "bowtie2=2.5.4"
     container "docker://quay.io/biocontainers/bowtie2:2.5.4--he20e202_1"
@@ -150,8 +146,7 @@ process TrinityStats {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     label 'process_single'
 
@@ -179,8 +174,7 @@ process TrinityStats2 {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     label 'process_single'
 
@@ -207,8 +201,7 @@ process BUSCO_transcriptome_metazoa {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     label 'process_high'
     label 'process_long'
@@ -238,8 +231,7 @@ process BUSCO_transcriptome_mollusca {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     label 'process_high'
     label 'process_long'
@@ -268,8 +260,7 @@ process BUSCO_transcriptome_metazoa2 {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     label 'process_high'
     label 'process_long'
@@ -299,8 +290,7 @@ process BUSCO_transcriptome_mollusca2 {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     label 'process_high'
     label 'process_long'
@@ -329,8 +319,7 @@ process Transcriptome_Combined {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     label 'process_low'
 
@@ -362,8 +351,7 @@ process BUSCO_transcriptome_metazoa3 {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     label 'process_high'
     label 'process_long'
@@ -394,8 +382,7 @@ process BUSCO_transcriptome_mollusca3 {
     errorStrategy 'retry'
     maxRetries 4
 
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     label 'process_high'
     label 'process_long'
@@ -433,8 +420,7 @@ process Kallisto_Trinity {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     input:
     tuple val(sample), path(R1), path(R2), val(Strandedness), path(combined_trinity)
@@ -464,8 +450,7 @@ process Blastdatabasecreation {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     label 'process_single'
 
@@ -492,8 +477,7 @@ process Blastx {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     conda "blast=2.17.0"
     container "docker://ncbi/blast:2.17.0"
@@ -527,8 +511,7 @@ process Transdecoder {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     publishDir "${sample}/Venomflow/results/ORFprediction/Transdecoder/", mode: 'copy'
 
@@ -559,8 +542,7 @@ process TD2 {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     publishDir "${sample}/Venomflow/results/ORFprediction/TD2/", mode: 'copy'
 
@@ -585,8 +567,7 @@ process ORFs_Combined {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     label 'process_medium'
 
@@ -626,8 +607,7 @@ process BUSCO_translatome_metazoa {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
@@ -657,8 +637,7 @@ process BUSCO_translatome_mollusca {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
@@ -688,8 +667,7 @@ process BUSCO_translatome_metazoa2 {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
@@ -719,8 +697,7 @@ process BUSCO_translatome_mollusca2 {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
@@ -750,8 +727,7 @@ process BUSCO_translatome_metazoa3 {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
@@ -781,8 +757,7 @@ process BUSCO_translatome_mollusca3 {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
@@ -810,8 +785,7 @@ process Kallisto_Transdecoder {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     label 'process_medium'
 
@@ -848,8 +822,7 @@ process Blastp {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     label 'process_low'
 
@@ -879,8 +852,7 @@ process ORF_complete {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     label 'process_single'
 
@@ -909,8 +881,7 @@ process SignalP {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     label 'process_low'
     label 'process_long'
@@ -937,8 +908,7 @@ process Filter2 {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     label 'process_single'
 
@@ -965,8 +935,7 @@ process stats {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     label 'process_single'
 
@@ -1003,8 +972,6 @@ process Interproscan {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
 
     label 'process_high'
     label 'process_long'
@@ -1032,8 +999,7 @@ process GenomeBlastdatabasecreation {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
+
 
     conda "blast=2.17.0"
     container "docker://ncbi/blast:2.17.0"
@@ -1063,8 +1029,6 @@ process GenomeBlasts {
 
     errorStrategy 'retry'
     maxRetries 4
-    cpus { task.attempt * 2 }
-    memory { task.attempt * 2.GB }
 
     publishDir "${sample}/Venomflow/results/Blast/Blastn/", mode: 'copy'
 
