@@ -918,15 +918,19 @@ process Filter2 {
     publishDir "${sample}/Venomflow/ORFprediction/Combined/", mode: 'copy'
 
     input:
-    tuple val(sample), path(maturesequences), path(complete_pep)
+    tuple val(sample), path(maturesequences), path(complete_pep), path(complete_cds)
 
     output:
-    tuple val(sample), path("*.fasta"), emit: transdecoderpep_signalp
+    tuple val(sample), path("*.pep.fasta"), emit: transdecoderpep_signalp
+    tuple val(sample), path("*.cds.fasta"), emit: transdecodercds_signalp
+
 
     script:
 
     """
-    seqkit grep -f <(seqkit seq -n ${maturesequences}) ${complete_pep} > ${sample}.complete.signalp.sequences.fasta
+    seqkit grep -f <(seqkit seq -n ${maturesequences}) ${complete_pep} > ${sample}.complete.signalp.sequences.pep.fasta
+    seqkit grep -f <(seqkit seq -n ${maturesequences}) ${complete_cds} > ${sample}.complete.signalp.sequences.cds.fasta
+
     """
 }
 
@@ -1332,7 +1336,7 @@ workflow {
 
     //Define Input: sample name + mature sequences + completepep tuple 
     maturesequences = SignalP.out.maturesequences
-    maturecomplete = maturesequences.join(input_signalp)
+    maturecomplete = maturesequences.join(input_signalp).join(ORF_complete.out.complete_cds)
 
     //Run Process: Filter2   
     maturecomplete | Filter2
@@ -1350,8 +1354,9 @@ workflow {
     //Run Process: STATS   
     stats_join | stats
 
+    input_Interproscan = Filter2.out.transdecoderpep_signalp
     //Run Process: Interproscan  (Complete pep ORFs only)
-    input_signalp | Interproscan
+    input_Interproscan | Interproscan
 
     //Define Input: genomefasta 
     Genomefasta = csv_channel
@@ -1370,7 +1375,7 @@ workflow {
     Blastncds = csv_channel.map { row -> tuple(row.Sample_name, row.Genome_fasta_name) }
 
     BlastnInput = Blastncds
-        .join(ORF_complete.out.complete_cds)
+        .join(Filter2.out.transdecodercds_signalp)
         .join(genomedb)
 
     //Run Process: BlastnGenome

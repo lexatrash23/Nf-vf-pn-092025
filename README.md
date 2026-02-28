@@ -5,6 +5,115 @@ Just updated to accept multiple inputs. ReadMe needs to be updated
 [On Installing Nextflow](https://www.nextflow.io/docs/latest/install.html)
 # Overview
 ___
+## Inputs and Outputs 
+### Required Input files
+This Nextflow pipeline has 4 required input files and 2 optional input file per sample (per row in the Samplesheet.csv). The required input files are as follows:
+1. Transcriptome Assembly (fasta)
+2. Trimmed Reads R1 (fasta/fastq.gz)
+3. Trimmed Reads R2 (fasta/fastq.gz)
+4. Protein Sequences of interest to BLAST against (fasta)
+
+### Optional Input files 
+5. Genome fasta
+6. A second transcriptome assembly 
+
+Allowing two transcriptome assemblies, allows for the use of both a de novo assembly and a genome-based assembly where available. 
+
+### Output files
+All Output files can be found in within the sample name-derived folder in the directory the script was run from.  
+Output files available are as follows: 
+1. Fastqc  
+    a. multiqc.html 
+3. BUSCO  
+    a. Transcriptome : BUSCO summary files, 1 per lineage specified per transcriptome provided. If two transcriptomes were provided, additional summary files based on the combined transcriptome will also be provided per lineage specified.
+    b. Translatome: BUSCO summary files, 1 per lineage. Two ORF prediction tools - Transdecoder and TD2 are used in the pipeline. BUSCO translatome assessments are provided based on protein fastas generated from each of these tools and based on a combined deduplicated version of these protein fastas. 
+5. Blast   
+    a. blastx fmt 0 and 6   
+     b. blastp fmt 0 and 6  
+  c. blastn fmt 0 and 6 (if genome was provided)  
+6. kallisto  
+    a. abundance.tsv files with trinity fasta used as an index  
+    b. abundance.tsv files with transdecoder fasta used as an index  
+8. Interproscan  
+    a. Interproscan output file (tsv)  
+10. Signalp  
+    a. Signalp summary file and mature fasta  
+12. Transdecoder  
+    a. Transdecoder pep and cds files  
+    b. Transdecoder pep and cds files filtered only for complete ORFs  
+    c. Transdecoder pep file filtered only for those with signalp sequence predicted  
+14. Stats  
+    d. 9 Seqkit stats files  
+
+## Pre-requisites
+### nextflow 
+Nextflow requires Bash 3.2 (or later) and Java 17 (or later, up to 25) to be installed.Detailed information on nextflow installation can be found [here](https://www.nextflow.io/docs/latest/install.html)
+> Install SDKMAN:
+    ``` curl -s https://get.sdkman.io | bash ```  
+> Install Java: 
+    ``` sdk install java 17.0.10-tem ``` 
+> Install nextflow: 
+    ``` curl -s https://get.nextflow.io | bash ```
+> Make nextflow executable and move into an executable path:
+    ``` chmod +x nextflow 
+        mkdir -p $HOME/.local/bin/
+        mv nextflow $HOME/.local/bin/
+    ```
+> Confirm nextflow installation 
+ ``` nextflow info ```
+ 
+### SignalP 5.0 
+Information for SignalP 5.0 download and installation can be found [here](https://services.healthtech.dtu.dk/services/SignalP-5.0/)
+> Download SignalP 5.0b 
+ Download Linux version of SignalP 5.0 from above hyperlink
+> Extract SignalP 5.0 
+ Move SignalP 5.0 package into desired directory and extract: 
+ ``` tar -xvzf signalp-5.0b.Linux.tar.gz
+ ```
+> Make signalp executable:
+open bashrc:  
+``` nano ~/.bashrc ``` 
+add the following line to the bashrc file replace [PathToFile] with the path to signalp-5.0b in your directory: 
+export PATH=$PATH:[PathToFile]/signalp-5.0b/bin/
+
+### Interproscan 
+Information for Interproscan download and installation can be found [here](https://www.ebi.ac.uk/interpro/download/InterProScan/)
+> Installation:
+Install Interproscan 5 from the above link 
+> Make Interproscan executable:
+move interprscan download to the desired directory
+open bashrc:  
+``` nano ~/.bashrc ``` 
+add the following line to the bashrc file replace [PathToFile] with the path to Interproscan dir in your directory: 
+export PATH=$PATH:[PathToFile]interproscan-5.76-107.0/
+
+### Database fasta file for Blastx and Blastn 
+The Animal toxin annotation project homepage can be found [here]( https://www.uniprot.org/help/Toxins)
+Here you can download your desired venom fasta file that will be used as database against which to search for similar venom proteins. A version of this file accessed in August 2025 can be found in this github homepage in the Test_files dir with the name "Unitox_curated.fasta"
+### Genome fasta (optional)
+If your sample organism has an available genome, you may include the path to this genome fasta file in the SampleSheet.csv 
+
+## Filing up the Sample Sheet 
+**1.** Download SampleSheet.csv file from this Github page 
+This Samplesheet.csv is utilized for both the VenomFlow pipeline as well as for VenomflowAnalysis pipeline that can be run following this pipeline. More information on the VenomflowAnalysis pipeline can be found here.
+This Samplesheet.csv contains both Metadata and file path columns. Most metadata columns will be used for the VenomFlowAnalysis pipeline and can be ignored for this pipeline. 
+For Venomflow pipeline running there are 11 mandatory columns and 5 optional columns as follows: 
+| # | Column name | Mandatory/Optional | Expected Input description | Expected Input example  | Input Format |
+| 1 |Sample_name | Mandatory | A shorthand for the sample name that will be used as a prefix in output files as well for the name of the results folder | "DP3_PD" | String |
+| 2 |R1 | Mandatory | Trimmed Reads 1 | "/home/project/lexatrash/DP3/TrimmedReads/R1.fastq.gz" | Path to fasta/fastq/fastq.gz | 
+| 3 |R2 | Mandatory | Trimmed Reads 2 | "/home/project/lexatrash/DP3/TrimmedReads/R2.fastq.gz" | Path to fasta/fastq/fastq.gz | 
+| 4 |Strandedness | Mandatory | Strandedness information. "rf"  = Reverse, "fr" = Forward. "Unstranded" = Unstranded. Any input other that rf or fr will also be taken as unstranded | "rf" | String | 
+| 5 |Transcriptome1_label | Mandatory | Label for transcriptome assembly. Will be used as a prefix for transcript sequences if more than one transcriptome assembly is provided| "DN" | String | 
+| 6 |Transcriptome1 | Mandatory | Path to Transcriptome assembly | "/home/project/lexatrash/DP3/Trinity/Trinity.fasta" | Path to fasta file | 
+| 7 |Transcriptome2_label | Optional | Label for 2nd transcriptome assembly if available. Will be used as a prefix for transcript sequences | "GB" | String | 
+| 8 |Transcriptome2 | Optional | Path to Transcriptome2 assembly | "/home/project/lexatrash/DP3/Stringtie/Stringtie.fasta" | Path to fasta file |
+| 9 |BUSCO_lin1 | Mandatory | Desired BUSCO lineage for transcriptome and translatome assements. Complete BUSCO lineage options can be found here | "metazoa_odb10" | String |
+| 10 |BUSCO_lin2 | Mandatory | Desired second BUSCO lineage for transcriptome and translatome assessments. Complete BUSCO lineage options can be found here | "mollusca_odb10" | String |
+| 11 |Protein_fasta_path_for_Blast | Mandatory | Path to fasta file intended to be used as blast database | "/home/project/lexatrash/Databases/Unitox_curated.fasta" | Path to fasta file |
+| 12 |Protein_fasta_name | Mandatory | String Name for Blast Database  | "Unitox_curated" | String |
+| 13 |isgenomeavailble | Mandatory | "Y" = Genome fasta is available, "N" = No Genome fasta is available  | "Y" | String |
+| 14 |Genome_fasta_path | Optional | Path to Genome fasta if available  | "/home/project/lexatrash/Genomes/Dp.fasta" | Path to fasta/fasta.gz |
+| 15 |NCBI_Genome_id | Optional | NCBI genome accesssion id if available  | "GCA_023376005.1" | String |
 
 ## Quick Start:   
 
@@ -56,30 +165,6 @@ Test run can be down with the following provided test files:
 Download Test_files folder and specify respective file paths in local config file.
 Due to size limitations, these are only sample fasta and hence the results will be limited  
 
-### Output files
-All Output files can be found in the results subfolder of the directory the script was run from.  
-Output files available are as follows: 
-1. Fastqc  
-	a. multiqc.html  
-3. BUSCO  
-	a. 4 Busco summary files (2 per lineage db used, one with the transcriptome and one translatome)  
-5. Blast   
-	a. blastx fmt 0 and 6   
- 	b. blastp fmt 0 and 6  
-  c. blastn fmt 0 and 6 (if genome was provided)  
-6. kallisto  
-	a. abundance.tsv files with trinity fasta used as an index  
-	b. abundance.tsv files with transdecoder fasta used as an index  
-8. Interproscan  
-	a. Interproscan output file (tsv)  
-10. Signalp  
-	a. Signalp summary file and mature fasta  
-12. Transdecoder  
-	a. Transdecoder pep and cds files  
-	b. Transdecoder pep and cds files filtered only for complete ORFs  
-	c. Transdecoder pep file filtered only for those with signalp sequence predicted  
-14. Stats  
-	d. 9 Seqkit stats files  
 
 ___
 
