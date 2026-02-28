@@ -494,8 +494,8 @@ process Blastx {
     script:
     """
    
-    blastx -query ${combined_trinity} -db ${proteindbdbname} -out ${sample}.blastx.db.6.txt -evalue 1e-5 -num_threads ${task.cpus} -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
-    blastx -query ${combined_trinity} -db ${proteindbdbname} -out ${sample}.blastx.db.0.txt -evalue 1e-5 -num_threads ${task.cpus} -outfmt '0'
+    blastx -query ${combined_trinity} -db ${proteindbdbname} -out ${sample}.blastx.db.6.txt -evalue 1e-5 -num_threads 16 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
+    blastx -query ${combined_trinity} -db ${proteindbdbname} -out ${sample}.blastx.db.0.txt -evalue 1e-5 -num_threads 16 -outfmt '0'
 
     """
 }
@@ -841,8 +841,8 @@ process Blastp {
     script:
     """
 
-    blastp -query ${combined_pep} -db ${proteindbdbname} -out ${sample}.blastp.db.6.txt -evalue 1e-5 -num_threads ${task.cpus} -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
-    blastp -query ${combined_pep} -db ${proteindbdbname} -out ${sample}.blastp.db.0.txt -evalue 1e-5 -num_threads ${task.cpus} -outfmt '0'
+    blastp -query ${combined_pep} -db ${proteindbdbname} -out ${sample}.blastp.db.6.txt -evalue 1e-5 -num_threads 16 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
+    blastp -query ${combined_pep} -db ${proteindbdbname} -out ${sample}.blastp.db.0.txt -evalue 1e-5 -num_threads 16 -outfmt '0'
 
     """
 }
@@ -1021,7 +1021,7 @@ process GenomeBlastdatabasecreation {
 // Process 21: GenomeBlasts6
 process GenomeBlasts6 {
 
-    label 'blast'
+    label 'process_high'
     label 'process_long'
 
     conda "blast=2.17.0"
@@ -1040,7 +1040,7 @@ process GenomeBlasts6 {
 
     script:
     """
-    blastn -query ${completecds} -db ${genomedbname} -out ${sample}.blastn.db.6.txt -evalue 1e-5 -num_threads ${task.cpus} -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
+    blastn -query ${completecds} -db ${genomedbname} -out ${sample}.blastn.db.6.txt -evalue 1e-5 -num_threads 16 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
 
     """
 }
@@ -1067,7 +1067,7 @@ process GenomeBlasts0 {
 
     script:
     """
-    blastn -query ${completecds} -db ${genomedbname} -out ${sample}.blastn.db.0.txt -evalue 1e-5 -num_threads ${task.cpus} -outfmt '0'
+    blastn -query ${completecds} -db ${genomedbname} -out ${sample}.blastn.db.0.txt -evalue 1e-5 -num_threads 16 -outfmt '0'
 
     """
 }
