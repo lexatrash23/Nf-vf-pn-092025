@@ -1021,7 +1021,7 @@ process GenomeBlastdatabasecreation {
 // Process 21: GenomeBlasts6
 process GenomeBlasts6 {
 
-    label 'process_high'
+    label 'blast'
     label 'process_long'
 
     conda "blast=2.17.0"
@@ -1048,7 +1048,7 @@ process GenomeBlasts6 {
 // Process 21: GenomeBlasts0
 process GenomeBlasts0 {
 
-    label 'process_high'
+    label 'blast'
     label 'process_long'
 
     conda "blast=2.17.0"
