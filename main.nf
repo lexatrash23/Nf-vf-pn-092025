@@ -55,10 +55,9 @@ process MultiQC {
 
 
     label 'process_single'
-    container "docker://multiqc/multiqc:v1.32"
-
     conda "multiqc=1.33"
     container "docker://multiqc/multiqc:v1.32"
+
 
     publishDir "${sample}/Venomflow/results/Fastqc/posttrim/", mode: 'copy'
     publishDir "${sample}/Analysis/results/htmls/", mode: 'copy'
@@ -326,7 +325,7 @@ process Transcriptome_Combined {
     conda "seqkit=2.12.0"
     container "docker://gfanz/seqkit"
 
-    publishDir "${sample}/Venomflow/results/Transcriptome/", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Combined_Transcriptome/", mode: 'copy'
 
     input:
     tuple val(sample), path(transcriptome1), val(transcriptome1_label), path(transcriptome2), val(transcriptome2_label)
@@ -363,7 +362,7 @@ process BUSCO_transcriptome_metazoa3 {
     publishDir "${sample}/Venomflow/results/BUSCO/transcriptome/Combined", mode: 'copy'
 
     input:
-    tuple val(sample),val(metazoa),path(combined_trinity)
+    tuple val(sample), val(metazoa), path(combined_trinity)
 
     output:
     path "*.txt"
@@ -393,7 +392,7 @@ process BUSCO_transcriptome_mollusca3 {
     publishDir "${sample}/Venomflow/results/BUSCO/transcriptome/Combined", mode: 'copy'
 
     input:
-    tuple val(sample), val(mollusca),path(combined_trinity)
+    tuple val(sample), val(mollusca), path(combined_trinity)
 
     output:
     path "*.txt"
@@ -420,7 +419,6 @@ process Kallisto_Trinity {
 
     errorStrategy 'retry'
     maxRetries 4
-
 
     input:
     tuple val(sample), path(R1), path(R2), val(Strandedness), path(combined_trinity)
@@ -574,7 +572,7 @@ process ORFs_Combined {
     conda "seqkit=2.12.0"
     container "docker://gfanz/seqkit"
 
-    publishDir "${sample}/Venomflow/results/ORFprediction/Combined", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/ORFprediction/Combined/All", mode: 'copy'
 
     input:
     tuple val(sample), path(transdecoder_pep), path(transdecoder_cds), path(TD2_pep), path(TD2_cds)
@@ -582,6 +580,7 @@ process ORFs_Combined {
     output:
     tuple val(sample), path("*combined.deduplicatedCDS.pep"), emit: combined_pep
     tuple val(sample), path("*combined.deduplicated.cds"), emit: combined_cds
+
     script:
 
     """
@@ -886,7 +885,7 @@ process SignalP {
     label 'process_low'
     label 'process_long'
 
-    publishDir "${sample}/Venomflow/results/Signalp", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Secreted/Mature/Signalp", mode: 'copy'
 
     input:
     tuple val(sample), path(complete_pep)
@@ -915,15 +914,14 @@ process Filter2 {
     conda "seqkit=2.12.0"
     container "docker://gfanz/seqkit"
 
-    publishDir "${sample}/Venomflow/ORFprediction/Combined/", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Secreted/Full_Secreted/Signalp", mode: 'copy'
 
     input:
     tuple val(sample), path(maturesequences), path(complete_pep), path(complete_cds)
 
     output:
-    tuple val(sample), path("*.pep.fasta"), emit: transdecoderpep_signalp
-    tuple val(sample), path("*.cds.fasta"), emit: transdecodercds_signalp
-
+    tuple val(sample), path("*.pep.fasta"), emit: complete_pep_signalp
+    tuple val(sample), path("*.cds.fasta"), emit: complete_cds_signalp
 
     script:
 
@@ -949,7 +947,7 @@ process stats {
     publishDir "${sample}/Venomflow/results/Stats", mode: 'copy'
 
     input:
-    tuple val(sample), path(Transdecoder_pep), path(Transdecoder_cds), path(transdecodercomplete_pep), path(transdecodercomplete_cds), path(maturesequences), path(transdecoderpep_signalp), path(TD2_pep), path(TD2_cds), path(combined_pep), path(combined_cds)
+    tuple val(sample), path(Transdecoder_pep), path(Transdecoder_cds), path(complete_pep), path(complete_cds), path(maturesequences), path(complete_pep_signalp), path(TD2_pep), path(TD2_cds), path(combined_pep), path(combined_cds)
 
     output:
     path "*"
@@ -959,10 +957,10 @@ process stats {
     """
     seqkit stats ${Transdecoder_pep} > ${sample}_Transdecoder_pep.stats.txt
     seqkit stats ${Transdecoder_cds} > ${sample}_Transdecoder_cds.stats.txt
-    seqkit stats ${transdecodercomplete_pep} > ${sample}_complete_pep.stats.txt
-    seqkit stats ${transdecodercomplete_cds} > ${sample}_transdecodercomplete_cds.stats.txt
+    seqkit stats ${complete_pep} > ${sample}_complete_pep.stats.txt
+    seqkit stats ${complete_cds} > ${sample}_complete_cds.stats.txt
     seqkit stats ${maturesequences} > ${sample}_maturesequences.stats.txt
-    seqkit stats ${transdecoderpep_signalp} > ${sample}_transdecoderpep_signalp.stats.txt
+    seqkit stats ${complete_pep_signalp} > ${sample}_complete_pep_signalp.stats.txt
     seqkit stats ${TD2_cds} > ${sample}_TD2_cds_pep.stats.txt
     seqkit stats ${TD2_pep} > ${sample}_TD2_pep.stats.txt
     seqkit stats ${combined_cds} > ${sample}_combined_cds.stats.txt
@@ -971,6 +969,78 @@ process stats {
     """
 }
 
+// Process 18a:  DeepTMHMM (Optional)
+
+process DeepTMHMM {
+
+    errorStrategy 'retry'
+    maxRetries 4
+
+    label 'process_medium'
+
+    conda "seqkit=2.12.0"
+    container "docker://gfanz/seqkit"
+
+    publishDir "${sample}/Venomflow/results/Secreted/Mature/DeepTMHMM", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Stats", mode: 'copy'
+
+    input:
+    tuple val(sample), path(complete_pep)
+
+    output:
+    tuple val(sample), path('*'), emit: mature
+
+    script:
+    """
+
+    predict --fasta ${complete_pep} --output-dir ${sample}
+
+    """
+}
+
+// Process 18b:  DeepTMHMMfiler (Optional)
+
+process DeepTMHMMFilter {
+
+    errorStrategy 'retry'
+    maxRetries 4
+
+    label 'process_single'
+
+    conda "seqkit=2.12.0"
+    container "docker://gfanz/seqkit"
+
+    publishDir "${sample}/Venomflow/results/Secreted/Full_Secreted/DeepTMHMM", pattern: "*DeepTMHMM*", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Secreted/Full_Secreted/Combined", pattern: "*deduplicated*", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Stats", pattern: "*.txt", mode: 'copy'
+
+    input:
+    tuple val(sample), path(DeepTMHMM_mature), path(complete_pep), path(complete_cds), path(complete_pep_signalp), path(complete_cds_signalp)
+
+    output:
+    tuple val(sample), path('*DeepTMHMM.sequences.pep.fasta')
+    tuple val(sample), path('*DeepTMHMM.sequences.cds.fasta')
+    tuple val(sample), path('*deduplicated.pep.fasta'), emit: complete_pep_secreted
+    tuple val(sample), path('*deduplicated.cds.fasta'), emit: complete_cds_secreted
+    tuple val(sample), path('*.txt')
+
+    script:
+    """
+    seqkit grep -f <(seqkit seq -n ${DeepTMHMM_mature}) ${complete_pep} > ${sample}.complete.DeepTMHMM.sequences.pep.fasta
+    seqkit grep -f <(seqkit seq -n ${DeepTMHMM_mature}) ${complete_cds} > ${sample}.complete.DeepTMHMM.sequences.cds.fasta
+    cat ${sample}.complete.DeepTMHMM.sequences.pep.fasta ${complete_pep_signalp} > ${sample}.complete.secreted.sequences.pep.fasta
+    seqkit rmdup -n ${sample}.complete.secreted.sequences.pep.fasta > ${sample}.complete.secreted.sequences.deduplicated.pep.fasta
+    cat ${sample}.complete.DeepTMHMM.sequences.cds.fasta ${complete_cds_signalp} > ${sample}.complete.secreted.sequences.cds.fasta
+    seqkit rmdup -n ${sample}.complete.secreted.sequences.cds.fasta > ${sample}.complete.secreted.sequences.deduplicated.cds.fasta
+
+    seqkit stats ${sample}.complete.DeepTMHMM.sequences.pep.fasta > ${sample}.complete.DeepTMHMM.sequences.pep.stats.txt
+    seqkit stats ${sample}.complete.DeepTMHMM.sequences.cds.fasta > ${sample}.complete.DeepTMHMM.sequences.cds.stats.txt
+    seqkit stats ${sample}.complete.secreted.sequences.deduplicated.pep.fasta > ${sample}.complete.secreted.sequences.deduplicated.pep.stats.txt
+    seqkit stats ${sample}.complete.secreted.sequences.deduplicated.cds.fasta > ${sample}.complete.secreted.sequences.deduplicated.cds.stats.txt
+
+
+    """
+}
 // Process 19: Interproscan
 process Interproscan {
 
@@ -983,7 +1053,7 @@ process Interproscan {
     publishDir "${sample}/Venomflow/results/Interproscan", mode: 'copy'
 
     input:
-    tuple val(sample), path(complete_pep)
+    tuple val(sample), path(secreted_pep)
 
     output:
     path "*.tsv", emit: Interproscan
@@ -991,9 +1061,9 @@ process Interproscan {
     script:
 
     """
-    awk '{if (\$0 ~ /^>/) print \$0; else {gsub(/\\*/, ""); print \$0}}' ${complete_pep} > "${sample}.Trinity.fasta.transdecoder.cleaned.pep"
+    awk '{if (\$0 ~ /^>/) print \$0; else {gsub(/\\*/, ""); print \$0}}' ${secreted_pep} > "${sample}.Trinity.fasta.secreted.cleaned.pep"
 
-    interproscan.sh -goterms -i "${sample}.Trinity.fasta.transdecoder.cleaned.pep" -pa -t p -d ./ -f TSV 
+    interproscan.sh -goterms -i "${sample}.Trinity.fasta.secreted.cleaned.pep" -pa -t p -d ./ -f TSV 
 
     """
 }
@@ -1037,14 +1107,14 @@ process GenomeBlasts6 {
     publishDir "${sample}/Venomflow/results/Blast/Blastn/", mode: 'copy'
 
     input:
-    tuple val(sample), val(genomedbname), path(completecds), path(genomedb)
+    tuple val(sample), val(genomedbname), path(secretedcds), path(genomedb)
 
     output:
     path "${sample}.blastn.db.6.txt", emit: blastn6
 
     script:
     """
-    blastn -query ${completecds} -db ${genomedbname} -out ${sample}.blastn.db.6.txt -evalue 1e-5 -num_threads 16 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
+    blastn -query ${secretedcds} -db ${genomedbname} -out ${sample}.blastn.db.6.txt -evalue 1e-5 -num_threads 16 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
 
     """
 }
@@ -1052,7 +1122,7 @@ process GenomeBlasts6 {
 // Process 21: GenomeBlasts0
 process GenomeBlasts0 {
 
-    label 'blast'
+    label 'process_high'
     label 'process_long'
 
     conda "blast=2.17.0"
@@ -1064,14 +1134,14 @@ process GenomeBlasts0 {
     publishDir "${sample}/Venomflow/results/Blast/Blastn/", mode: 'copy'
 
     input:
-    tuple val(sample), val(genomedbname), path(completecds), path(genomedb)
+    tuple val(sample), val(genomedbname), path(secretedcds), path(genomedb)
 
     output:
     path "${sample}.blastn.db.0.txt", emit: blastn0
 
     script:
     """
-    blastn -query ${completecds} -db ${genomedbname} -out ${sample}.blastn.db.0.txt -evalue 1e-5 -num_threads 16 -outfmt '0'
+    blastn -query ${secretedcds} -db ${genomedbname} -out ${sample}.blastn.db.0.txt -evalue 1e-5 -num_threads 16 -outfmt '0'
 
     """
 }
@@ -1224,8 +1294,8 @@ workflow {
     Blastxinputfasta_single = csv_channel
         .filter { row -> !row.Transcriptome2?.trim() || row.Transcriptome2.trim().toLowerCase() == 'null' }
         .map { row ->
-        tuple(row.Sample_name, row.Protein_fasta_name, file(row.Transcriptome1))
-    }
+            tuple(row.Sample_name, row.Protein_fasta_name, file(row.Transcriptome1))
+        }
         .join(Blastdatabasecreation.out.proteindb)
 
     Blastxinputfasta_combined = csv_channel
@@ -1347,16 +1417,12 @@ workflow {
         .join(ORF_complete.out.complete_pep)
         .join(ORF_complete.out.complete_cds)
         .join(maturesequences)
-        .join(Filter2.out.transdecoderpep_signalp)
+        .join(Filter2.out.complete_pep_signalp)
         .join(TD2_pep)
         .join(TD2.out.TD2_cds)
         .join(input_ORF_complete)
     //Run Process: STATS   
     stats_join | stats
-
-    input_Interproscan = Filter2.out.transdecoderpep_signalp
-    //Run Process: Interproscan  (Complete pep ORFs only)
-    input_Interproscan | Interproscan
 
     //Define Input: genomefasta 
     Genomefasta = csv_channel
@@ -1369,14 +1435,33 @@ workflow {
 
     // Run Process: BlastnGenome database creation
     GenomeBlastdatabasecreation(Genomefasta)
-
-    //Define Input: Genome BLAST 
     genomedb = GenomeBlastdatabasecreation.out.genomedbfiles
     Blastncds = csv_channel.map { row -> tuple(row.Sample_name, row.Genome_fasta_name) }
 
-    BlastnInput = Blastncds
-        .join(Filter2.out.transdecodercds_signalp)
-        .join(genomedb)
+    // Optional Params 
+    if (params.DeepTMHMM) {
+        input_signalp | DeepTMHMM
+        input_DeepTMHMMFilter = DeepTMHMM.out.mature
+            .join(ORF_complete.out.complete_pep)
+            .join(ORF_complete.out.complete_cds)
+            .join(Filter2.out.complete_pep_signalp)
+            .join(Filter2.out.complete_cds_signalp)
+        input_DeepTMHMMFilter | DeepTMHMMFilter
+        input_Interproscan = DeepTMHMMFilter.out.complete_pep_secreted
+        BlastnInput = Blastncds
+            .join(DeepTMHMMFilter.out.complete_cds_secreted)
+            .join(genomedb)
+    }
+    else {
+        input_Interproscan = Filter2.out.complete_pep_signalp
+        //Define Input: Genome BLAST 
+        BlastnInput = Blastncds
+            .join(Filter2.out.complete_cds_signalp)
+            .join(genomedb)
+    }
+
+    //Run Process: Interproscan  (Complete secreted pep ORFs only)
+    input_Interproscan | Interproscan
 
     //Run Process: BlastnGenome
     BlastnInput | GenomeBlasts6
