@@ -1434,7 +1434,7 @@ workflow {
             path != null && path != 'NULL' && path.toString() != 'NULL' && path.toString().trim() != ''
         }
         .map { row -> tuple(row.Sample_name, file(row.Genome_fasta_path)) }
-        .unique { sample_name, genome_file -> sample_name }
+        .unique { tuple -> tuple[0] }
 
     // Run Process: BlastnGenome database creation
     GenomeBlastdatabasecreation(Genomefasta)
