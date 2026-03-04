@@ -995,8 +995,7 @@ process DeepTMHMM {
 
     RUN_DIR="\$(pwd)"
 
-    predict --fasta ${complete_pep} --output-dir "\${RUN_DIR}/${sample}"
-    python3 ${workflow.projectDir}/bin/deepout.py "$RUN_DIR"/${sample}/predicted_topologies.3line ${sample}_
+    predict --fasta ${complete_pep} --output-dir "$\{RUN_DIR}/${sample}"
     """
 }
 
