@@ -993,9 +993,9 @@ process DeepTMHMM {
     script:
     """
 
-    RUN_DIR="$(pwd)"
+    RUN_DIR="\$(pwd)"
 
-    predict --fasta ${complete_pep} --output-dir "$RUN_DIR"/${sample}
+    predict --fasta ${complete_pep} --output-dir "\${RUN_DIR}/${sample}"
     python3 ${workflow.projectDir}/bin/deepout.py "$RUN_DIR"/${sample}/predicted_topologies.3line ${sample}_
     """
 }
@@ -1063,12 +1063,11 @@ process Interproscan {
     script:
 
     """
-    export TMPDIR="."
-    mkdir -p $TMPDIR
-    
+
+
     awk '{if (\$0 ~ /^>/) print \$0; else {gsub(/\\*/, ""); print \$0}}' ${secreted_pep} > "${sample}.Trinity.fasta.secreted.cleaned.pep"
 
-    interproscan.sh -goterms -i "${sample}.Trinity.fasta.secreted.cleaned.pep" -pa -t p -d ./ -f TSV 
+    interproscan.sh -goterms -i "${sample}.Trinity.fasta.secreted.cleaned.pep" -pa -t p -d ./ -f TSV -T "."
 
     """
 }
