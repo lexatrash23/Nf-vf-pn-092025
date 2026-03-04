@@ -995,7 +995,7 @@ process DeepTMHMM {
 
     RUN_DIR="\$(pwd)"
 
-    predict --fasta ${complete_pep} --output-dir "$\{RUN_DIR}/${sample}"
+    predict --fasta ${complete_pep} --output-dir \$RUN_DIR/${sample}
     """
 }
 
