@@ -981,14 +981,16 @@ process DeepTMHMM {
     conda "seqkit=2.12.0"
     container "docker://gfanz/seqkit"
 
-    publishDir "${sample}/Venomflow/results/Secreted/Mature/DeepTMHMM", mode: 'copy'
-    publishDir "${sample}/Venomflow/results/Stats", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Secreted/Mature/DeepTMHMM", pattern: "*.fasta", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Stats", pattern: "*.txt",  mode: 'copy'
 
     input:
     tuple val(sample), path(complete_pep)
 
     output:
-    tuple val(sample), path('*'), emit: mature
+    tuple val(sample), path('*.fasta'), emit: mature
+    tuple val(sample), path('*.txt')
+
 
     script:
     """
@@ -996,6 +998,8 @@ process DeepTMHMM {
     RUN_DIR="\$(pwd)"
 
     predict --fasta ${complete_pep} --output-dir \$RUN_DIR/${sample}
+    python3 ${workflow.projectDir}/bin/deepout.py ${sample}/predicted_topologies.3line ${sample}_Deep_mature_sequences.fasta 
+    seqkit stats ${sample}_Deep_mature_sequences.fasta > ${sample}_Deep_mature_sequences.stats.txt
     """
 }
 
@@ -1066,7 +1070,7 @@ process Interproscan {
 
     awk '{if (\$0 ~ /^>/) print \$0; else {gsub(/\\*/, ""); print \$0}}' ${secreted_pep} > "${sample}.Trinity.fasta.secreted.cleaned.pep"
 
-    interproscan.sh -goterms -i "${sample}.Trinity.fasta.secreted.cleaned.pep" -pa -t p -d ./ -f TSV -T "."
+    interproscan.sh -goterms -i "${sample}.Trinity.fasta.secreted.cleaned.pep" -pa -t p -d ./ -f TSV 
 
     """
 }
