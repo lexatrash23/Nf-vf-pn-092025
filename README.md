@@ -98,22 +98,23 @@ If your sample organism has an available genome, you may include the path to thi
 This Samplesheet.csv is utilized for both the VenomFlow pipeline as well as for VenomflowAnalysis pipeline that can be run following this pipeline. More information on the VenomflowAnalysis pipeline can be found here.
 This Samplesheet.csv contains both Metadata and file path columns. Most metadata columns will be used for the VenomFlowAnalysis pipeline and can be ignored for this pipeline. 
 For Venomflow pipeline running there are 11 mandatory columns and 5 optional columns as follows: 
-| # | Column name | Mandatory/Optional | Expected Input description | Expected Input example  | Input Format |
-| 1 |Sample_name | Mandatory | A shorthand for the sample name that will be used as a prefix in output files as well for the name of the results folder | "DP3_PD" | String |
-| 2 |R1 | Mandatory | Trimmed Reads 1 | "/home/project/lexatrash/DP3/TrimmedReads/R1.fastq.gz" | Path to fasta/fastq/fastq.gz | 
-| 3 |R2 | Mandatory | Trimmed Reads 2 | "/home/project/lexatrash/DP3/TrimmedReads/R2.fastq.gz" | Path to fasta/fastq/fastq.gz | 
-| 4 |Strandedness | Mandatory | Strandedness information. "rf"  = Reverse, "fr" = Forward. "Unstranded" = Unstranded. Any input other that rf or fr will also be taken as unstranded | "rf" | String | 
-| 5 |Transcriptome1_label | Mandatory | Label for transcriptome assembly. Will be used as a prefix for transcript sequences if more than one transcriptome assembly is provided| "DN" | String | 
-| 6 |Transcriptome1 | Mandatory | Path to Transcriptome assembly | "/home/project/lexatrash/DP3/Trinity/Trinity.fasta" | Path to fasta file | 
-| 7 |Transcriptome2_label | Optional | Label for 2nd transcriptome assembly if available. Will be used as a prefix for transcript sequences | "GB" | String | 
-| 8 |Transcriptome2 | Optional | Path to Transcriptome2 assembly | "/home/project/lexatrash/DP3/Stringtie/Stringtie.fasta" | Path to fasta file |
-| 9 |BUSCO_lin1 | Mandatory | Desired BUSCO lineage for transcriptome and translatome assements. Complete BUSCO lineage options can be found here | "metazoa_odb10" | String |
-| 10 |BUSCO_lin2 | Mandatory | Desired second BUSCO lineage for transcriptome and translatome assessments. Complete BUSCO lineage options can be found here | "mollusca_odb10" | String |
-| 11 |Protein_fasta_path_for_Blast | Mandatory | Path to fasta file intended to be used as blast database | "/home/project/lexatrash/Databases/Unitox_curated.fasta" | Path to fasta file |
-| 12 |Protein_fasta_name | Mandatory | String Name for Blast Database  | "Unitox_curated" | String |
-| 13 |isgenomeavailble | Mandatory | "Y" = Genome fasta is available, "N" = No Genome fasta is available  | "Y" | String |
-| 14 |Genome_fasta_path | Optional | Path to Genome fasta if available  | "/home/project/lexatrash/Genomes/Dp.fasta" | Path to fasta/fasta.gz |
-| 15 |NCBI_Genome_id | Optional | NCBI genome accesssion id if available  | "GCA_023376005.1" | String |
+| # | Column name | Mandatory/Optional | Expected Input description | Expected Input example | Input Format |
+|---|-------------|--------------------|----------------------------|------------------------|-------------|
+| 1 | Sample_name | Mandatory | A shorthand for the sample name that will be used as a prefix in output files as well for the name of the results folder | "DP3_PD" | String |
+| 2 | R1 | Mandatory | Trimmed Reads 1 | "/home/project/lexatrash/DP3/TrimmedReads/R1.fastq.gz" | Path to fasta/fastq/fastq.gz |
+| 3 | R2 | Mandatory | Trimmed Reads 2 | "/home/project/lexatrash/DP3/TrimmedReads/R2.fastq.gz" | Path to fasta/fastq/fastq.gz |
+| 4 | Strandedness | Mandatory | Strandedness information. "rf" = Reverse, "fr" = Forward. "Unstranded" = Unstranded. Any input other than rf or fr will also be taken as unstranded | "rf" | String |
+| 5 | Transcriptome1_label | Mandatory | Label for transcriptome assembly. Will be used as a prefix for transcript sequences if more than one transcriptome assembly is provided | "DN" | String |
+| 6 | Transcriptome1 | Mandatory | Path to Transcriptome assembly | "/home/project/lexatrash/DP3/Trinity/Trinity.fasta" | Path to fasta file |
+| 7 | Transcriptome2_label | Optional | Label for 2nd transcriptome assembly if available. Will be used as a prefix for transcript sequences | "GB" | String |
+| 8 | Transcriptome2 | Optional | Path to Transcriptome2 assembly | "/home/project/lexatrash/DP3/Stringtie/Stringtie.fasta" | Path to fasta file |
+| 9 | BUSCO_lin1 | Mandatory | Desired BUSCO lineage for transcriptome and translatome assessments. Complete BUSCO lineage options can be found here | "metazoa_odb10" | String |
+| 10 | BUSCO_lin2 | Mandatory | Desired second BUSCO lineage for transcriptome and translatome assessments. Complete BUSCO lineage options can be found here | "mollusca_odb10" | String |
+| 11 | Protein_fasta_path_for_Blast | Mandatory | Path to fasta file intended to be used as blast database | "/home/project/lexatrash/Databases/Unitox_curated.fasta" | Path to fasta file |
+| 12 | Protein_fasta_name | Mandatory | String name for Blast Database | "Unitox_curated" | String |
+| 13 | isgenomeavailble | Mandatory | "Y" = Genome fasta is available, "N" = No genome fasta is available | "Y" | String |
+| 14 | Genome_fasta_path | Optional | Path to genome fasta if available | "/home/project/lexatrash/Genomes/Dp.fasta" | Path to fasta/fasta.gz |
+| 15 | NCBI_Genome_id | Optional | NCBI genome accession ID if available | "GCA_023376005.1" | String |
 
 ## Quick Start:   
 
