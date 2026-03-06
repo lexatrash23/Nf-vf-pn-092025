@@ -982,7 +982,7 @@ process DeepTMHMM {
     container "docker://gfanz/seqkit"
 
     publishDir "${sample}/Venomflow/results/Secreted/Mature/DeepTMHMM", pattern: "*.fasta", mode: 'copy'
-    publishDir "${sample}/Venomflow/results/Stats", pattern: "*.txt",  mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Stats", pattern: "*.txt", mode: 'copy'
 
     input:
     tuple val(sample), path(complete_pep)
@@ -990,7 +990,6 @@ process DeepTMHMM {
     output:
     tuple val(sample), path('*.fasta'), emit: mature
     tuple val(sample), path('*.txt')
-
 
     script:
     """
