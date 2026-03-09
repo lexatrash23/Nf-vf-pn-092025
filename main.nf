@@ -996,7 +996,7 @@ process DeepTMHMM {
 
     RUN_DIR="\$(pwd)"
 
-    predict --fasta \$RUN_DIR${complete_pep} --output-dir \$RUN_DIR/${sample}
+    predict --fasta \$RUN_DIR/${complete_pep} --output-dir \$RUN_DIR/${sample}
     Cd \$RUN_DIR
     python3 ${workflow.projectDir}/bin/deepout.py ${sample}/predicted_topologies.3line ${sample}_Deep_mature_sequences.fasta 
     seqkit stats ${sample}_Deep_mature_sequences.fasta > ${sample}_Deep_mature_sequences.stats.txt
