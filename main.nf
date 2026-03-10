@@ -17,6 +17,7 @@ def printhead() {
     log.info("README:                          ${workflow.manifest.homePage}")
     log.info("Description:                     ${workflow.manifest.description}")
     log.info("Version:                         ${workflow.manifest.version}")
+    log.info("DeepTMHMM:                       ${params.DeepTMHMM}")
     log.info("Start:                           ${workflow.start}")
     log.info("")
     log.info("────────────────────────────────────────────────────────────")
@@ -977,6 +978,7 @@ process DeepTMHMM {
     maxRetries 4
 
     label 'process_medium'
+    label 'process_long'
 
     conda "seqkit=2.12.0"
     container "docker://gfanz/seqkit"
