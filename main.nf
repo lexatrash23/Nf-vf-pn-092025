@@ -32,7 +32,7 @@ process PostTrimFastqc {
     maxRetries 4
 
 
-    label 'process_low'
+    label 'process_bare'
 
     conda "fastqc=0.12.1"
     container "docker://biocontainers/fastqc:v0.11.9_cv8"
@@ -55,7 +55,7 @@ process MultiQC {
     maxRetries 4
 
 
-    label 'process_single'
+    label 'process_bare'
     conda "multiqc=1.33"
     container "docker://multiqc/multiqc:v1.32"
 
@@ -79,7 +79,7 @@ process MultiQC {
 // Process 3: Bowtie build and index # Transcriptome 1 
 process Bowtie {
 
-    label 'process_high'
+    label 'process_medium'
     label 'process_long'
 
     errorStrategy 'retry'
@@ -111,7 +111,7 @@ process Bowtie {
 
 process Bowtie2 {
 
-    label 'process_high'
+    label 'process_medium'
     label 'process_long'
 
     errorStrategy 'retry'
@@ -148,7 +148,7 @@ process TrinityStats {
     maxRetries 4
 
 
-    label 'process_single'
+    label 'process_bare'
 
     conda "seqkit=2.12.0"
     container "docker://quay.io/biocontainers/seqkit:2.8.2--h9ee0642_0"
@@ -176,7 +176,7 @@ process TrinityStats2 {
     maxRetries 4
 
 
-    label 'process_single'
+    label 'process_bare'
 
     conda "seqkit=2.12.0"
     container "docker://quay.io/biocontainers/seqkit:2.8.2--h9ee0642_0"
@@ -203,7 +203,7 @@ process BUSCO_transcriptome_metazoa {
     maxRetries 4
 
 
-    label 'process_high'
+    label 'process_medium'
     label 'process_long'
 
     conda "busco=5.8.3"
@@ -233,7 +233,7 @@ process BUSCO_transcriptome_mollusca {
     maxRetries 4
 
 
-    label 'process_high'
+    label 'process_medium'
     label 'process_long'
 
     conda "busco=5.8.3"
@@ -262,7 +262,7 @@ process BUSCO_transcriptome_metazoa2 {
     maxRetries 4
 
 
-    label 'process_high'
+    label 'process_medium'
     label 'process_long'
 
     conda "busco=5.8.3"
@@ -292,7 +292,7 @@ process BUSCO_transcriptome_mollusca2 {
     maxRetries 4
 
 
-    label 'process_high'
+    label 'process_medium'
     label 'process_long'
 
     conda "busco=5.8.3"
@@ -321,7 +321,7 @@ process Transcriptome_Combined {
     maxRetries 4
 
 
-    label 'process_low'
+    label 'process_bare'
 
     conda "seqkit=2.12.0"
     container "docker://gfanz/seqkit"
@@ -353,7 +353,7 @@ process BUSCO_transcriptome_metazoa3 {
     maxRetries 4
 
 
-    label 'process_high'
+    label 'process_medium'
     label 'process_long'
 
     conda "busco=5.8.3"
@@ -384,7 +384,7 @@ process BUSCO_transcriptome_mollusca3 {
 
 
 
-    label 'process_high'
+    label 'process_medium'
     label 'process_long'
 
     conda "busco=5.8.3"
@@ -413,7 +413,7 @@ process Kallisto_Trinity {
     container "docker://quay.io/biocontainers/kallisto:0.51.1--h2b92561_2"
 
 
-    label 'process_low'
+    label 'process_bare'
     label 'process_long'
 
     publishDir "${sample}/Venomflow/results/kallisto/trinity/output", mode: 'copy'
@@ -451,7 +451,7 @@ process Blastdatabasecreation {
     maxRetries 4
 
 
-    label 'process_single'
+    label 'process_bare'
 
     conda "blast=2.17.0"
     container "docker://ncbi/blast:2.17.0"
@@ -493,8 +493,8 @@ process Blastx {
     script:
     """
    
-    blastx -query ${combined_trinity} -db ${proteindbdbname} -out ${sample}.blastx.db.6.txt -evalue 1e-5 -num_threads 16 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
-    blastx -query ${combined_trinity} -db ${proteindbdbname} -out ${sample}.blastx.db.0.txt -evalue 1e-5 -num_threads 16 -outfmt '0'
+    blastx -query ${combined_trinity} -db ${proteindbdbname} -out ${sample}.blastx.db.6.txt -evalue 1e-5 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
+    blastx -query ${combined_trinity} -db ${proteindbdbname} -out ${sample}.blastx.db.0.txt -evalue 1e-5 -outfmt '0'
 
     """
 }
@@ -502,7 +502,7 @@ process Blastx {
 // Process 10: Transdecoder
 process Transdecoder {
 
-    label 'process_medium'
+    label 'process_bare'
 
     conda "transdecoder=5.7.1"
     container 'quay.io/biocontainers/transdecoder'
@@ -568,7 +568,7 @@ process ORFs_Combined {
     maxRetries 4
 
 
-    label 'process_medium'
+    label 'process_bare'
 
     conda "seqkit=2.12.0"
     container "docker://gfanz/seqkit"
@@ -602,7 +602,7 @@ process ORFs_Combined {
 // Process 11: BUSCO_translatome_metazoa
 process BUSCO_translatome_metazoa {
 
-    label 'process_high'
+    label 'process_medium'
     label 'process_long'
 
     errorStrategy 'retry'
@@ -632,7 +632,7 @@ process BUSCO_translatome_metazoa {
 // Process 12: BUSCO_translatome_mollusca
 process BUSCO_translatome_mollusca {
 
-    label 'process_high'
+    label 'process_medium'
     label 'process_long'
 
     errorStrategy 'retry'
@@ -662,7 +662,7 @@ process BUSCO_translatome_mollusca {
 // Process 11: BUSCO_translatome_metazoa
 process BUSCO_translatome_metazoa2 {
 
-    label 'process_high'
+    label 'process_medium'
     label 'process_long'
 
     errorStrategy 'retry'
@@ -692,7 +692,7 @@ process BUSCO_translatome_metazoa2 {
 // Process 12: BUSCO_translatome_mollusca
 process BUSCO_translatome_mollusca2 {
 
-    label 'process_high'
+    label 'process_medium'
     label 'process_long'
 
     errorStrategy 'retry'
@@ -722,7 +722,7 @@ process BUSCO_translatome_mollusca2 {
 // Process 11: BUSCO_translatome_metazoa
 process BUSCO_translatome_metazoa3 {
 
-    label 'process_high'
+    label 'process_medium'
     label 'process_long'
 
     errorStrategy 'retry'
@@ -752,7 +752,7 @@ process BUSCO_translatome_metazoa3 {
 // Process 12: BUSCO_translatome_mollusca
 process BUSCO_translatome_mollusca3 {
 
-    label 'process_high'
+    label 'process_medium'
     label 'process_long'
 
     errorStrategy 'retry'
@@ -787,7 +787,7 @@ process Kallisto_Transdecoder {
     maxRetries 4
 
 
-    label 'process_medium'
+    label 'process_single'
 
     conda "kallisto=0.51.1"
     container "docker://quay.io/biocontainers/kallisto:0.51.1--h2b92561_2"
@@ -841,8 +841,8 @@ process Blastp {
     script:
     """
 
-    blastp -query ${combined_pep} -db ${proteindbdbname} -out ${sample}.blastp.db.6.txt -evalue 1e-5 -num_threads 16 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
-    blastp -query ${combined_pep} -db ${proteindbdbname} -out ${sample}.blastp.db.0.txt -evalue 1e-5 -num_threads 16 -outfmt '0'
+    blastp -query ${combined_pep} -db ${proteindbdbname} -out ${sample}.blastp.db.6.txt -evalue 1e-5 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
+    blastp -query ${combined_pep} -db ${proteindbdbname} -out ${sample}.blastp.db.0.txt -evalue 1e-5 -outfmt '0'
 
     """
 }
@@ -854,7 +854,7 @@ process ORF_complete {
     maxRetries 4
 
 
-    label 'process_single'
+    label 'process_bare'
 
     conda "seqkit=2.12.0"
     container "docker://gfanz/seqkit"
@@ -910,7 +910,7 @@ process Filter2 {
     maxRetries 4
 
 
-    label 'process_single'
+    label 'process_bare'
 
     conda "seqkit=2.12.0"
     container "docker://gfanz/seqkit"
@@ -940,7 +940,7 @@ process stats {
     maxRetries 4
 
 
-    label 'process_single'
+    label 'process_bare'
 
     conda "seqkit=2.12.0"
     container "docker://gfanz/seqkit"
@@ -1012,7 +1012,7 @@ process DeepTMHMMFilter {
     errorStrategy 'retry'
     maxRetries 4
 
-    label 'process_single'
+    label 'process_bare'
 
     conda "seqkit=2.12.0"
     container "docker://gfanz/seqkit"
@@ -1054,7 +1054,7 @@ process Interproscan {
     errorStrategy 'retry'
     maxRetries 4
 
-    label 'process_high'
+    label 'process_low'
     label 'process_long'
 
     publishDir "${sample}/Venomflow/results/Interproscan", mode: 'copy'
@@ -1104,7 +1104,7 @@ process GenomeBlastdatabasecreation {
 // Process 21: GenomeBlasts6
 process GenomeBlasts6 {
 
-    label 'process_high'
+    label 'process_single'
     label 'process_long'
 
     conda "blast=2.17.0"
@@ -1123,7 +1123,7 @@ process GenomeBlasts6 {
 
     script:
     """
-    blastn -query ${secretedcds} -db ${genomedbname} -out ${sample}.blastn.db.6.txt -evalue 1e-5 -num_threads 16 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
+    blastn -query ${secretedcds} -db ${genomedbname} -out ${sample}.blastn.db.6.txt -evalue 1e-5 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
 
     """
 }
@@ -1131,7 +1131,7 @@ process GenomeBlasts6 {
 // Process 21: GenomeBlasts0
 process GenomeBlasts0 {
 
-    label 'process_high'
+    label 'process_single'
     label 'process_long'
 
     conda "blast=2.17.0"
@@ -1150,7 +1150,7 @@ process GenomeBlasts0 {
 
     script:
     """
-    blastn -query ${secretedcds} -db ${genomedbname} -out ${sample}.blastn.db.0.txt -evalue 1e-5 -num_threads 16 -outfmt '0'
+    blastn -query ${secretedcds} -db ${genomedbname} -out ${sample}.blastn.db.0.txt -evalue 1e-5 -outfmt '0'
 
     """
 }
