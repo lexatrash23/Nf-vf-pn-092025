@@ -471,7 +471,7 @@ process Blastdatabasecreation {
 // Process 9: Blastx
 process Blastx {
 
-    label 'process_medium'
+    label 'process_single'
     label 'process_long'
 
     errorStrategy 'retry'
