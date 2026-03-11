@@ -413,7 +413,7 @@ process Kallisto_Trinity {
     container "docker://quay.io/biocontainers/kallisto:0.51.1--h2b92561_2"
 
 
-    label 'process_bare'
+    label 'process_single'
     label 'process_long'
 
     publishDir "${sample}/Venomflow/results/kallisto/trinity/output", mode: 'copy'
@@ -502,7 +502,7 @@ process Blastx {
 // Process 10: Transdecoder
 process Transdecoder {
 
-    label 'process_bare'
+    label 'process_single'
 
     conda "transdecoder=5.7.1"
     container 'quay.io/biocontainers/transdecoder'
