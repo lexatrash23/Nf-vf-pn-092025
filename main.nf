@@ -787,7 +787,7 @@ process Kallisto_Transdecoder {
     maxRetries 4
 
 
-    label 'process_single'
+    label 'process_low'
 
     conda "kallisto=0.51.1"
     container "docker://quay.io/biocontainers/kallisto:0.51.1--h2b92561_2"
@@ -1054,7 +1054,7 @@ process Interproscan {
     errorStrategy 'retry'
     maxRetries 4
 
-    label 'process_low'
+    label 'process_medium'
     label 'process_long'
 
     publishDir "${sample}/Venomflow/results/Interproscan", mode: 'copy'
@@ -1104,7 +1104,7 @@ process GenomeBlastdatabasecreation {
 // Process 21: GenomeBlasts6
 process GenomeBlasts6 {
 
-    label 'process_single'
+    label 'process_medium'
     label 'process_long'
 
     conda "blast=2.17.0"
@@ -1131,7 +1131,7 @@ process GenomeBlasts6 {
 // Process 21: GenomeBlasts0
 process GenomeBlasts0 {
 
-    label 'process_single'
+    label 'process_medium'
     label 'process_long'
 
     conda "blast=2.17.0"
