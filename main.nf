@@ -997,7 +997,7 @@ process DeepTMHMM {
     """
     RUN_DIR="\$(pwd)"
     awk -F'\t' 'NR==2{for(i=1;i<=NF;i++)if(\$i=="SP.Sec.SPI.")col=i} NR>2 && \$col>=0.28 && \$col<=0.5{print \$1}' ${signalpsummary} > labels.txt
-    seqkit grep -f labels.txt orf_combined.pep -o deeptmhmmcandidates.pep
+    seqkit grep -f labels.txt ${complete_pep} -o deeptmhmmcandidates.pep
 
     predict --fasta \$RUN_DIR/deeptmhmmcandidates.pep --output-dir \$RUN_DIR/${sample}
     Cd \$RUN_DIR
