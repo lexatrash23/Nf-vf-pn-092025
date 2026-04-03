@@ -1019,8 +1019,9 @@ process DeepTMHMMFilter {
     container "docker://gfanz/seqkit"
 
     publishDir "${sample}/Venomflow/results/Secreted/Full_Secreted/DeepTMHMM", pattern: "*DeepTMHMM*", mode: 'copy'
-    publishDir "${sample}/Venomflow/results/Secreted/Full_Secreted/Combined", pattern: "*deduplicated*", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Secreted/Full_Secreted/Combined", pattern: "*sequences.deduplicated*", mode: 'copy'
     publishDir "${sample}/Venomflow/results/Stats", pattern: "*.txt", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Secreted/Mature/Combined/", pattern: "*.combined.mature.deduplicated.pep.fasta", mode: 'copy'
 
     input:
     tuple val(sample), path(DeepTMHMM_mature), path(complete_pep), path(complete_cds), path(complete_pep_signalp), path(complete_cds_signalp), path(signalpmature)
@@ -1029,8 +1030,8 @@ process DeepTMHMMFilter {
     tuple val(sample), path('*DeepTMHMM.sequences.pep.fasta')
     tuple val(sample), path('*DeepTMHMM.sequences.cds.fasta')
     tuple val(sample), path('*.combined.mature.deduplicated.pep.fasta')
-    tuple val(sample), path('*deduplicated.pep.fasta'), emit: complete_pep_secreted
-    tuple val(sample), path('*deduplicated.cds.fasta'), emit: complete_cds_secreted
+    tuple val(sample), path('*sequences.deduplicated.pep.fasta'), emit: complete_pep_secreted
+    tuple val(sample), path('*sequences.deduplicated.cds.fasta'), emit: complete_cds_secreted
     tuple val(sample), path('*.txt')
 
     script:
