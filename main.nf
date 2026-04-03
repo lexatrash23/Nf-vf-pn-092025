@@ -987,7 +987,7 @@ process DeepTMHMM {
     publishDir "${sample}/Venomflow/results/Stats", pattern: "*.txt", mode: 'copy'
 
     input:
-    tuple val(sample), path(complete_pep)
+    tuple val(sample), path(complete_pep), path(signalpsummary)
 
     output:
     tuple val(sample), path('*.fasta'), emit: mature
@@ -995,10 +995,11 @@ process DeepTMHMM {
 
     script:
     """
-
     RUN_DIR="\$(pwd)"
+    awk -F'\t' 'NR==2{for(i=1;i<=NF;i++)if(\$i=="SP.Sec.SPI.")col=i} NR>2 && \$col>=0.28 && \$col<=0.5{print \$1}' ${signalpsummary} > labels.txt
+    seqkit grep -f labels.txt orf_combined.pep -o deeptmhmmcandidates.pep
 
-    predict --fasta \$RUN_DIR/${complete_pep} --output-dir \$RUN_DIR/${sample}
+    predict --fasta \$RUN_DIR/deeptmhmmcandidates.pep --output-dir \$RUN_DIR/${sample}
     Cd \$RUN_DIR
     python3 ${workflow.projectDir}/bin/deepout.py ${sample}/predicted_topologies.3line ${sample}_Deep_mature_sequences.fasta 
     seqkit stats ${sample}_Deep_mature_sequences.fasta > ${sample}_Deep_mature_sequences.stats.txt
