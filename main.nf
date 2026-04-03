@@ -893,7 +893,7 @@ process SignalP {
 
     output:
     tuple val(sample), path("*_mature.fasta"), emit: maturesequences
-    path "*.signalp5", emit: signalpsummary
+    tuple val(sample), path ("*.signalp5"), emit: signalpsummary
 
     script:
 
@@ -1023,11 +1023,12 @@ process DeepTMHMMFilter {
     publishDir "${sample}/Venomflow/results/Stats", pattern: "*.txt", mode: 'copy'
 
     input:
-    tuple val(sample), path(DeepTMHMM_mature), path(complete_pep), path(complete_cds), path(complete_pep_signalp), path(complete_cds_signalp)
+    tuple val(sample), path(DeepTMHMM_mature), path(complete_pep), path(complete_cds), path(complete_pep_signalp), path(complete_cds_signalp), path(signalpmature)
 
     output:
     tuple val(sample), path('*DeepTMHMM.sequences.pep.fasta')
     tuple val(sample), path('*DeepTMHMM.sequences.cds.fasta')
+    tuple val(sample), path('*.combined.mature.deduplicated.pep.fasta')
     tuple val(sample), path('*deduplicated.pep.fasta'), emit: complete_pep_secreted
     tuple val(sample), path('*deduplicated.cds.fasta'), emit: complete_cds_secreted
     tuple val(sample), path('*.txt')
@@ -1040,11 +1041,14 @@ process DeepTMHMMFilter {
     seqkit rmdup -n ${sample}.complete.secreted.sequences.pep.fasta > ${sample}.complete.secreted.sequences.deduplicated.pep.fasta
     cat ${sample}.complete.DeepTMHMM.sequences.cds.fasta ${complete_cds_signalp} > ${sample}.complete.secreted.sequences.cds.fasta
     seqkit rmdup -n ${sample}.complete.secreted.sequences.cds.fasta > ${sample}.complete.secreted.sequences.deduplicated.cds.fasta
+    cat ${DeepTMHMM_mature} ${signalpmature} > ${sample}.combined.mature.pep.fasta
+    seqkit rmdup -n ${sample}.combined.mature.pep.fasta > ${sample}.combined.mature.deduplicated.pep.fasta
 
     seqkit stats ${sample}.complete.DeepTMHMM.sequences.pep.fasta > ${sample}.complete.DeepTMHMM.sequences.pep.stats.txt
     seqkit stats ${sample}.complete.DeepTMHMM.sequences.cds.fasta > ${sample}.complete.DeepTMHMM.sequences.cds.stats.txt
     seqkit stats ${sample}.complete.secreted.sequences.deduplicated.pep.fasta > ${sample}.complete.secreted.sequences.deduplicated.pep.stats.txt
     seqkit stats ${sample}.complete.secreted.sequences.deduplicated.cds.fasta > ${sample}.complete.secreted.sequences.deduplicated.cds.stats.txt
+    seqkit stats ${sample}.combined.mature.deduplicated.pep.fasta > ${sample}.combined.mature.deduplicated.pep.stats.txt
 
 
     """
@@ -1447,15 +1451,18 @@ workflow {
     GenomeBlastdatabasecreation(Genomefasta)
     genomedb = GenomeBlastdatabasecreation.out.genomedbfiles
     Blastncds = csv_channel.map { row -> tuple(row.Sample_name, row.Genome_fasta_name) }
+    signalpsummary = SignalP.out.signalpsummary
+    DeepTMHMMinput = input_signalp.join(signalpsummary)
 
     // Optional Params 
     if (params.DeepTMHMM) {
-        input_signalp | DeepTMHMM
+        DeepTMHMMinput | DeepTMHMM
         input_DeepTMHMMFilter = DeepTMHMM.out.mature
             .join(ORF_complete.out.complete_pep)
             .join(ORF_complete.out.complete_cds)
             .join(Filter2.out.complete_pep_signalp)
             .join(Filter2.out.complete_cds_signalp)
+            .join(SignalP.out.maturesequences)
         input_DeepTMHMMFilter | DeepTMHMMFilter
         input_Interproscan = DeepTMHMMFilter.out.complete_pep_secreted
         BlastnInput = Blastncds
