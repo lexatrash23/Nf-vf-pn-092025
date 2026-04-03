@@ -702,7 +702,7 @@ process BUSCO_translatome_mollusca2 {
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
 
-    publishDir "${sample}/Venomflow/results/BUSCO/translatome/Transdecoder/", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/BUSCO/translatome/TD2/", mode: 'copy'
 
     input:
     tuple val(sample), path(TD2_pep), val(mollusca)
