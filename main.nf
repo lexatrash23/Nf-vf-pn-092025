@@ -996,11 +996,11 @@ process DeepTMHMM {
     script:
     """
     RUN_DIR="\$(pwd)"
-    awk -F'\t' 'NR==2{for(i=1;i<=NF;i++)if(\$i=="SP(Sec/SPI)")col=i} NR>2 && \$col>=0.28 && \$col<=0.5{print \$1}' ${signalpsummary} > labels.txt
+    awk -F'\t' 'NR==2{for(i=1;i<=NF;i++)if(\$i=="SP(Sec/SPI)")col=i} NR>2 && \$col>=0.25 && \$col<=0.5{print \$1}' ${signalpsummary} > labels.txt
     seqkit grep -f labels.txt ${complete_pep} -o deeptmhmmcandidates.pep
 
     predict --fasta \$RUN_DIR/deeptmhmmcandidates.pep --output-dir \$RUN_DIR/${sample}
-    Cd \$RUN_DIR
+    cd \$RUN_DIR
     python3 ${workflow.projectDir}/bin/deepout.py ${sample}/predicted_topologies.3line ${sample}_Deep_mature_sequences.fasta 
     seqkit stats ${sample}_Deep_mature_sequences.fasta > ${sample}_Deep_mature_sequences.stats.txt
     """
