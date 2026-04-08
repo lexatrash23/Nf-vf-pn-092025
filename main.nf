@@ -1070,8 +1070,9 @@ process DeepTMHMM {
     RUN_DIR="\$(pwd)"
     awk -F'\t' 'NR==2{for(i=1;i<=NF;i++)if(\$i=="SP(Sec/SPI)")col=i} NR>2 && \$col>=0.25 && \$col<=0.5{print \$1}' ${signalpsummary} > labels.txt
     seqkit grep -f labels.txt ${complete_pep} -o deeptmhmmcandidates.pep
+    awk '{if (\$0 ~ /^>/) print \$0; else {gsub(/\\*/, ""); print \$0}}' deeptmhmmcandidates.pep > deeptmhmmcandidates.cleaned.pep
 
-    predict --fasta \$RUN_DIR/deeptmhmmcandidates.pep --output-dir \$RUN_DIR/${sample}
+    predict --fasta \$RUN_DIR/deeptmhmmcandidates.cleaned.pep --output-dir \$RUN_DIR/${sample}
     cd \$RUN_DIR
     python3 ${workflow.projectDir}/bin/deepout.py ${sample}/predicted_topologies.3line ${sample}_Deep_mature_sequences.fasta 
     seqkit stats ${sample}_Deep_mature_sequences.fasta > ${sample}_Deep_mature_sequences.stats.txt
