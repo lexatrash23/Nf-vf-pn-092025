@@ -30,6 +30,7 @@ process PostTrimFastqc {
 
     errorStrategy 'retry'
     maxRetries 4
+    
 
 
     label 'process_bare'
@@ -85,6 +86,9 @@ process Bowtie {
     errorStrategy 'retry'
     maxRetries 4
 
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
+
 
     conda "bowtie2=2.5.4"
     container "docker://quay.io/biocontainers/bowtie2:2.5.4--he20e202_1"
@@ -117,6 +121,9 @@ process Bowtie2 {
     errorStrategy 'retry'
     maxRetries 4
 
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
+
 
     conda "bowtie2=2.5.4"
     container "docker://quay.io/biocontainers/bowtie2:2.5.4--he20e202_1"
@@ -146,6 +153,7 @@ process TrinityStats {
 
     errorStrategy 'retry'
     maxRetries 4
+
 
 
     label 'process_bare'
@@ -178,6 +186,7 @@ process TrinityStats2 {
 
     label 'process_bare'
 
+
     conda "seqkit=2.12.0"
     container "docker://quay.io/biocontainers/seqkit:2.8.2--h9ee0642_0"
 
@@ -205,6 +214,9 @@ process BUSCO_transcriptome_metazoa {
 
     label 'process_medium'
     label 'process_long'
+
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
@@ -236,6 +248,9 @@ process BUSCO_transcriptome_mollusca {
     label 'process_medium'
     label 'process_long'
 
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
+
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
 
@@ -264,6 +279,9 @@ process BUSCO_transcriptome_metazoa2 {
 
     label 'process_medium'
     label 'process_long'
+
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
@@ -294,6 +312,9 @@ process BUSCO_transcriptome_mollusca2 {
 
     label 'process_medium'
     label 'process_long'
+
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
@@ -356,6 +377,9 @@ process BUSCO_transcriptome_metazoa3 {
     label 'process_medium'
     label 'process_long'
 
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
+
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
 
@@ -387,6 +411,9 @@ process BUSCO_transcriptome_mollusca3 {
     label 'process_medium'
     label 'process_long'
 
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
+
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
 
@@ -415,6 +442,9 @@ process Kallisto_Trinity {
 
     label 'process_single'
     label 'process_long'
+
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
 
     publishDir "${sample}/Venomflow/results/kallisto/trinity/output", mode: 'copy'
 
@@ -477,6 +507,9 @@ process Blastx {
     errorStrategy 'retry'
     maxRetries 4
 
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
+
 
     conda "blast=2.17.0"
     container "docker://ncbi/blast:2.17.0"
@@ -511,6 +544,9 @@ process Transdecoder {
     errorStrategy 'retry'
     maxRetries 4
 
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
+
 
     publishDir "${sample}/Venomflow/results/ORFprediction/Transdecoder/", mode: 'copy'
 
@@ -541,6 +577,9 @@ process TD2 {
 
     errorStrategy 'retry'
     maxRetries 4
+
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
 
 
     publishDir "${sample}/Venomflow/results/ORFprediction/TD2/", mode: 'copy'
@@ -608,6 +647,9 @@ process BUSCO_translatome_metazoa {
     errorStrategy 'retry'
     maxRetries 4
 
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
+
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
@@ -637,6 +679,9 @@ process BUSCO_translatome_mollusca {
 
     errorStrategy 'retry'
     maxRetries 4
+
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
 
 
     conda "busco=5.8.3"
@@ -668,6 +713,9 @@ process BUSCO_translatome_metazoa2 {
     errorStrategy 'retry'
     maxRetries 4
 
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
+
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
@@ -697,6 +745,9 @@ process BUSCO_translatome_mollusca2 {
 
     errorStrategy 'retry'
     maxRetries 4
+
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
 
 
     conda "busco=5.8.3"
@@ -728,6 +779,9 @@ process BUSCO_translatome_metazoa3 {
     errorStrategy 'retry'
     maxRetries 4
 
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
+
 
     conda "busco=5.8.3"
     container "docker://ezlabgva/busco:v5.8.2_cv1"
@@ -757,6 +811,9 @@ process BUSCO_translatome_mollusca3 {
 
     errorStrategy 'retry'
     maxRetries 4
+
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
 
 
     conda "busco=5.8.3"
@@ -788,6 +845,9 @@ process Kallisto_Transdecoder {
 
 
     label 'process_low'
+
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
 
     conda "kallisto=0.51.1"
     container "docker://quay.io/biocontainers/kallisto:0.51.1--h2b92561_2"
@@ -826,6 +886,9 @@ process Blastp {
 
     label 'process_low'
 
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
+
     conda "blast=2.17.0"
     container "docker://ncbi/blast:2.17.0"
 
@@ -856,6 +919,9 @@ process ORF_complete {
 
     label 'process_bare'
 
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
+
     conda "seqkit=2.12.0"
     container "docker://gfanz/seqkit"
 
@@ -885,6 +951,9 @@ process SignalP {
 
     label 'process_low'
     label 'process_long'
+
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
 
     publishDir "${sample}/Venomflow/results/Secreted/Mature/Signalp", mode: 'copy'
 
@@ -980,6 +1049,9 @@ process DeepTMHMM {
     label 'process_medium'
     label 'process_long'
 
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
+
     conda "seqkit=2.12.0"
     container "docker://gfanz/seqkit"
 
@@ -1014,6 +1086,8 @@ process DeepTMHMMFilter {
     maxRetries 4
 
     label 'process_bare'
+
+    
 
     conda "seqkit=2.12.0"
     container "docker://gfanz/seqkit"
@@ -1062,6 +1136,9 @@ process Interproscan {
 
     label 'process_medium'
     label 'process_long'
+
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
 
     publishDir "${sample}/Venomflow/results/Interproscan", mode: 'copy'
 
@@ -1119,6 +1196,9 @@ process GenomeBlasts6 {
     errorStrategy 'retry'
     maxRetries 4
 
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
+
     publishDir "${sample}/Venomflow/results/Blast/Blastn/", mode: 'copy'
 
     input:
@@ -1145,6 +1225,9 @@ process GenomeBlasts0 {
 
     errorStrategy 'retry'
     maxRetries 4
+
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
 
     publishDir "${sample}/Venomflow/results/Blast/Blastn/", mode: 'copy'
 
