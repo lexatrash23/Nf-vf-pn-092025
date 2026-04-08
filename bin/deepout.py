@@ -22,7 +22,7 @@ with open(input_file, 'r') as infile, open(mature_fasta, 'w') as outfile:
             sequence = line.strip()
         else:
             label = line.strip()
-            if "SP" in header_after:
+            if "SP " in header_after:
                 mature_seq = "".join(sequence[j] for j in range(len(sequence)) if label[j] == "O")
                 if mature_seq:
                     outfile.write(header_before + "\n")
