@@ -1055,14 +1055,14 @@ process DeepTMHMM {
     conda "seqkit=2.12.0"
     container "docker://gfanz/seqkit"
 
-    publishDir "${sample}/Venomflow/results/Secreted/Mature/DeepTMHMM", pattern: "*.fasta", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Secreted/Mature/DeepTMHMM", pattern: "*min5.fasta", mode: 'copy'
     publishDir "${sample}/Venomflow/results/Stats", pattern: "*.txt", mode: 'copy'
 
     input:
     tuple val(sample), path(complete_pep), path(signalpsummary)
 
     output:
-    tuple val(sample), path('*.fasta'), emit: mature
+    tuple val(sample), path('*min5.fasta'), emit: mature
     tuple val(sample), path('*.txt')
 
     script:
@@ -1075,7 +1075,8 @@ process DeepTMHMM {
     predict --fasta \$RUN_DIR/deeptmhmmcandidates.cleaned.pep --output-dir \$RUN_DIR/${sample}
     cd \$RUN_DIR
     python3 ${workflow.projectDir}/bin/deepout.py ${sample}/predicted_topologies.3line ${sample}_Deep_mature_sequences.fasta 
-    seqkit stats ${sample}_Deep_mature_sequences.fasta > ${sample}_Deep_mature_sequences.stats.txt
+    seqkit seq -m 5 ${sample}_Deep_mature_sequences.fasta > ${sample}_Deep_mature_sequences.min5.fasta 
+    seqkit stats ${sample}_Deep_mature_sequences.min5.fasta > ${sample}_Deep_mature_sequences.stats.txt
     """
 }
 
