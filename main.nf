@@ -36,7 +36,8 @@ process PostTrimFastqc {
     label 'process_bare'
 
     conda "fastqc=0.12.1"
-    container "docker://biocontainers/fastqc:v0.11.9_cv8"
+    container 'community.wave.seqera.io/library/fastqc:0.12.1--aa717e1a9d994d74'
+
 
     input:
     tuple val(sample), path(R1), path(R2)
@@ -58,8 +59,7 @@ process MultiQC {
 
     label 'process_bare'
     conda "multiqc=1.33"
-    container "docker://multiqc/multiqc:v1.32"
-
+    container 'community.wave.seqera.io/library/multiqc:1.33--9daaf37cc59ba7dc'
 
     publishDir "${sample}/Venomflow/results/Fastqc/posttrim/", mode: 'copy'
     publishDir "${sample}/Analysis/results/htmls/", mode: 'copy'
@@ -91,7 +91,7 @@ process Bowtie {
 
 
     conda "bowtie2=2.5.4"
-    container "docker://quay.io/biocontainers/bowtie2:2.5.4--he20e202_1"
+    container 'community.wave.seqera.io/library/bowtie2:2.5.4--d5022d6316284d3d'
 
     publishDir "${sample}/Venomflow/results/Bowtie/Transcriptome1", pattern: "*.log", mode: 'copy'
 
@@ -126,7 +126,7 @@ process Bowtie2 {
 
 
     conda "bowtie2=2.5.4"
-    container "docker://quay.io/biocontainers/bowtie2:2.5.4--he20e202_1"
+    container 'community.wave.seqera.io/library/bowtie2:2.5.4--d5022d6316284d3d'
 
     publishDir "${sample}/Venomflow/results/Bowtie/Transcriptome2", pattern: "*.log", mode: 'copy'
 
@@ -159,7 +159,7 @@ process TrinityStats {
     label 'process_bare'
 
     conda "seqkit=2.12.0"
-    container "docker://quay.io/biocontainers/seqkit:2.8.2--h9ee0642_0"
+    container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
 
     publishDir "${sample}/Venomflow/results/Stats/", mode: 'copy'
 
@@ -188,7 +188,7 @@ process TrinityStats2 {
 
 
     conda "seqkit=2.12.0"
-    container "docker://quay.io/biocontainers/seqkit:2.8.2--h9ee0642_0"
+    container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
 
     publishDir "${sample}/Venomflow/results/Stats/", mode: 'copy'
 
@@ -219,8 +219,7 @@ process BUSCO_transcriptome_metazoa {
     time { task.time * task.attempt }
 
     conda "busco=5.8.3"
-    container "docker://ezlabgva/busco:v5.8.2_cv1"
-
+    container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
     publishDir "${sample}/Venomflow/results/BUSCO/transcriptome/Transcriptome1", mode: 'copy'
 
@@ -252,7 +251,7 @@ process BUSCO_transcriptome_mollusca {
     time { task.time * task.attempt }
 
     conda "busco=5.8.3"
-    container "docker://ezlabgva/busco:v5.8.2_cv1"
+    container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
     publishDir "${sample}/Venomflow/results/BUSCO/transcriptome/Transcriptome1", mode: 'copy'
 
@@ -284,7 +283,7 @@ process BUSCO_transcriptome_metazoa2 {
     time { task.time * task.attempt }
 
     conda "busco=5.8.3"
-    container "docker://ezlabgva/busco:v5.8.2_cv1"
+    container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
 
     publishDir "${sample}/Venomflow/results/BUSCO/transcriptome/Transcriptome2", mode: 'copy'
@@ -317,7 +316,7 @@ process BUSCO_transcriptome_mollusca2 {
     time { task.time * task.attempt }
 
     conda "busco=5.8.3"
-    container "docker://ezlabgva/busco:v5.8.2_cv1"
+    container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
     publishDir "${sample}/Venomflow/results/BUSCO/transcriptome/Transcriptome2", mode: 'copy'
 
@@ -345,7 +344,7 @@ process Transcriptome_Combined {
     label 'process_bare'
 
     conda "seqkit=2.12.0"
-    container "docker://gfanz/seqkit"
+    container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
 
     publishDir "${sample}/Venomflow/results/Combined_Transcriptome/", mode: 'copy'
 
@@ -381,7 +380,7 @@ process BUSCO_transcriptome_metazoa3 {
     time { task.time * task.attempt }
 
     conda "busco=5.8.3"
-    container "docker://ezlabgva/busco:v5.8.2_cv1"
+    container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
 
     publishDir "${sample}/Venomflow/results/BUSCO/transcriptome/Combined", mode: 'copy'
@@ -415,7 +414,7 @@ process BUSCO_transcriptome_mollusca3 {
     time { task.time * task.attempt }
 
     conda "busco=5.8.3"
-    container "docker://ezlabgva/busco:v5.8.2_cv1"
+    container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
     publishDir "${sample}/Venomflow/results/BUSCO/transcriptome/Combined", mode: 'copy'
 
@@ -437,8 +436,7 @@ process BUSCO_transcriptome_mollusca3 {
 process Kallisto_Trinity {
 
     conda "kallisto=0.51.1"
-    container "docker://quay.io/biocontainers/kallisto:0.51.1--h2b92561_2"
-
+    container 'community.wave.seqera.io/library/kallisto:0.51.1--d7728813dda40c70'  
 
     label 'process_single'
     label 'process_long'
@@ -484,7 +482,7 @@ process Blastdatabasecreation {
     label 'process_bare'
 
     conda "blast=2.17.0"
-    container "docker://ncbi/blast:2.17.0"
+    container 'community.wave.seqera.io/library/blast:2.17.0--6279aeee601cb05e'
 
     input:
     tuple val(sample), path(database_fasta)
@@ -512,7 +510,7 @@ process Blastx {
 
 
     conda "blast=2.17.0"
-    container "docker://ncbi/blast:2.17.0"
+    container 'community.wave.seqera.io/library/blast:2.17.0--6279aeee601cb05e'
 
     publishDir "${sample}/Venomflow/results/Blast/Blastx/", mode: 'copy'
 
@@ -538,8 +536,7 @@ process Transdecoder {
     label 'process_medium'
 
     conda "transdecoder=5.7.1"
-    container 'quay.io/biocontainers/transdecoder'
-
+    container 'community.wave.seqera.io/library/transdecoder:5.7.1--bfc613e7081a52d9'
 
     errorStrategy 'retry'
     maxRetries 4
@@ -572,7 +569,7 @@ process TD2 {
     label 'process_medium'
 
     conda "bioconda::td2"
-    container 'quay.io/biocontainers/td2:1.0.7--pyhdfd78af_0'
+    container 'community.wave.seqera.io/library/td2:ca3786e862ccfcd7'
 
 
     errorStrategy 'retry'
@@ -610,7 +607,7 @@ process ORFs_Combined {
     label 'process_bare'
 
     conda "seqkit=2.12.0"
-    container "docker://gfanz/seqkit"
+    container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
 
     publishDir "${sample}/Venomflow/results/ORFprediction/Combined/All", mode: 'copy'
 
@@ -652,7 +649,7 @@ process BUSCO_translatome_metazoa {
 
 
     conda "busco=5.8.3"
-    container "docker://ezlabgva/busco:v5.8.2_cv1"
+    container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
     publishDir "${sample}/Venomflow/results/BUSCO/translatome/Transdecoder/", mode: 'copy'
 
@@ -685,7 +682,7 @@ process BUSCO_translatome_mollusca {
 
 
     conda "busco=5.8.3"
-    container "docker://ezlabgva/busco:v5.8.2_cv1"
+    container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
     publishDir "${sample}/Venomflow/results/BUSCO/translatome/Transdecoder/", mode: 'copy'
 
@@ -718,7 +715,7 @@ process BUSCO_translatome_metazoa2 {
 
 
     conda "busco=5.8.3"
-    container "docker://ezlabgva/busco:v5.8.2_cv1"
+    container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
     publishDir "${sample}/Venomflow/results/BUSCO/translatome/TD2/", mode: 'copy'
 
@@ -751,7 +748,7 @@ process BUSCO_translatome_mollusca2 {
 
 
     conda "busco=5.8.3"
-    container "docker://ezlabgva/busco:v5.8.2_cv1"
+    container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
     publishDir "${sample}/Venomflow/results/BUSCO/translatome/TD2/", mode: 'copy'
 
@@ -784,7 +781,7 @@ process BUSCO_translatome_metazoa3 {
 
 
     conda "busco=5.8.3"
-    container "docker://ezlabgva/busco:v5.8.2_cv1"
+    container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
     publishDir "${sample}/Venomflow/results/BUSCO/translatome/Combined/", mode: 'copy'
 
@@ -817,7 +814,7 @@ process BUSCO_translatome_mollusca3 {
 
 
     conda "busco=5.8.3"
-    container "docker://ezlabgva/busco:v5.8.2_cv1"
+    container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
     publishDir "${sample}/Venomflow/results/BUSCO/translatome/Combined/", mode: 'copy'
 
@@ -850,7 +847,7 @@ process Kallisto_Transdecoder {
     time { task.time * task.attempt }
 
     conda "kallisto=0.51.1"
-    container "docker://quay.io/biocontainers/kallisto:0.51.1--h2b92561_2"
+    container 'community.wave.seqera.io/library/kallisto:0.51.1--d7728813dda40c70'
 
     publishDir "${sample}/Venomflow/results/kallisto/transdecoder/output", mode: 'copy'
 
@@ -890,7 +887,7 @@ process Blastp {
     time { task.time * task.attempt }
 
     conda "blast=2.17.0"
-    container "docker://ncbi/blast:2.17.0"
+    container 'community.wave.seqera.io/library/blast:2.17.0--6279aeee601cb05e'
 
     publishDir "${sample}/Venomflow/results/Blast/Blastp/", mode: 'copy'
 
@@ -923,7 +920,7 @@ process ORF_complete {
     time { task.time * task.attempt }
 
     conda "seqkit=2.12.0"
-    container "docker://gfanz/seqkit"
+    container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
 
     publishDir "${sample}/Venomflow/results/ORFprediction/Combined/Complete/", mode: 'copy'
 
@@ -982,7 +979,7 @@ process Filter2 {
     label 'process_bare'
 
     conda "seqkit=2.12.0"
-    container "docker://gfanz/seqkit"
+    container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
 
     publishDir "${sample}/Venomflow/results/Secreted/Full_Secreted/Signalp", mode: 'copy'
 
@@ -1012,7 +1009,7 @@ process stats {
     label 'process_bare'
 
     conda "seqkit=2.12.0"
-    container "docker://gfanz/seqkit"
+    container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
 
     publishDir "${sample}/Venomflow/results/Stats", mode: 'copy'
 
@@ -1053,7 +1050,7 @@ process DeepTMHMM {
     time { task.time * task.attempt }
 
     conda "seqkit=2.12.0"
-    container "docker://gfanz/seqkit"
+    container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
 
     publishDir "${sample}/Venomflow/results/Secreted/Mature/DeepTMHMM", pattern: "*min5.fasta", mode: 'copy'
     publishDir "${sample}/Venomflow/results/Stats", pattern: "*.txt", mode: 'copy'
@@ -1092,7 +1089,7 @@ process DeepTMHMMFilter {
     
 
     conda "seqkit=2.12.0"
-    container "docker://gfanz/seqkit"
+    container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
 
     publishDir "${sample}/Venomflow/results/Secreted/Full_Secreted/DeepTMHMM", pattern: "*DeepTMHMM*", mode: 'copy'
     publishDir "${sample}/Venomflow/results/Secreted/Full_Secreted/Combined", pattern: "*sequences.deduplicated*", mode: 'copy'
@@ -1170,7 +1167,7 @@ process GenomeBlastdatabasecreation {
 
 
     conda "blast=2.17.0"
-    container "docker://ncbi/blast:2.17.0"
+    container 'community.wave.seqera.io/library/blast:2.17.0--6279aeee601cb05e'
 
     label 'process_single'
 
@@ -1193,7 +1190,7 @@ process GenomeBlasts6 {
     label 'process_long'
 
     conda "blast=2.17.0"
-    container "docker://ncbi/blast:2.17.0"
+    container 'community.wave.seqera.io/library/blast:2.17.0--6279aeee601cb05e'
 
     errorStrategy 'retry'
     maxRetries 4
@@ -1223,7 +1220,7 @@ process GenomeBlasts0 {
     label 'process_long'
 
     conda "blast=2.17.0"
-    container "docker://ncbi/blast:2.17.0"
+    container 'community.wave.seqera.io/library/blast:2.17.0--6279aeee601cb05e'
 
     errorStrategy 'retry'
     maxRetries 4
