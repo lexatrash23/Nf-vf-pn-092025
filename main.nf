@@ -1050,7 +1050,7 @@ process DeepTMHMM {
     time { task.time * task.attempt }
 
     conda "seqkit=2.12.0"
-    container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
+    container 'community.wave.seqera.io/library/conda_seqkit:384a157af28b3331'
 
     publishDir "${sample}/Venomflow/results/Secreted/Mature/DeepTMHMM", pattern: "*min5.fasta", mode: 'copy'
     publishDir "${sample}/Venomflow/results/Stats", pattern: "*.txt", mode: 'copy'
