@@ -30,14 +30,13 @@ process PostTrimFastqc {
 
     errorStrategy 'retry'
     maxRetries 4
-    
+
 
 
     label 'process_bare'
 
     conda "fastqc=0.12.1"
     container 'community.wave.seqera.io/library/fastqc:0.12.1--aa717e1a9d994d74'
-
 
     input:
     tuple val(sample), path(R1), path(R2)
@@ -436,7 +435,7 @@ process BUSCO_transcriptome_mollusca3 {
 process Kallisto_Trinity {
 
     conda "kallisto=0.51.1"
-    container 'community.wave.seqera.io/library/kallisto:0.51.1--d7728813dda40c70'  
+    container 'community.wave.seqera.io/library/kallisto:0.51.1--d7728813dda40c70'
 
     label 'process_single'
     label 'process_long'
@@ -492,7 +491,7 @@ process Blastdatabasecreation {
 
     script:
     """
-    makeblastdb -in "${database_fasta}" -dbtype prot
+    makeblastdb -in "${database_fasta}" -dbtype prot -out proteindb
     """
 }
 
@@ -515,7 +514,7 @@ process Blastx {
     publishDir "${sample}/Venomflow/results/Blast/Blastx/", mode: 'copy'
 
     input:
-    tuple val(sample), val(proteindbdbname), path(combined_trinity), path(proteindb)
+    tuple val(sample), path(combined_trinity), path(proteindb)
 
     output:
     path "${sample}.blastx.db.0.txt", emit: blastx0
@@ -524,8 +523,8 @@ process Blastx {
     script:
     """
    
-    blastx -query ${combined_trinity} -db ${proteindbdbname} -out ${sample}.blastx.db.6.txt -evalue 1e-5 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
-    blastx -query ${combined_trinity} -db ${proteindbdbname} -out ${sample}.blastx.db.0.txt -evalue 1e-5 -outfmt '0'
+    blastx -query ${combined_trinity} -db proteindb -out ${sample}.blastx.db.6.txt -evalue 1e-5 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
+    blastx -query ${combined_trinity} -db proteindb -out ${sample}.blastx.db.0.txt -evalue 1e-5 -outfmt '0'
 
     """
 }
@@ -889,10 +888,10 @@ process Blastp {
     conda "blast=2.17.0"
     container 'community.wave.seqera.io/library/blast:2.17.0--6279aeee601cb05e'
 
-    publishDir "${sample}/Venomflow/results/Blast/Blastp/", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/Blast/Blastp_Toxin/", mode: 'copy'
 
     input:
-    tuple val(sample), path(combined_pep), path(proteindb), val(proteindbdbname)
+    tuple val(sample), path(combined_pep), path(proteindb)
 
     output:
     path "${sample}.blastp.db.0.txt", emit: blastp0
@@ -901,8 +900,8 @@ process Blastp {
     script:
     """
 
-    blastp -query ${combined_pep} -db ${proteindbdbname} -out ${sample}.blastp.db.6.txt -evalue 1e-5 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
-    blastp -query ${combined_pep} -db ${proteindbdbname} -out ${sample}.blastp.db.0.txt -evalue 1e-5 -outfmt '0'
+    blastp -query ${combined_pep} -db proteindb -out ${sample}.blastp.db.6.txt -evalue 1e-5 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
+    blastp -query ${combined_pep} -db proteindb -out ${sample}.blastp.db.0.txt -evalue 1e-5 -outfmt '0'
 
     """
 }
@@ -959,7 +958,7 @@ process SignalP {
 
     output:
     tuple val(sample), path("*_mature.fasta"), emit: maturesequences
-    tuple val(sample), path ("*.signalp5"), emit: signalpsummary
+    tuple val(sample), path("*.signalp5"), emit: signalpsummary
 
     script:
 
@@ -1086,7 +1085,7 @@ process DeepTMHMMFilter {
 
     label 'process_bare'
 
-    
+
 
     conda "seqkit=2.12.0"
     container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
@@ -1159,7 +1158,62 @@ process Interproscan {
     """
 }
 
-// Process 20: GenomeBlastdatabasecreation
+// Process 20: Blastdatabasecreation
+process BlastdatabasecreationNonToxin {
+
+    errorStrategy 'retry'
+    maxRetries 4
+
+
+    label 'process_bare'
+
+    conda "blast=2.17.0"
+    container 'community.wave.seqera.io/library/blast:2.17.0--6279aeee601cb05e'
+
+    input:
+    tuple val(sample), path(database_fasta)
+
+    output:
+    tuple val(sample), path("*"), emit: nontoxinproteindb
+
+    script:
+    """
+    makeblastdb -in "${database_fasta}" -dbtype prot -out NonToxinDataBase
+    """
+}
+// Process 21: Blastdatabasecreation
+
+process BlastpNonToxin {
+
+    errorStrategy 'retry'
+    maxRetries 4
+
+
+    label 'process_medium'
+
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
+
+    conda "blast=2.17.0"
+    container 'community.wave.seqera.io/library/blast:2.17.0--6279aeee601cb05e'
+
+    publishDir "${sample}/Venomflow/results/Blast/Blastp_NonToxin/", mode: 'copy'
+
+    input:
+    tuple val(sample), path(secreted_pep), path(proteindb)
+
+    output:
+    path "${sample}.blastp.db.6.txt", emit: nontoxblastp6
+
+    script:
+    """
+
+    blastp -query ${secreted_pep} -db NonToxinDataBase -out ${sample}.nontoxin.blastp.db.6.txt -evalue 1e-5 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
+
+    """
+}
+
+// Process 22: GenomeBlastdatabasecreation
 process GenomeBlastdatabasecreation {
 
     errorStrategy 'retry'
@@ -1179,11 +1233,11 @@ process GenomeBlastdatabasecreation {
 
     script:
     """
-    makeblastdb -in "${genome_fasta}" -dbtype nucl
+    makeblastdb -in "${genome_fasta}" -dbtype nucl -out genomedb
     """
 }
 
-// Process 21: GenomeBlasts6
+// Process 23: GenomeBlasts6
 process GenomeBlasts6 {
 
     label 'process_medium'
@@ -1201,14 +1255,14 @@ process GenomeBlasts6 {
     publishDir "${sample}/Venomflow/results/Blast/Blastn/", mode: 'copy'
 
     input:
-    tuple val(sample), val(genomedbname), path(secretedcds), path(genomedb)
+    tuple val(sample), path(secretedcds), path(genomedb)
 
     output:
     path "${sample}.blastn.db.6.txt", emit: blastn6
 
     script:
     """
-    blastn -query ${secretedcds} -db ${genomedbname} -out ${sample}.blastn.db.6.txt -evalue 1e-5 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
+    blastn -query ${secretedcds} -db genomedb -out ${sample}.blastn.db.6.txt -evalue 1e-5 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send sstrand evalue bitscore qframe qcovs"
 
     """
 }
@@ -1231,14 +1285,14 @@ process GenomeBlasts0 {
     publishDir "${sample}/Venomflow/results/Blast/Blastn/", mode: 'copy'
 
     input:
-    tuple val(sample), val(genomedbname), path(secretedcds), path(genomedb)
+    tuple val(sample), path(secretedcds), path(genomedb)
 
     output:
     path "${sample}.blastn.db.0.txt", emit: blastn0
 
     script:
     """
-    blastn -query ${secretedcds} -db ${genomedbname} -out ${sample}.blastn.db.0.txt -evalue 1e-5 -outfmt '0'
+    blastn -query ${secretedcds} -db genomedb -out ${sample}.blastn.db.0.txt -evalue 1e-5 -outfmt '0'
 
     """
 }
@@ -1391,14 +1445,14 @@ workflow {
     Blastxinputfasta_single = csv_channel
         .filter { row -> !row.Transcriptome2?.trim() || row.Transcriptome2.trim().toLowerCase() == 'null' }
         .map { row ->
-            tuple(row.Sample_name, row.Protein_fasta_name, file(row.Transcriptome1))
+            tuple(row.Sample_name, file(row.Transcriptome1))
         }
         .join(Blastdatabasecreation.out.proteindb)
 
     Blastxinputfasta_combined = csv_channel
         .filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim() != '' && row.Transcriptome2.trim().toLowerCase() != 'null' }
         .map { row ->
-            tuple(row.Sample_name, row.Protein_fasta_name)
+            tuple(row.Sample_name)
         }
         .join(Transcriptome_Combined.out.transcriptome_combined)
         .join(Blastdatabasecreation.out.proteindb)
@@ -1480,10 +1534,7 @@ workflow {
     input_TransKallisto | Kallisto_Transdecoder
 
     //Define Input: Blastp - Match Transdecoder output with databases
-    Blastpdb = csv_channel.map { row ->
-        tuple(row.Sample_name, row.Protein_fasta_name)
-    }
-    input_Blastp = Combined_pep.join(Blastdatabasecreation.out.proteindb).join(Blastpdb)
+    input_Blastp = Combined_pep.join(Blastdatabasecreation.out.proteindb)
 
     //Run Process: Blastp
     input_Blastp | Blastp
@@ -1562,6 +1613,19 @@ workflow {
 
     //Run Process: Interproscan  (Complete secreted pep ORFs only)
     input_Interproscan | Interproscan
+
+
+    // Define Input: BlastdatabasecreationNonToxin
+    input_nontoxindatabasefasta = csv_channel.map { row -> tuple(row.Sample_name, file(row.NonToxin_Protein_fasta_path_for_Blast)) }
+
+    //Run Process: BlastdatabasecreationNonToxin
+    input_nontoxindatabasefasta | BlastdatabasecreationNonToxin
+
+    // Define Input: BlastpNonToxin
+    input_nontoxinBlastp = input_Interproscan.join(BlastdatabasecreationNonToxin.out.nontoxinproteindb)
+
+    //Run Process:BlastpNonToxin
+    input_nontoxinBlastp | BlastpNonToxin
 
     //Run Process: BlastnGenome
     BlastnInput | GenomeBlasts6
