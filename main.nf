@@ -18,6 +18,7 @@ def printhead() {
     log.info("Description:                     ${workflow.manifest.description}")
     log.info("Version:                         ${workflow.manifest.version}")
     log.info("DeepTMHMM:                       ${params.DeepTMHMM}")
+    log.info("Profile:                         ${params.profile}")
     log.info("Start:                           ${workflow.start}")
     log.info("")
     log.info("────────────────────────────────────────────────────────────")
@@ -1584,7 +1585,6 @@ workflow {
     // Run Process: BlastnGenome database creation
     GenomeBlastdatabasecreation(Genomefasta)
     genomedb = GenomeBlastdatabasecreation.out.genomedbfiles
-    Blastncds = csv_channel.map { row -> tuple(row.Sample_name, row.Genome_fasta_name) }
     signalpsummary = SignalP.out.signalpsummary
     DeepTMHMMinput = input_signalp.join(signalpsummary)
 
@@ -1599,15 +1599,13 @@ workflow {
             .join(SignalP.out.maturesequences)
         input_DeepTMHMMFilter | DeepTMHMMFilter
         input_Interproscan = DeepTMHMMFilter.out.complete_pep_secreted
-        BlastnInput = Blastncds
-            .join(DeepTMHMMFilter.out.complete_cds_secreted)
+        BlastnInput = DeepTMHMMFilter.out.complete_cds_secreted
             .join(genomedb)
     }
     else {
         input_Interproscan = Filter2.out.complete_pep_signalp
         //Define Input: Genome BLAST 
-        BlastnInput = Blastncds
-            .join(Filter2.out.complete_cds_signalp)
+        BlastnInput = Filter2.out.complete_cds_signalp
             .join(genomedb)
     }
 
