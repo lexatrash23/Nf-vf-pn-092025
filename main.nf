@@ -433,7 +433,7 @@ process BUSCO_transcriptome_mollusca3 {
 }
 
 // Process 7: Kallisto_Trinity
-process Kallisto_Trinity {
+process Kallisto_Trinity1 {
 
     conda "kallisto=0.51.1"
     container 'community.wave.seqera.io/library/kallisto:0.51.1--d7728813dda40c70'
@@ -444,13 +444,13 @@ process Kallisto_Trinity {
     cpus { task.cpus * task.attempt }
     time { task.time * task.attempt }
 
-    publishDir "${sample}/Venomflow/results/kallisto/trinity/output", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/kallisto/trinity1/output", mode: 'copy'
 
     errorStrategy 'retry'
     maxRetries 4
 
     input:
-    tuple val(sample), path(R1), path(R2), val(Strandedness), path(combined_trinity)
+    tuple val(sample), path(R1), path(R2), val(Strandedness), path(trinity1)
 
     output:
     path "abundance.tsv", emit: KallistoTrinityAbundance
@@ -466,7 +466,47 @@ process Kallisto_Trinity {
     else
         stranded_flag=""
     fi
-    kallisto index -i index ${combined_trinity}
+    kallisto index -i index ${trinity1}
+    kallisto quant -i index -o ./ -b 100 ${R1} ${R2} \$stranded_flag
+
+    """
+}
+
+// Process 7: Kallisto_Trinity
+process Kallisto_Trinity2 {
+
+    conda "kallisto=0.51.1"
+    container 'community.wave.seqera.io/library/kallisto:0.51.1--d7728813dda40c70'
+
+    label 'process_single'
+    label 'process_long'
+
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
+
+    publishDir "${sample}/Venomflow/results/kallisto/trinity2/output", mode: 'copy'
+
+    errorStrategy 'retry'
+    maxRetries 4
+
+    input:
+    tuple val(sample), path(R1), path(R2), val(Strandedness), path(trinity2)
+
+    output:
+    path "abundance.tsv", emit: KallistoTrinityAbundance
+
+    script:
+    """
+    stranded_input="${Strandedness}"
+
+    if [ ${Strandedness} == "fr" ]; then
+        stranded_flag="--fr-stranded"
+    elif [ ${Strandedness} == "rf" ]; then
+        stranded_flag="--rf-stranded"
+    else
+        stranded_flag=""
+    fi
+    kallisto index -i index ${trinity2}
     kallisto quant -i index -o ./ -b 100 ${R1} ${R2} \$stranded_flag
 
     """
@@ -835,7 +875,7 @@ process BUSCO_translatome_mollusca3 {
 
 
 // Process 13: Kallisto_Transdecoder
-process Kallisto_Transdecoder {
+process Kallisto_Transdecoder_TD {
 
     errorStrategy 'retry'
     maxRetries 4
@@ -852,7 +892,7 @@ process Kallisto_Transdecoder {
     publishDir "${sample}/Venomflow/results/kallisto/transdecoder/output", mode: 'copy'
 
     input:
-    tuple val(sample), path(combined_cds), path(R1), path(R2), val(Strandedness)
+    tuple val(sample), path(R1), path(R2), val(Strandedness), path(transdecodercds)
 
     output:
     path "abundance.tsv", emit: KallistoTransdecoderAbundance
@@ -868,7 +908,47 @@ process Kallisto_Transdecoder {
     else
         stranded_flag=""
     fi
-    kallisto index -i index ${combined_cds}
+    kallisto index -i index ${transdecodercds}
+    kallisto quant -i index -o ./ -b 100 ${R1} ${R2} \$stranded_flag
+
+    """
+}
+
+// Process 13: Kallisto_Transdecoder
+process Kallisto_Transdecoder_TD2 {
+
+    errorStrategy 'retry'
+    maxRetries 4
+
+
+    label 'process_low'
+
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
+
+    conda "kallisto=0.51.1"
+    container 'community.wave.seqera.io/library/kallisto:0.51.1--d7728813dda40c70'
+
+    publishDir "${sample}/Venomflow/results/kallisto/TD2/output", mode: 'copy'
+
+    input:
+    tuple val(sample), path(R1), path(R2), val(Strandedness), path(td2_cds)
+
+    output:
+    path "abundance.tsv", emit: KallistoTransdecoderAbundance
+
+    script:
+
+    """
+
+    if [ ${Strandedness} == "fr" ]; then
+        stranded_flag="--fr-stranded"
+    elif [ ${Strandedness} == "rf" ]; then
+        stranded_flag="--rf-stranded"
+    else
+        stranded_flag=""
+    fi
+    kallisto index -i index ${td2_cds}
     kallisto quant -i index -o ./ -b 100 ${R1} ${R2} \$stranded_flag
 
     """
@@ -1414,25 +1494,19 @@ workflow {
     input_BUSCOlin2_3 | BUSCO_transcriptome_mollusca3
 
 
+    //Input: Kallisto_Trinity1 
+    input_kallistotrinity1 = csv_channel.map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2), row.Strandedness, file(row.Transcriptome1)) }
 
+    // Run Process: Kallisto_Trinity1
+    input_kallistotrinity1 | Kallisto_Trinity1
 
-
-
-    // Define Input: Trinity fasta + R1 + R2 tuple 
-    input_TrinityKallisto_single = csv_channel
-        .filter { row -> !row.Transcriptome2?.trim() || row.Transcriptome2.trim().toLowerCase() == 'null' }
-        .map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2), row.Strandedness, file(row.Transcriptome1)) }
-
-    input_TrinityKallisto_combined = csv_channel
+    // Input:Kallisto_Trinity2
+    input_kallistotrinity2 = csv_channel
         .filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim() != '' && row.Transcriptome2.trim().toLowerCase() != 'null' }
-        .map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2), row.Strandedness) }
-        .join(Transcriptome_Combined.out.transcriptome_combined)
+        .map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2), row.Strandedness, file(row.Transcriptome2)) }
 
-    // Combine both channels using mix() operator
-    input_TrinityKallisto_all = input_TrinityKallisto_single.mix(input_TrinityKallisto_combined)
-
-    // Run Process: Kallisto_Trinity
-    input_TrinityKallisto_all | Kallisto_Trinity
+    // Run Process: Kallisto_Trinity2
+    input_kallistotrinity2 | Kallisto_Trinity2
 
 
     //Define Input: Database_Fasta. This is set up to allow for multiple different databases if needed.
@@ -1528,11 +1602,22 @@ workflow {
 
     //Define Input: Transdecoder cds + R1 + R2 + Strandedness tuple 
     Combined_cds = ORFs_Combined.out.combined_cds
-    KallistoTransdecoderR1R2S = csv_channel.map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2), row.Strandedness) }
-    input_TransKallisto = Combined_cds.join(KallistoTransdecoderR1R2S)
 
-    //Run Process: TransKallisto
-    input_TransKallisto | Kallisto_Transdecoder
+    //Input: Kallisto_Transdecoder_TD
+    input_Kallisto_Transdecoder_TD = csv_channel
+        .map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2), row.Strandedness) }
+        .join(Transdecoder.out.transdecoder_cds)
+
+    //Run Process: Kallisto_Transdecoder_TD
+    input_Kallisto_Transdecoder_TD | Kallisto_Transdecoder_TD
+
+    //Input: Kallisto_Transdecoder_TD2
+    input_Kallisto_Transdecoder_TD2 = csv_channel
+        .map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2), row.Strandedness) }
+        .join(TD2.out.TD2_cds)
+
+    //Run Process: Kallisto_Transdecoder_TD2
+    input_Kallisto_Transdecoder_TD2 | Kallisto_Transdecoder_TD2
 
     //Define Input: Blastp - Match Transdecoder output with databases
     input_Blastp = Combined_pep.join(Blastdatabasecreation.out.proteindb)
@@ -1599,14 +1684,12 @@ workflow {
             .join(SignalP.out.maturesequences)
         input_DeepTMHMMFilter | DeepTMHMMFilter
         input_Interproscan = DeepTMHMMFilter.out.complete_pep_secreted
-        BlastnInput = DeepTMHMMFilter.out.complete_cds_secreted
-            .join(genomedb)
+        BlastnInput = DeepTMHMMFilter.out.complete_cds_secreted.join(genomedb)
     }
     else {
         input_Interproscan = Filter2.out.complete_pep_signalp
         //Define Input: Genome BLAST 
-        BlastnInput = Filter2.out.complete_cds_signalp
-            .join(genomedb)
+        BlastnInput = Filter2.out.complete_cds_signalp.join(genomedb)
     }
 
     //Run Process: Interproscan  (Complete secreted pep ORFs only)
