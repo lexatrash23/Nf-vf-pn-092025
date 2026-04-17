@@ -868,7 +868,7 @@ process Kallisto_Transdecoder {
     else
         stranded_flag=""
     fi
-    kallisto index -i index ${combined_cds}
+    kallisto index -i index ${complete_cds}
     kallisto quant -i index -o ./ -b 100 ${R1} ${R2} \$stranded_flag
 
     """
