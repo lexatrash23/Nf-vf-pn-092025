@@ -852,7 +852,7 @@ process Kallisto_Transdecoder {
     publishDir "${sample}/Venomflow/results/kallisto/transdecoder/output", mode: 'copy'
 
     input:
-    tuple val(sample), path(combined_cds), path(R1), path(R2), val(Strandedness)
+    tuple val(sample), path(complete_cds), path(R1), path(R2), val(Strandedness)
 
     output:
     path "abundance.tsv", emit: KallistoTransdecoderAbundance
@@ -1526,8 +1526,15 @@ workflow {
     input_BUSCOlin2_L_3 | BUSCO_translatome_mollusca3
 
 
+    //Define Input: Sample name + PEP + CDS tuple
+    input_ORF_complete = Combined_pep.join(Combined_cds)
+
+    //Run Process: Transdecoder filter for complete ORFs
+    input_ORF_complete | ORF_complete
+
+
     //Define Input: Transdecoder cds + R1 + R2 + Strandedness tuple 
-    Combined_cds = ORFs_Combined.out.combined_cds
+    Combined_cds = ORF_complete.out.complete_cds
     KallistoTransdecoderR1R2S = csv_channel.map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2), row.Strandedness) }
     input_TransKallisto = Combined_cds.join(KallistoTransdecoderR1R2S)
 
@@ -1540,11 +1547,7 @@ workflow {
     //Run Process: Blastp
     input_Blastp | Blastp
 
-    //Define Input: Sample name + PEP + CDS tuple
-    input_ORF_complete = Combined_pep.join(Combined_cds)
 
-    //Run Process: Transdecoder filter for complete ORFs
-    input_ORF_complete | ORF_complete
 
 
     //Define Input: Sample name + completepep tuple
