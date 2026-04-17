@@ -1528,16 +1528,17 @@ workflow {
     
 
     //Define Input: Sample name + PEP + CDS tuple
-    Combined_cds = ORF_complete.out.complete_cds
+    Combined_cds = ORFs_Combined.out.combined_cds
     input_ORF_complete = Combined_pep.join(Combined_cds)
 
     //Run Process: Transdecoder filter for complete ORFs
     input_ORF_complete | ORF_complete
 
+    Complete_cds = ORF_complete.out.complete_cds
 
     //Define Input: Transdecoder cds + R1 + R2 + Strandedness tuple 
     KallistoTransdecoderR1R2S = csv_channel.map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2), row.Strandedness) }
-    input_TransKallisto = Combined_cds.join(KallistoTransdecoderR1R2S)
+    input_TransKallisto = Complete_cds.join(KallistoTransdecoderR1R2S)
 
     //Run Process: TransKallisto
     input_TransKallisto | Kallisto_Transdecoder
