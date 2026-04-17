@@ -1284,7 +1284,7 @@ process BlastpNonToxin {
     tuple val(sample), path(secreted_pep), path(proteindb)
 
     output:
-    path "${sample}.blastp.db.6.txt", emit: nontoxblastp6
+    path "${sample}.nontoxin.blastp.db.6.txt", emit: nontoxblastp6
 
     script:
     """
