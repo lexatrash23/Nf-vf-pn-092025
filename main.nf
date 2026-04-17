@@ -18,7 +18,7 @@ def printhead() {
     log.info("Description:                     ${workflow.manifest.description}")
     log.info("Version:                         ${workflow.manifest.version}")
     log.info("DeepTMHMM:                       ${params.DeepTMHMM}")
-    log.info("Profile:                         ${params.profile}")
+    log.info("Profile:                         ${workflow.profile}")
     log.info("ORFPrediction:                   ${params.ORFPrediction}")
     log.info("Start:                           ${workflow.start}")
     log.info("")
