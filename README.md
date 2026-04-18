@@ -32,22 +32,24 @@ Output files available are as follows:
     a. multiqc.html 
 3. BUSCO  
     a. Transcriptome : BUSCO summary files, 1 per lineage specified per transcriptome provided. If two transcriptomes were provided, additional summary files based on the combined transcriptome will also be provided per lineage specified.
+   </br>
     b. Translatome: BUSCO summary files, 1 per lineage. Two ORF prediction tools - Transdecoder and TD2 are used in the pipeline. BUSCO translatome assessments are provided based on protein fastas generated from each of these tools and based on a combined deduplicated version of these protein fastas. 
 5. Blast   
     a. blastx fmt 0 and 6   
      b. blastp fmt 0 and 6  
-  c. blastn fmt 0 and 6 (if genome was provided)  
-6. kallisto  
+  c. blastn fmt 0 and 6 (if genome was provided)
+   d. blastp fmt 6 against nontoxin database
+7. kallisto  
     a. abundance.tsv files with trinity fasta used as an index  
     b. abundance.tsv files with transdecoder fasta used as an index  
 8. Interproscan  
     a. Interproscan output file (tsv)  
 10. Signalp  
     a. Signalp summary file and mature fasta  
-12. Transdecoder  
-    a. Transdecoder pep and cds files  
-    b. Transdecoder pep and cds files filtered only for complete ORFs  
-    c. Transdecoder pep file filtered only for those with signalp sequence predicted  
+12. ORF Prediction  
+    a. Transdecoder/TD2 pep and cds files  
+    b. Transdecoder/TD2 pep and cds files filtered only for complete ORFs  
+    c. Transdecoder/TD2 pep file filtered only for those with signalp sequence predicted  
 14. Stats  
     d. 9 Seqkit stats files  
 
