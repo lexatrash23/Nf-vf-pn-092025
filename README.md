@@ -11,14 +11,17 @@ This Nextflow pipeline has 4 required input files and 2 optional input file per 
 1. Transcriptome Assembly (fasta)
 2. Trimmed Reads R1 (fasta/fastq.gz)
 3. Trimmed Reads R2 (fasta/fastq.gz)
-4. Protein Sequences of interest to BLAST against (fasta)
+4. ToxProt UniProt reviewed proteins (fasta)
+5. NonToxProt UniProt reviewed proteins (fasta)
 
 ### Optional Input files 
 5. Genome fasta
 6. A second transcriptome assembly 
 
-Allowing two transcriptome assemblies, allows for the use of both a de novo assembly and a genome-based assembly where available. 
-
+## Optional Run Parameters 
+-profile     conda; singularity 
+-- DeepTMHMM false;true
+-- ORFPrediction TD2;TD;Both
 ### Output files
 All Output files can be found in within the sample name-derived folder in the directory the script was run from.  
 Output files available are as follows: 
