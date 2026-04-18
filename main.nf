@@ -344,8 +344,8 @@ process Transcriptome_Combined {
 
     label 'process_bare'
 
-    conda "seqkit=2.12.0"
-    container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
+    conda "seqkit=2.12.0, bioconda::cd-hit=4.8.1"
+    container 'community.wave.seqera.io/library/cd-hit_seqkit:27b33ce1ba0d851c'
 
     publishDir "${sample}/Venomflow/results/Combined_Transcriptome/", mode: 'copy'
 
@@ -353,7 +353,8 @@ process Transcriptome_Combined {
     tuple val(sample), path(transcriptome1), val(transcriptome1_label), path(transcriptome2), val(transcriptome2_label)
 
     output:
-    tuple val(sample), path("*combined.deduplicated.fasta"), emit: transcriptome_combined
+    tuple val(sample), path("*combined.deduplicated.fasta"), emit: transcriptome_combineddedup
+    tuple val(sample), path("*deduplicated.cdhit95.fasta"), emit: transcriptome_combined
 
     script:
 
@@ -362,6 +363,7 @@ process Transcriptome_Combined {
     seqkit replace -p '(.+)' -r '${transcriptome2_label}_\$1' ${transcriptome2} > Transcriptome2_labelled.fasta
     cat Transcriptome1_labelled.fasta Transcriptome2_labelled.fasta > Transcriptome_combined.fasta
     seqkit rmdup Transcriptome_combined.fasta -s -o ${sample}_transcriptome_combined.deduplicated.fasta
+    cd-hit-est -i ${sample}_transcriptome_combined.deduplicated.fasta  -o ${sample}_transcriptome_combined.deduplicated.cdhit95.fasta -c 0.95 -d 0
 
     """
 }
@@ -632,6 +634,37 @@ process ORFs_Combined {
     cat transdecoder_labelled.pep TD2_labelled.pep > orf_combined.pep
     seqkit seq -n -i ${sample}_ORF_combined.deduplicated.cds > ids_from_cds.txt
     seqkit grep -f ids_from_cds.txt orf_combined.pep -o ${sample}_orf_combined.deduplicatedCDS.pep
+
+    """
+}
+
+// Process 6: Label transcriptomes, combine and remove duplicates 
+process ORFs_Combined_NoGenomeCDHit {
+
+    errorStrategy 'retry'
+    maxRetries 4
+
+
+    label 'process_bare'
+
+    conda "seqkit=2.12.0, bioconda::cd-hit=4.8.1"
+    container 'community.wave.seqera.io/library/cd-hit_seqkit:27b33ce1ba0d851c'
+
+    publishDir "${sample}/Venomflow/results/ORFprediction/Combined/All", mode: 'copy'
+
+    input:
+    tuple val(sample), path(combined_pep), path(combined_cds)
+
+    output:
+    tuple val(sample), path("*combined.deduplicatedcds.cd95.pep"), emit: combined_pep
+    tuple val(sample), path("*combined.deduplicated.cd95pep.cds"), emit: combined_cds
+
+    script:
+
+    """
+    cd-hit -i ${combined_pep}  -o ${sample}_combined.deduplicatedcds.cd95.pep -c 0.95 -d 0
+    seqkit seq -n -i ${sample}_combined.deduplicatedcds.cd95.pep > ids_from_pep.txt
+    seqkit grep -f ids_from_pep.txt ${combined_cds} -o ${sample}_combined.deduplicated.cd95pep.cds
 
     """
 }
@@ -1473,6 +1506,20 @@ workflow {
 
     input_orf = Transcriptpome1.mix(Transcriptome_Combined.out.transcriptome_combined)
 
+    //Define Input: sample_with_genome 
+    csv_channel
+        .branch { row ->
+            def path = row.Genome_fasta_path?.toString()?.trim()
+            def hasGenome = path && path != '' && !path.equalsIgnoreCase('NULL')
+            with_genome: hasGenome
+            return tuple(row.Sample_name)
+            without_genome: !hasGenome
+            return tuple(row.Sample_name)
+        }
+        .set { branched_samples }
+
+    Sample_with_Genome = branched_samples.with_genome.unique()
+    Sample_without_Genome = branched_samples.without_genome.unique()
     // Initialize variables that will be used after the conditional blocks
     BUSCOlin1 = csv_channel.map { row -> tuple(row.Sample_name, row.BUSCO_lin1) }
     BUSCOlin2 = csv_channel.map { row -> tuple(row.Sample_name, row.BUSCO_lin2) }
@@ -1545,12 +1592,20 @@ workflow {
         input_BUSCOlin2_L_3 | BUSCO_translatome_mollusca3
 
         //Define Input for input_ORF_complete 
+        //for no genome and for genome one's
+        input_ORFs_Combined_NoGenomeCDHit = Sample_without_Genome.join(ORFs_Combined.out.combined_pep).join(ORFs_Combined.out.combined_cds)
+        input_ORFs_Combined_NoGenomeCDHit | ORFs_Combined_NoGenomeCDHit
 
-        Combined_cds = ORFs_Combined.out.combined_cds
-        input_ORF_complete = Combined_pep.join(Combined_cds)
+        NoGenomeCompleteInput = Sample_without_Genome.join(ORFs_Combined_NoGenomeCDHit.out.combined_cds).join(ORFs_Combined_NoGenomeCDHit.out.combined_pep)
+        GenomeCompleteInput = Sample_with_Genome.join(ORFs_Combined.out.combined_cds).join(ORFs_Combined.out.combined_pep)
+
+        input_ORF_complete = NoGenomeCompleteInput.mix(GenomeCompleteInput)
+        NoGenomeCompleteInputpep = Sample_without_Genome.join(ORFs_Combined_NoGenomeCDHit.out.combined_pep).join(Blastdatabasecreation.out.proteindb)
+        GenomeCompleteInputpep = Sample_with_Genome.join(ORFs_Combined.out.combined_pep).join(Blastdatabasecreation.out.proteindb)
+
 
         //Define Input: Blastp - Match Transdecoder output with databases
-        input_Blastp = Combined_pep.join(Blastdatabasecreation.out.proteindb)
+        input_Blastp = NoGenomeCompleteInputpep.mix(GenomeCompleteInputpep)
     }
     else {
         // TD2  logic 
@@ -1626,6 +1681,9 @@ workflow {
         }
         .map { row -> tuple(row.Sample_name, file(row.Genome_fasta_path)) }
         .unique { tuple -> tuple[0] }
+
+
+
 
     // Run Process: BlastnGenome database creation
     GenomeBlastdatabasecreation(Genomefasta)
