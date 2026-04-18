@@ -30,10 +30,9 @@ Output files available are as follows:
 1. Fastqc  
     a. multiqc.html 
 3. BUSCO  
-    a. Transcriptome : BUSCO summary files, 1 per lineage specified per transcriptome provided. If two transcriptomes were provided, additional summary files based on the combined transcriptome will also be provided per lineage specified.
+    a. Transcriptome : BUSCO summary files, 1 per lineage specified per transcriptome provided. 
    </br>
-    b. Translatome: BUSCO summary files, 1 per lineage. Two ORF prediction tools - Transdecoder and TD2 are used in the pipeline. BUSCO translatome assessments are provided based on protein fastas generated from each of these tools and based on a combined deduplicated version of these protein fastas. 
-5. Blast   
+    b. Translatome: BUSCO summary files, 1 per lineage. 
     a. blastx fmt 0 and 6   
      b. blastp fmt 0 and 6  
   c. blastn fmt 0 and 6 (if genome was provided)
