@@ -55,7 +55,7 @@ Output files available are as follows:
     d. 9 Seqkit stats files  
 
 ## Pre-requisites
-### nextflow 
+### Nextflow 
 Nextflow requires Bash 3.2 (or later) and Java 17 (or later, up to 25) to be installed.Detailed information on nextflow installation can be found [here](https://www.nextflow.io/docs/latest/install.html)
 > Install SDKMAN:
     ``` curl -s https://get.sdkman.io | bash ```
