@@ -344,7 +344,7 @@ process Transcriptome_Combined {
 
     label 'process_bare'
 
-    conda "seqkit=2.12.0, bioconda::cd-hit=4.8.1"
+    conda "seqkit=2.12.0 bioconda::cd-hit=4.8.1"
     container 'community.wave.seqera.io/library/cd-hit_seqkit:27b33ce1ba0d851c'
 
     publishDir "${sample}/Venomflow/results/Combined_Transcriptome/", mode: 'copy'
@@ -647,7 +647,7 @@ process ORFs_Combined_NoGenomeCDHit {
 
     label 'process_bare'
 
-    conda "seqkit=2.12.0, bioconda::cd-hit=4.8.1"
+    conda "seqkit=2.12.0 bioconda::cd-hit=4.8.1"
     container 'community.wave.seqera.io/library/cd-hit_seqkit:27b33ce1ba0d851c'
 
     publishDir "${sample}/Venomflow/results/ORFprediction/Combined/All", mode: 'copy'
