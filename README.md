@@ -20,8 +20,11 @@ This Nextflow pipeline has 4 required input files and 2 optional input file per 
 
 ## Optional Run Parameters 
 -profile     conda; singularity 
+</br>
 -- DeepTMHMM false;true
+</br>
 -- ORFPrediction TD2;TD;Both
+</br>
 ### Output files
 All Output files can be found in within the sample name-derived folder in the directory the script was run from.  
 Output files available are as follows: 
