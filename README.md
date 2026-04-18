@@ -1,6 +1,6 @@
 This Nextflow pipeline and documentation is still in development! 
 ![Pipelineimage](pipeline_figures/PipelineFigure.png)
-___
+___ 
 # Overview
 Venomflow is an automated Nextflow-based pipeline for the identification of venom peptides and proteins from transcriptomic data. 
 
