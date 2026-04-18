@@ -139,11 +139,10 @@ For Venomflow pipeline running there are 11 mandatory columns and 5 optional col
 | 8 | Transcriptome2 | Optional | Path to Transcriptome2 assembly | "/home/project/lexatrash/DP3/Stringtie/Stringtie.fasta" | Path to fasta file |
 | 9 | BUSCO_lin1 | Mandatory | Desired BUSCO lineage for transcriptome and translatome assessments. Complete BUSCO lineage options can be found here | "metazoa_odb10" | String |
 | 10 | BUSCO_lin2 | Mandatory | Desired second BUSCO lineage for transcriptome and translatome assessments. Complete BUSCO lineage options can be found here | "mollusca_odb10" | String |
-| 11 | Protein_fasta_path_for_Blast | Mandatory | Path to fasta file intended to be used as blast database | "/home/project/lexatrash/Databases/Unitox_curated.fasta" | Path to fasta file |
-| 12 | Protein_fasta_name | Mandatory | String name for Blast Database | "Unitox_curated" | String |
-| 13 | isgenomeavailble | Mandatory | "Y" = Genome fasta is available, "N" = No genome fasta is available | "Y" | String |
-| 14 | Genome_fasta_path | Optional | Path to genome fasta if available | "/home/project/lexatrash/Genomes/Dp.fasta" | Path to fasta/fasta.gz |
-| 15 | NCBI_Genome_id | Optional | NCBI genome accession ID if available | "GCA_023376005.1" | String |
+| 11 | Protein_fasta_path_for_Blast | Mandatory | Path to ToxProt fasta file | "/home/project/lexatrash/Databases/Unitox_curated.fasta" | Path to fasta file |
+| 12 | NonToxin_Protein_fasta_path_for_Blast | Mandatory | Path to nontoxin fasta | "/home/project/lexatrash/Databases/nontoxin_curated.fasta" | String |
+| 13 | Genome_fasta_path | Optional | Path to genome fasta if available | "/home/project/lexatrash/Genomes/Dp.fasta" | Path to fasta/fasta.gz |
+| 14 | NCBI_Genome_id | Optional | NCBI genome accession ID if available | "GCA_023376005.1" | String |
 
 ## Quick Start:   
 
