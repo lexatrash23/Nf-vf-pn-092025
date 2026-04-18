@@ -37,7 +37,6 @@ Output files available are as follows:
     a. blastx fmt 0 and 6   
      b. blastp fmt 0 and 6  
   c. blastn fmt 0 and 6 (if genome was provided)
-d. blastp fmt 6 against nontoxin database
 
 7. kallisto  
     a. abundance.tsv files with trinity fasta used as an index  
