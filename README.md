@@ -24,7 +24,7 @@ This Nextflow pipeline has 4 required input files and 2 optional input file per 
 </br>
 -- ORFPrediction TD2;TD;Both
 </br>
-### Output files
+## Output files
 All Output files can be found in within the sample name-derived folder in the directory the script was run from.  
 Output files available are as follows: 
 1. Fastqc  
@@ -39,18 +39,23 @@ Output files available are as follows:
   c. blastn fmt 0 and 6 (if genome was provided)
 </br>
    d. blastp fmt 6 against nontoxin database
+
 7. kallisto  
     a. abundance.tsv files with trinity fasta used as an index  
-    b. abundance.tsv files with transdecoder fasta used as an index  
-8. Interproscan  
-    a. Interproscan output file (tsv)  
-10. Signalp  
-    a. Signalp summary file and mature fasta  
-12. ORF Prediction  
+    b. abundance.tsv files with transdecoder fasta used as an index
+
+9. Interproscan  
+    a. Interproscan output file (tsv)
+
+11. Signalp  
+    a. Signalp summary file and mature fasta
+
+13. ORF Prediction  
     a. Transdecoder/TD2 pep and cds files  
     b. Transdecoder/TD2 pep and cds files filtered only for complete ORFs  
-    c. Transdecoder/TD2 pep file filtered only for those with signalp sequence predicted  
-14. Stats  
+    c. Transdecoder/TD2 pep file filtered only for those with signalp sequence predicted
+
+15. Stats  
     d. 9 Seqkit stats files  
 
 ## Pre-requisites
