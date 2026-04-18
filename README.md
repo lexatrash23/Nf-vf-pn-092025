@@ -29,30 +29,31 @@ All Output files can be found in within the sample name-derived folder in the di
 Output files available are as follows: 
 1. Fastqc  
     a. multiqc.html 
-3. BUSCO  
+2. BUSCO  
     a. Transcriptome : BUSCO summary files, 1 per lineage specified per transcriptome provided. 
    </br>
-    b. Translatome: BUSCO summary files, 1 per lineage. 
+    b. Translatome: BUSCO summary files, 1 per lineage.
+3. Blast
     a. blastx fmt 0 and 6   
      b. blastp fmt 0 and 6  
   c. blastn fmt 0 and 6 (if genome was provided)
 
-7. kallisto  
+4. kallisto  
     a. abundance.tsv files with trinity fasta used as an index  
     b. abundance.tsv files with transdecoder fasta used as an index
 
-9. Interproscan  
+5. Interproscan  
     a. Interproscan output file (tsv)
 
-11. Signalp  
+6. Signalp  
     a. Signalp summary file and mature fasta
 
-13. ORF Prediction  
+7. ORF Prediction  
     a. Transdecoder/TD2 pep and cds files  
     b. Transdecoder/TD2 pep and cds files filtered only for complete ORFs  
     c. Transdecoder/TD2 pep file filtered only for those with signalp sequence predicted
 
-15. Stats  
+8. Stats  
     d. 9 Seqkit stats files  
 
 ## Pre-requisites
