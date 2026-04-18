@@ -70,14 +70,19 @@ Nextflow requires Bash 3.2 (or later) and Java 17 (or later, up to 25) to be ins
 > Install nextflow: 
     ``` curl -s https://get.nextflow.io | bash ```
 <br>
+
 > Make nextflow executable and move into an executable path:
     ``` chmod +x nextflow 
         mkdir -p $HOME/.local/bin/
         mv nextflow $HOME/.local/bin/
     ```
+
 <br>
+
 > Confirm nextflow installation 
  ``` nextflow info ```
+
+<br>
  
 ### SignalP 5.0 
 Information for SignalP 5.0 download and installation can be found [here](https://services.healthtech.dtu.dk/services/SignalP-5.0/)
