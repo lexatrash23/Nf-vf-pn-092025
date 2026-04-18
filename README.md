@@ -38,6 +38,7 @@ Output files available are as follows:
     a. blastx fmt 0 and 6   
      b. blastp fmt 0 and 6  
   c. blastn fmt 0 and 6 (if genome was provided)
+</br>
    d. blastp fmt 6 against nontoxin database
 7. kallisto  
     a. abundance.tsv files with trinity fasta used as an index  
@@ -57,16 +58,20 @@ Output files available are as follows:
 ### nextflow 
 Nextflow requires Bash 3.2 (or later) and Java 17 (or later, up to 25) to be installed.Detailed information on nextflow installation can be found [here](https://www.nextflow.io/docs/latest/install.html)
 > Install SDKMAN:
-    ``` curl -s https://get.sdkman.io | bash ```  
+    ``` curl -s https://get.sdkman.io | bash ```
+<br>
 > Install Java: 
-    ``` sdk install java 17.0.10-tem ``` 
+    ``` sdk install java 17.0.10-tem ```
+<br>
 > Install nextflow: 
     ``` curl -s https://get.nextflow.io | bash ```
+<br>
 > Make nextflow executable and move into an executable path:
     ``` chmod +x nextflow 
         mkdir -p $HOME/.local/bin/
         mv nextflow $HOME/.local/bin/
     ```
+<br>
 > Confirm nextflow installation 
  ``` nextflow info ```
  
