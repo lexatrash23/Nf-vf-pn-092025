@@ -150,12 +150,7 @@ For Venomflow pipeline running there are 11 mandatory columns and 5 optional col
 **1.** Install [BUSCO](https://busco.ezlab.org/busco_userguide.html), [SignalP](https://services.healthtech.dtu.dk/services/SignalP-5.0/) and [Interproscan](https://www.ebi.ac.uk/interpro/about/interproscan/) accordingly  - insert hyperlink to section below on how to install each of these and add to PATH.
 
 ___
-## Additional notes 
-**_Suggested Dir Structure:_**  
-Sample_Name>Venomflow>.config  
-
-**_BUSCO lineage files_:**  
-If you are not using the molluscan and metazoan databases, you may still paste the path of any two lineages in the params listed under '// Path to BUSCO lineages files' in the config file but do not change the names of the params themselves. i.e. anything before the '=' in the config file should not be changed. 
+## Additional notes   
 
 **_When complete:_**     
 Check slurm output file (if using sbatch script) to ensure all tasks were run successfully. Blast and Interproscan tasks may fail with insufficient memory allocation. If completed sucessfully, work directory can be deleted to clear space.
@@ -164,11 +159,6 @@ Check slurm output file (if using sbatch script) to ensure all tasks were run su
 -If desired -resume flag can be used to resume nextflow script when troubleshooting failed steps to avoid repeating successful steps  
 -If slurm job running nextflow pipeline is cancelled prior to completion, and subsequent run fails, work directory may need to be deleted prior to rerunning to ensure proper conda environment installation 
 ___
-Pipeline image : 
-![Pipelineimage](pipeline_figures/Venomflow_pipeline.png)
-
-___
-
 
 ### Provided test files
 Test run can be down with the following provided test files:  
@@ -178,7 +168,6 @@ Test run can be down with the following provided test files:
 4. unitox_fasta: Fasta file of ToxProt reviewed sequences [Accessed in August 2025]  
 Download Test_files folder and specify respective file paths in local config file.
 Due to size limitations, these are only sample fasta and hence the results will be limited  
-
 
 ___
 
