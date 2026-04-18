@@ -1,4 +1,5 @@
 This Nextflow pipeline and documentation is still in development! 
+![Pipelineimage](pipeline_figures/PipelineFigure.png)
 ___
 # Overview
 Venomflow is an automated Nextflow-based pipeline for the identification of venom peptides and proteins from transcriptomic data. 
@@ -7,8 +8,7 @@ The pipeline involves quality assessment(Fastqc, BUSCO, Bowtie), BLAST (against 
 
 The Output of this pipeline can be used as an input for the Venomflow-analysis pipeline [here](https://github.com/lexatrash23/Nf-vfa-pn-092025)
 ___
-![Pipelineimage](pipeline_figures/PipelineFigure.png)
-___
+
 ## Inputs and Outputs 
 ### Required Input files
 This Nextflow pipeline has 4 required input files and 2 optional input file per sample (per row in the Samplesheet.csv). The required input files are as follows:
