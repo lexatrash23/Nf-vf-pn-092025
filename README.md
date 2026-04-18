@@ -3,6 +3,8 @@ This Nextflow pipeline and documentation is still in development!
 Venomflow is an automated Nextflow-based pipeline for the identification of venom peptides and proteins from transcriptomic data. 
 
 The pipeline involves quality assessment(Fastqc, BUSCO, Bowtie), BLAST (against ToxProt, NonToxProt and Genome database if available), ORF prediction(Transdecoder, TD2), Signal Sequence Prediction (Signalp5, DeepTMHMM), Expression quantification(Kallisto), Domain annotation (Interproscan).
+
+The Output of this pipeline can be used as an input for the Venomflow-analysis pipeline [here] (https://github.com/lexatrash23/Nf-vfa-pn-092025)
 ___
 ## Inputs and Outputs 
 ### Required Input files
