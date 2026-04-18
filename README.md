@@ -1,9 +1,6 @@
 This Nextflow pipeline and documentation is still in development! 
-Just updated to accept multiple inputs. ReadMe needs to be updated
-
-
-[On Installing Nextflow](https://www.nextflow.io/docs/latest/install.html)
 # Overview
+Venomflow is an automated Nextflow-based pipeline for the identification of venom peptides and proteins from transcriptomic data. It requires paired-end trimmed RNAseq reads and at least one transcriptomic Assembly. The pipeline involves quality assessment(Fastqc, BUSCO, Bowtie), BLAST (against ToxProt, NonToxProt and Genome database if available), ORF prediction(Transdecoder, TD2), Signal Sequence Prediction (Signalp5, DeepTMHMM), Expression quantification(Kallisto), Domain annotation (Interproscan).
 ___
 ## Inputs and Outputs 
 ### Required Input files
@@ -142,13 +139,6 @@ For Venomflow pipeline running there are 11 mandatory columns and 5 optional col
 
 **1.** Install [BUSCO](https://busco.ezlab.org/busco_userguide.html), [SignalP](https://services.healthtech.dtu.dk/services/SignalP-5.0/) and [Interproscan](https://www.ebi.ac.uk/interpro/about/interproscan/) accordingly  - insert hyperlink to section below on how to install each of these and add to PATH.
 
-**2.** Download nextflow.config file from lexatrash-vf-092025  - change to samplesheet.csv with multisample merge
-**3.** Edit config file by providing appropriate input for each described parameter. config file must be in the same directory that the script is run from  
-**4.** (Optional)Edit config file by providing appropriate memory allocation for each described parameters  
-**5.** run on command line:  
-    ``` nextflow pull lexatrash23/Nf-vf-pn-092025 ```  
-**6.** run on command line (or preferably in an sbatch script) :  
-   ``` nextflow run lexatrash23/Nf-vf-pn-092025 -with-conda -with-dag -with-timeline -with-report -with-trace  ```
 ___
 ## Additional notes 
 **_Suggested Dir Structure:_**  
@@ -168,16 +158,7 @@ Pipeline image :
 ![Pipelineimage](pipeline_figures/Venomflow_pipeline.png)
 
 ___
-## Files
-### Required Inputs
-This Nextflow pipeline has 4 required input files and 1 optional input file. The required input files are as follows:
-1. De novo Trinity Assembly (fasta)
-2. Trimmed Reads R1 (fasta/fastq.gz)
-3. Trimmed Reads R2 (fasta/fastq.gz)
-4. Protein Sequences of interest to BLAST against (fasta)
 
-### Optional Input
-5. Genome fasta
 
 ### Provided test files
 Test run can be down with the following provided test files:  
