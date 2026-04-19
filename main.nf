@@ -1596,14 +1596,13 @@ workflow {
         input_ORFs_Combined_NoGenomeCDHit = Sample_without_Genome.join(ORFs_Combined.out.combined_pep).join(ORFs_Combined.out.combined_cds)
         input_ORFs_Combined_NoGenomeCDHit | ORFs_Combined_NoGenomeCDHit
 
-        NoGenomeCompleteInput = Sample_without_Genome.join(ORFs_Combined_NoGenomeCDHit.out.combined_cds).join(ORFs_Combined_NoGenomeCDHit.out.combined_pep)
-        GenomeCompleteInput = Sample_with_Genome.join(ORFs_Combined.out.combined_cds).join(ORFs_Combined.out.combined_pep)
-
+        NoGenomeCompleteInput = Sample_without_Genome.join(ORFs_Combined_NoGenomeCDHit.out.combined_pep).join(ORFs_Combined_NoGenomeCDHit.out.combined_cds)
+        GenomeCompleteInput = Sample_with_Genome.join(ORFs_Combined.out.combined_pep).join(ORFs_Combined.out.combined_cds)
         input_ORF_complete = NoGenomeCompleteInput.mix(GenomeCompleteInput)
+
+
         NoGenomeCompleteInputpep = Sample_without_Genome.join(ORFs_Combined_NoGenomeCDHit.out.combined_pep).join(Blastdatabasecreation.out.proteindb)
         GenomeCompleteInputpep = Sample_with_Genome.join(ORFs_Combined.out.combined_pep).join(Blastdatabasecreation.out.proteindb)
-
-
         //Define Input: Blastp - Match Transdecoder output with databases
         input_Blastp = NoGenomeCompleteInputpep.mix(GenomeCompleteInputpep)
     }
