@@ -1679,8 +1679,8 @@ workflow {
             .join(maturesequences)
             .join(Filter2.out.complete_pep_signalp)
             .join(input_ORF_complete)
-            .combine("NULL")
-            .combine("NULL")
+            .combine(channel.of("NULL"))
+            .combine(channel.of("NULL"))
     }
     else if (params.ORFPrediction == "Both") {
         stats_join = Transdecoder_pep
@@ -1701,8 +1701,8 @@ workflow {
             .join(TD2_pep)
             .join(TD2.out.TD2_cds)
             .join(input_ORF_complete)
-            .combine("NULL")
-            .combine("NULL")
+            .combine(channel.of("NULL"))
+            ..combine(channel.of("NULL"))
     }
 
 
