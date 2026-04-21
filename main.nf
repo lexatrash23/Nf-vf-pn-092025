@@ -956,20 +956,22 @@ process ORF_complete {
     conda "seqkit=2.12.0"
     container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
 
-    publishDir "${sample}/Venomflow/results/ORFprediction/Combined/Complete/", mode: 'copy'
+    publishDir "${sample}/Venomflow/results/ORFprediction/Combined/Complete/", pattern: "*cleaned*", mode: 'copy'
 
     input:
     tuple val(sample), path(combined_pep), path(combined_cds)
 
     output:
-    tuple val(sample), path("*.pep"), emit: complete_pep
-    tuple val(sample), path("*.cds"), emit: complete_cds
+    tuple val(sample), path("*cleaned.pep"), emit: complete_pep
+    tuple val(sample), path("*cleaned.cds"), emit: complete_cds
 
     script:
 
     """
     seqkit grep -n -r -p "ORF type:complete" ${combined_pep} -o "${sample}.combine.complete.pep"
     seqkit grep -n -r -p "ORF type:complete" ${combined_cds} -o "${sample}.combine.complete.cds"
+    awk '{if (\$0 ~ /^>/) print \$0; else {gsub(/\\*/, ""); print \$0}}' "${sample}.combine.complete.pep" > "${sample}.combine.complete.cleaned.pep"
+    awk '{if (\$0 ~ /^>/) print \$0; else {gsub(/\\*/, ""); print \$0}}' "${sample}.combine.complete.cds" > "${sample}.combine.complete.cleaned.cds"
     """
 }
 
@@ -999,7 +1001,9 @@ process SignalP {
 
 
     """
-    signalp -fasta ${complete_pep} -mature -prefix "${sample}"
+    
+
+    signalp -fasta signalp.cleaned.pep-mature -prefix "${sample}"
     """
 }
 
@@ -1064,8 +1068,12 @@ process stats {
     seqkit stats ${complete_pep_signalp} > ${sample}_complete_pep_signalp.stats.txt
     seqkit stats ${TD2_cds} > ${sample}_TD2_cds_pep.stats.txt
     seqkit stats ${TD2_pep} > ${sample}_TD2_pep.stats.txt
-    seqkit stats ${combined_cds} > ${sample}_combined_cds.stats.txt
-    seqkit stats ${combined_pep} > ${sample}_combined_pep.stats.txt
+    # Check for optional inputs
+    if [ "${combined_cds}" != "NULL" ]; then
+        seqkit stats ${combined_cds} > ${sample}_combined_cds.stats.txt
+        seqkit stats ${combined_pep} > ${sample}_combined_pep.stats.txt
+
+    fi
     
     """
 }
@@ -1152,11 +1160,13 @@ process DeepTMHMMFilter {
     cat ${DeepTMHMM_mature} ${signalpmature} > ${sample}.combined.mature.pep.fasta
     seqkit rmdup -n ${sample}.combined.mature.pep.fasta > ${sample}.combined.mature.deduplicated.pep.fasta
 
-    seqkit stats ${sample}.complete.DeepTMHMM.sequences.pep.fasta > ${sample}.complete.DeepTMHMM.sequences.pep.stats.txt
-    seqkit stats ${sample}.complete.DeepTMHMM.sequences.cds.fasta > ${sample}.complete.DeepTMHMM.sequences.cds.stats.txt
-    seqkit stats ${sample}.complete.secreted.sequences.deduplicated.pep.fasta > ${sample}.complete.secreted.sequences.deduplicated.pep.stats.txt
-    seqkit stats ${sample}.complete.secreted.sequences.deduplicated.cds.fasta > ${sample}.complete.secreted.sequences.deduplicated.cds.stats.txt
+    seqkit stats ${sample}.complete.DeepTMHMM.sequences.pep.fasta > ${sample}.complete.Deep.sequences.pep.stats.txt
+    seqkit stats ${sample}.complete.DeepTMHMM.sequences.cds.fasta > ${sample}.complete.Deep.sequences.cds.stats.txt
+    seqkit stats ${sample}.complete.secreted.sequences.deduplicated.pep.fasta > ${sample}.complete.secreted.deduplicated.pep.stats.txt
+    seqkit stats ${sample}.complete.secreted.sequences.deduplicated.cds.fasta > ${sample}.complete.secreted.deduplicated.cds.stats.txt
     seqkit stats ${sample}.combined.mature.deduplicated.pep.fasta > ${sample}.combined.mature.deduplicated.pep.stats.txt
+    
+
 
 
     """
@@ -1660,15 +1670,43 @@ workflow {
     maturecomplete | Filter2
 
     //Define Input: stats sample name + pep + cds + completepep + completecds + mature +signalp  tuple 
-    stats_join = Transdecoder_pep
-        .join(Transdecoder.out.transdecoder_cds)
-        .join(ORF_complete.out.complete_pep)
-        .join(ORF_complete.out.complete_cds)
-        .join(maturesequences)
-        .join(Filter2.out.complete_pep_signalp)
-        .join(TD2_pep)
-        .join(TD2.out.TD2_cds)
-        .join(input_ORF_complete)
+    // With the optional NULL's the order here does not match the input tuple. but for this particular proceess it doesnt matter because it is just running seqkit stats on all of them
+    if (params.ORFPrediction == "TD") {
+        stats_join = Transdecoder_pep
+            .join(Transdecoder.out.transdecoder_cds)
+            .join(ORF_complete.out.complete_pep)
+            .join(ORF_complete.out.complete_cds)
+            .join(maturesequences)
+            .join(Filter2.out.complete_pep_signalp)
+            .join(input_ORF_complete)
+            .join("NULL")
+            .join("NULL")
+    }
+    else if (params.ORFPrediction == "Both") {
+        stats_join = Transdecoder_pep
+            .join(Transdecoder.out.transdecoder_cds)
+            .join(ORF_complete.out.complete_pep)
+            .join(ORF_complete.out.complete_cds)
+            .join(maturesequences)
+            .join(Filter2.out.complete_pep_signalp)
+            .join(TD2_pep)
+            .join(TD2.out.TD2_cds)
+            .join(input_ORF_complete)
+    }
+    else {
+        stats_join = ORF_complete.out.complete_pep
+            .join(ORF_complete.out.complete_cds)
+            .join(maturesequences)
+            .join(Filter2.out.complete_pep_signalp)
+            .join(TD2_pep)
+            .join(TD2.out.TD2_cds)
+            .join(input_ORF_complete)
+            .combine("NULL")
+            .combine("NULL")
+    }
+
+
+
     //Run Process: STATS   
     stats_join | stats
 
