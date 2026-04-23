@@ -1003,7 +1003,7 @@ process SignalP {
     """
     
 
-    signalp -fasta signalp.cleaned.pep -mature -prefix "${sample}"
+    signalp -fasta ${complete_pep} -mature -prefix "${sample}"
     """
 }
 
