@@ -488,10 +488,10 @@ process Blastdatabasecreation {
     container 'community.wave.seqera.io/library/blast:2.17.0--6279aeee601cb05e'
 
     input:
-    tuple val(sample), path(database_fasta)
+    path database_fasta
 
     output:
-    tuple val(sample), path("*"), emit: proteindb
+    path ("*"), emit: proteindb
 
     script:
     """
@@ -638,7 +638,7 @@ process ORFs_Combined {
     """
 }
 
-// Process 6: Label transcriptomes, combine and remove duplicates 
+// Process 6: remove duplicates for those with no genomes
 process ORFs_Combined_NoGenomeCDHit {
 
     errorStrategy 'retry'
@@ -1216,10 +1216,10 @@ process BlastdatabasecreationNonToxin {
     container 'community.wave.seqera.io/library/blast:2.17.0--6279aeee601cb05e'
 
     input:
-    tuple val(sample), path(database_fasta)
+    path database_fasta
 
     output:
-    tuple val(sample), path("*"), emit: nontoxinproteindb
+    path ("*"), emit: nontoxinproteindb
 
     script:
     """
@@ -1248,7 +1248,7 @@ process BlastpNonToxin {
     tuple val(sample), path(secreted_pep), path(proteindb)
 
     output:
-    path "${sample}.nontoxin.blastp.db.6.txt", emit: nontoxblastp6
+    tuple val(sample), path("${sample}.nontoxin.blastp.db.6.txt"), emit: nontoxblastp6
 
     script:
     """
@@ -1303,7 +1303,7 @@ process GenomeBlasts6 {
     tuple val(sample), path(secretedcds), path(genomedb)
 
     output:
-    path "${sample}.blastn.db.6.txt", emit: blastn6
+    tuple val(sample), path("${sample}.blastn.db.6.txt"), emit: blastn6
 
     script:
     """
@@ -1333,7 +1333,7 @@ process GenomeBlasts0 {
     tuple val(sample), path(secretedcds), path(genomedb)
 
     output:
-    path "${sample}.blastn.db.0.txt", emit: blastn0
+    tuple val(sample), path("${sample}.blastn.db.0.txt"), emit: blastn0
 
     script:
     """
@@ -1351,6 +1351,10 @@ workflow {
 
     // Print head 
     printhead()
+
+    //Fasta Databases
+
+
 
     // Define CSV channel
     csv_channel = Channel.fromPath(params.input_csv)
@@ -1480,7 +1484,12 @@ workflow {
 
 
     //Define Input: Database_Fasta. This is set up to allow for multiple different databases if needed.
-    input_databasefasta = csv_channel.map { row -> tuple(row.Sample_name, file(row.Protein_fasta_path_for_Blast)) }
+    // ToxinFasta names entry list
+    def Toxin_fasta_file = file(params.toxprot_fasta, checkIfExists: false).exists()
+        ? file(params.toxprot_fasta)
+        : file(params.Fallback_toxin_fasta)
+    input_databasefasta = Channel.fromPath(Toxin_fasta_file)
+
 
     //Run Process: DatabaseCreation
     input_databasefasta | Blastdatabasecreation
@@ -1492,7 +1501,7 @@ workflow {
         .map { row ->
             tuple(row.Sample_name, file(row.Transcriptome1))
         }
-        .join(Blastdatabasecreation.out.proteindb)
+        .combine(Blastdatabasecreation.out.proteindb)
 
     Blastxinputfasta_combined = csv_channel
         .filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim() != '' && row.Transcriptome2.trim().toLowerCase() != 'null' }
@@ -1500,7 +1509,7 @@ workflow {
             tuple(row.Sample_name)
         }
         .join(Transcriptome_Combined.out.transcriptome_combined)
-        .join(Blastdatabasecreation.out.proteindb)
+        .combine(Blastdatabasecreation.out.proteindb)
 
     // Combine both channels using mix() operator
     Blastxinputfasta_all = Blastxinputfasta_single.mix(Blastxinputfasta_combined)
@@ -1522,14 +1531,13 @@ workflow {
             def path = row.Genome_fasta_path?.toString()?.trim()
             def hasGenome = path && path != '' && !path.equalsIgnoreCase('NULL')
             with_genome: hasGenome
-            return tuple(row.Sample_name)
-            without_genome: !hasGenome
-            return tuple(row.Sample_name)
+            without_genome: true
         }
         .set { branched_samples }
 
-    Sample_with_Genome = branched_samples.with_genome.unique()
-    Sample_without_Genome = branched_samples.without_genome.unique()
+    Sample_with_Genome = branched_samples.with_genome.map { row -> tuple(row.Sample_name) }
+
+    Sample_without_Genome = branched_samples.without_genome.map { row -> tuple(row.Sample_name) }
     // Initialize variables that will be used after the conditional blocks
     BUSCOlin1 = csv_channel.map { row -> tuple(row.Sample_name, row.BUSCO_lin1) }
     BUSCOlin2 = csv_channel.map { row -> tuple(row.Sample_name, row.BUSCO_lin2) }
@@ -1602,7 +1610,6 @@ workflow {
         input_BUSCOlin2_L_3 | BUSCO_translatome_mollusca3
 
         //Define Input for input_ORF_complete 
-        //for no genome and for genome one's
         input_ORFs_Combined_NoGenomeCDHit = Sample_without_Genome.join(ORFs_Combined.out.combined_pep).join(ORFs_Combined.out.combined_cds)
         input_ORFs_Combined_NoGenomeCDHit | ORFs_Combined_NoGenomeCDHit
 
@@ -1694,15 +1701,7 @@ workflow {
             .join(input_ORF_complete)
     }
     else {
-        stats_join = ORF_complete.out.complete_pep
-            .join(ORF_complete.out.complete_cds)
-            .join(maturesequences)
-            .join(Filter2.out.complete_pep_signalp)
-            .join(TD2_pep)
-            .join(TD2.out.TD2_cds)
-            .join(input_ORF_complete)
-            .combine(channel.of("NULL"))
-            ..combine(channel.of("NULL"))
+        stats_join = ORF_complete.out.complete_pep.join(ORF_complete.out.complete_cds).join(maturesequences).join(Filter2.out.complete_pep_signalp).join(TD2_pep).join(TD2.out.TD2_cds).join(input_ORF_complete).combine(channel.of("NULL"))..combine(channel.of("NULL"))
     }
 
 
@@ -1752,13 +1751,17 @@ workflow {
 
 
     // Define Input: BlastdatabasecreationNonToxin
-    input_nontoxindatabasefasta = csv_channel.map { row -> tuple(row.Sample_name, file(row.NonToxin_Protein_fasta_path_for_Blast)) }
+    // Panther names entry list
+    def NonToxin_fasta_file = file(params.nontoxprot_fasta, checkIfExists: false).exists()
+        ? file(params.nontoxprot_fasta)
+        : file(params.Fallback_nontoxin_fasta)
+    input_nontoxindatabasefasta = Channel.fromPath(NonToxin_fasta_file)
 
     //Run Process: BlastdatabasecreationNonToxin
     input_nontoxindatabasefasta | BlastdatabasecreationNonToxin
 
     // Define Input: BlastpNonToxin
-    input_nontoxinBlastp = input_Interproscan.join(BlastdatabasecreationNonToxin.out.nontoxinproteindb)
+    input_nontoxinBlastp = input_Interproscan.combine(BlastdatabasecreationNonToxin.out.nontoxinproteindb)
 
     //Run Process:BlastpNonToxin
     input_nontoxinBlastp | BlastpNonToxin
