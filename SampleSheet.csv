@@ -1,1 +1,2 @@
 ﻿Sample_number,AnalysisdataAuth,Species,Sample_name,Basename,R1,R2,Strandedness,Transcriptome1_label,Transcriptome1,Transcriptome2_label,Transcriptome2,BUSCO_lin1,BUSCO_lin2,Genome_fasta_path
+1,"""lexatrash""","""Species""",Test_Sample,Test,TestSample/R1.test.fastq.gz,TestSample/R2.test.fastq.gz,"""rf""","""DN""",TestSample/Transcriptome1_test.fasta,"""GB""",TestSample/Transcriptome2_test.fasta,,,TestSample/GenomeTest.fna.fai
