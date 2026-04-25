@@ -491,7 +491,7 @@ process Blastdatabasecreation {
     path database_fasta
 
     output:
-    path ("*"), emit: proteindb
+    tuple path ("*"), emit: proteindb
 
     script:
     """
@@ -1219,7 +1219,7 @@ process BlastdatabasecreationNonToxin {
     path database_fasta
 
     output:
-    path ("*"), emit: nontoxinproteindb
+    tuple path ("*"), emit: nontoxinproteindb
 
     script:
     """
