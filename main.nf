@@ -491,7 +491,7 @@ process Blastdatabasecreation {
     path database_fasta
 
     output:
-    tuple path ("*.pdb"),path ("*.phr"),path ("*.pin"),path ("*.pjs"),path ("*.pot"),path ("*.psg"),path ("*.ptf"), path ("*.pto"),  emit: proteindb
+    tuple path ("*.pdb"),path ("*.phr"),path ("*.pin"),path ("*.pjs"),path ("*.pot"),path ("*.psq"),path ("*.ptf"), path ("*.pto"),  emit: proteindb
 
     script:
     """
