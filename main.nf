@@ -491,14 +491,13 @@ process Blastdatabasecreation {
     path database_fasta
 
     output:
-    path "*", emit: proteindb
+    tuple path ("*.pdb"),path ("*.phr"),path ("*.pin"),path ("*.pjs"),path ("*.pot"),path ("*.psg"),path ("*.ptf"),path ("*.pto")  emit: proteindb
 
     script:
     """
     makeblastdb -in "${database_fasta}" -dbtype prot -out proteindb
     """
 }
-
 // Process 9: Blastx
 process Blastx {
 
