@@ -1499,7 +1499,7 @@ workflow {
         .map { row ->
             tuple(row.Sample_name, file(row.Transcriptome1))
         }
-        .combine(Blastdatabasecreation.out.proteindb)
+        
 
     Blastxinputfasta_combined = csv_channel
         .filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim() != '' && row.Transcriptome2.trim().toLowerCase() != 'null' }
@@ -1507,11 +1507,10 @@ workflow {
             tuple(row.Sample_name)
         }
         .join(Transcriptome_Combined.out.transcriptome_combined)
-        .combine(Blastdatabasecreation.out.proteindb)
 
     // Combine both channels using mix() operator
-    Blastxinputfasta_all = Blastxinputfasta_single.mix(Blastxinputfasta_combined)
-
+    Blastxinputfasta_all_1 = Blastxinputfasta_single.mix(Blastxinputfasta_combined)
+    Blastxinputfasta_all = Blastxinputfasta_all.combine(Blastdatabasecreation.out.proteindb)
     // Run Process: Blastx 
     Blastxinputfasta_all | Blastx
     //Run Process: Transdecoder
