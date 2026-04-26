@@ -491,8 +491,7 @@ process Blastdatabasecreation {
     path database_fasta
 
     output:
-    tuple path ("*.pdb"),path ("*.phr"),path ("*.pin"),path ("*.pjs"),path ("*.pot"),path ("*.psq"),path ("*.ptf"), path ("*.pto"),  emit: proteindb
-
+    path "proteindb.*", emit: proteindb
     script:
     """
     makeblastdb -in "${database_fasta}" -dbtype prot -out proteindb
