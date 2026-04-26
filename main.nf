@@ -503,7 +503,7 @@ process Blastx {
     label 'process_single'
     label 'process_long'
 
-    errorStrategy 'retry'
+    errorStrategy 'ignore'
     maxRetries 4
 
     cpus { task.cpus * task.attempt }
