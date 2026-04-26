@@ -1510,7 +1510,7 @@ workflow {
 
     // Combine both channels using mix() operator
     Blastxinputfasta_all_1 = Blastxinputfasta_single.mix(Blastxinputfasta_combined)
-    Blastxinputfasta_all = Blastxinputfasta_all.combine(Blastdatabasecreation.out.proteindb)
+    Blastxinputfasta_all = Blastxinputfasta_all_1.combine(Blastdatabasecreation.out.proteindb)
     // Run Process: Blastx 
     Blastxinputfasta_all | Blastx
     //Run Process: Transdecoder
