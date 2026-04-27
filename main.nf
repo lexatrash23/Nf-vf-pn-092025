@@ -491,11 +491,11 @@ process Blastdatabasecreation {
     path database_fasta
 
     output:
-    path "*", emit: proteindb
+    path "ToxProtdb", emit: proteindb
 
     script:
     """
-    makeblastdb -in "${database_fasta}" -dbtype prot -out proteindb
+    makeblastdb -in "${database_fasta}" -dbtype prot -out ToxProtdb/proteindb
     """
 }
 // Process 9: Blastx
@@ -526,8 +526,8 @@ process Blastx {
     script:
     """
    
-    blastx -query ${combined_trinity} -db proteindb -out ${sample}.blastx.db.6.txt -evalue 1e-5 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
-    blastx -query ${combined_trinity} -db proteindb -out ${sample}.blastx.db.0.txt -evalue 1e-5 -outfmt '0'
+    blastx -query ${combined_trinity} -db proteinToxProtdb/proteindb -out ${sample}.blastx.db.6.txt -evalue 1e-5 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
+    blastx -query ${combined_trinity} -db proteinToxProtdb/proteindb -out ${sample}.blastx.db.0.txt -evalue 1e-5 -outfmt '0'
 
     """
 }
@@ -1511,8 +1511,7 @@ workflow {
 
     // Combine both channels using mix() operator
     Blastxinputfasta_all_1 = Blastxinputfasta_single.mix(Blastxinputfasta_combined)
-    db_files = Blastdatabasecreation.out.proteindb.collect()
-    Blastxinputfasta_all = Blastxinputfasta_all_1.combine(db_files)
+    Blastxinputfasta_all = Blastxinputfasta_all_1.combine(Blastdatabasecreation.out.proteindb)
     // Run Process: Blastx 
     Blastxinputfasta_all | Blastx
     //Run Process: Transdecoder
