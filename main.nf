@@ -1562,7 +1562,7 @@ workflow {
         input_ORF_complete = Transdecoderpep.join(Transdecodercds)
 
         //Define Input: Blastp - Match Transdecoder output with databases
-        input_Blastp = Transdecoderpep.combine(db_files)
+        input_Blastp = Transdecoderpep.combine(Blastdatabasecreation.out.proteindb)
     }
     else if (params.ORFPrediction == "Both") {
         // Both 
@@ -1616,8 +1616,8 @@ workflow {
         input_ORF_complete = NoGenomeCompleteInput.mix(GenomeCompleteInput)
 
 
-        NoGenomeCompleteInputpep = Sample_without_Genome.join(ORFs_Combined_NoGenomeCDHit.out.combined_pep).combine(db_files)
-        GenomeCompleteInputpep = Sample_with_Genome.join(ORFs_Combined.out.combined_pep).combine(db_files)
+        NoGenomeCompleteInputpep = Sample_without_Genome.join(ORFs_Combined_NoGenomeCDHit.out.combined_pep).combine(Blastdatabasecreation.out.proteindb)
+        GenomeCompleteInputpep = Sample_with_Genome.join(ORFs_Combined.out.combined_pep).combine(Blastdatabasecreation.out.proteindb)
         //Define Input: Blastp - Match Transdecoder output with databases
         input_Blastp = NoGenomeCompleteInputpep.mix(GenomeCompleteInputpep)
     }
@@ -1641,7 +1641,7 @@ workflow {
         input_ORF_complete = TD2pep.join(TD2cds)
 
         //Define Input: Blastp - Match Transdecoder output with databases
-        input_Blastp = TD2pep.combine(db_files)
+        input_Blastp = TD2pep.combine(Blastdatabasecreation.out.proteindb)
     }
 
     //Run Process: Transdecoder filter for complete ORFs
@@ -1757,10 +1757,10 @@ workflow {
 
     //Run Process: BlastdatabasecreationNonToxin
     input_nontoxindatabasefasta | BlastdatabasecreationNonToxin
-    nontox_db_files = BlastdatabasecreationNonToxin.out.nontoxinproteindb.collect()
+    nontox_Blastdatabasecreation.out.proteindb = BlastdatabasecreationNonToxin.out.nontoxinproteindb.collect()
 
     // Define Input: BlastpNonToxin
-    input_nontoxinBlastp = input_Interproscan.combine(nontox_db_files)
+    input_nontoxinBlastp = input_Interproscan.combine(nontox_Blastdatabasecreation.out.proteindb)
 
     //Run Process:BlastpNonToxin
     input_nontoxinBlastp | BlastpNonToxin
