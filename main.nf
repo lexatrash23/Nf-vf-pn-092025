@@ -526,8 +526,8 @@ process Blastx {
     script:
     """
    
-    blastx -query ${combined_trinity} -db proteinToxProtdb/proteindb -out ${sample}.blastx.db.6.txt -evalue 1e-5 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
-    blastx -query ${combined_trinity} -db proteinToxProtdb/proteindb -out ${sample}.blastx.db.0.txt -evalue 1e-5 -outfmt '0'
+    blastx -query ${combined_trinity} -db ToxProtdb/proteindb -out ${sample}.blastx.db.6.txt -evalue 1e-5 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
+    blastx -query ${combined_trinity} -db ToxProtdb/proteindb -out ${sample}.blastx.db.0.txt -evalue 1e-5 -outfmt '0'
 
     """
 }
@@ -934,8 +934,8 @@ process Blastp {
     script:
     """
 
-    blastp -query ${combined_pep} -db proteindb -out ${sample}.blastp.db.6.txt -evalue 1e-5 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
-    blastp -query ${combined_pep} -db proteindb -out ${sample}.blastp.db.0.txt -evalue 1e-5 -outfmt '0'
+    blastp -query ${combined_pep} -db ToxProtdb/proteindb -out ${sample}.blastp.db.6.txt -evalue 1e-5 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
+    blastp -query ${combined_pep} -db ToxProtdb/proteindb -out ${sample}.blastp.db.0.txt -evalue 1e-5 -outfmt '0'
 
     """
 }
@@ -1218,11 +1218,11 @@ process BlastdatabasecreationNonToxin {
     path database_fasta
 
     output:
-    path "*", emit: nontoxinproteindb
+    path "Folder", emit: nontoxinproteindb
 
     script:
     """
-    makeblastdb -in "${database_fasta}" -dbtype prot -out NonToxinDataBase
+    makeblastdb -in "${database_fasta}" -dbtype prot -out Folder/NonToxinDataBase
     """
 }
 // Process 21: Blastdatabasecreation
@@ -1252,7 +1252,7 @@ process BlastpNonToxin {
     script:
     """
 
-    blastp -query ${secreted_pep} -db NonToxinDataBase -out ${sample}.nontoxin.blastp.db.6.txt -evalue 1e-5 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
+    blastp -query ${secreted_pep} -db Folder/NonToxinDataBase -out ${sample}.nontoxin.blastp.db.6.txt -evalue 1e-5 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
 
     """
 }
