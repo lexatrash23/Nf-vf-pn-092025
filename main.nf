@@ -1757,10 +1757,9 @@ workflow {
 
     //Run Process: BlastdatabasecreationNonToxin
     input_nontoxindatabasefasta | BlastdatabasecreationNonToxin
-    nontox_Blastdatabasecreation.out.proteindb = BlastdatabasecreationNonToxin.out.nontoxinproteindb.collect()
 
     // Define Input: BlastpNonToxin
-    input_nontoxinBlastp = input_Interproscan.combine(nontox_Blastdatabasecreation.out.proteindb)
+    input_nontoxinBlastp = input_Interproscan.combine(BlastdatabasecreationNonToxin.out.nontoxinproteindb)
 
     //Run Process:BlastpNonToxin
     input_nontoxinBlastp | BlastpNonToxin
