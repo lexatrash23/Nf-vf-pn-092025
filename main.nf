@@ -491,7 +491,8 @@ process Blastdatabasecreation {
     path database_fasta
 
     output:
-    path "proteindb.*", emit: proteindb
+    path "*", emit: proteindb
+
     script:
     """
     makeblastdb -in "${database_fasta}" -dbtype prot -out proteindb
@@ -1510,7 +1511,8 @@ workflow {
 
     // Combine both channels using mix() operator
     Blastxinputfasta_all_1 = Blastxinputfasta_single.mix(Blastxinputfasta_combined)
-    Blastxinputfasta_all = Blastxinputfasta_all_1.combine(Blastdatabasecreation.out.proteindb)
+    db_files = Blastdatabasecreation.out.proteindb.collect()
+    Blastxinputfasta_all = Blastxinputfasta_all_1.combine(db_files)
     // Run Process: Blastx 
     Blastxinputfasta_all | Blastx
     //Run Process: Transdecoder
@@ -1561,7 +1563,7 @@ workflow {
         input_ORF_complete = Transdecoderpep.join(Transdecodercds)
 
         //Define Input: Blastp - Match Transdecoder output with databases
-        input_Blastp = Transdecoderpep.join(Blastdatabasecreation.out.proteindb)
+        input_Blastp = Transdecoderpep.combine(db_files)
     }
     else if (params.ORFPrediction == "Both") {
         // Both 
@@ -1615,8 +1617,8 @@ workflow {
         input_ORF_complete = NoGenomeCompleteInput.mix(GenomeCompleteInput)
 
 
-        NoGenomeCompleteInputpep = Sample_without_Genome.join(ORFs_Combined_NoGenomeCDHit.out.combined_pep).join(Blastdatabasecreation.out.proteindb)
-        GenomeCompleteInputpep = Sample_with_Genome.join(ORFs_Combined.out.combined_pep).join(Blastdatabasecreation.out.proteindb)
+        NoGenomeCompleteInputpep = Sample_without_Genome.join(ORFs_Combined_NoGenomeCDHit.out.combined_pep).combine(db_files)
+        GenomeCompleteInputpep = Sample_with_Genome.join(ORFs_Combined.out.combined_pep).combine(db_files)
         //Define Input: Blastp - Match Transdecoder output with databases
         input_Blastp = NoGenomeCompleteInputpep.mix(GenomeCompleteInputpep)
     }
@@ -1640,7 +1642,7 @@ workflow {
         input_ORF_complete = TD2pep.join(TD2cds)
 
         //Define Input: Blastp - Match Transdecoder output with databases
-        input_Blastp = TD2pep.join(Blastdatabasecreation.out.proteindb)
+        input_Blastp = TD2pep.combine(db_files)
     }
 
     //Run Process: Transdecoder filter for complete ORFs
@@ -1756,9 +1758,10 @@ workflow {
 
     //Run Process: BlastdatabasecreationNonToxin
     input_nontoxindatabasefasta | BlastdatabasecreationNonToxin
+    nontox_db_files = BlastdatabasecreationNonToxin.out.nontoxinproteindb.collect()
 
     // Define Input: BlastpNonToxin
-    input_nontoxinBlastp = input_Interproscan.combine(BlastdatabasecreationNonToxin.out.nontoxinproteindb)
+    input_nontoxinBlastp = input_Interproscan.combine(nontox_db_files)
 
     //Run Process:BlastpNonToxin
     input_nontoxinBlastp | BlastpNonToxin
