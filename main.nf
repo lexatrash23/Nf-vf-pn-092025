@@ -398,7 +398,7 @@ process BUSCO_transcriptome_metazoa3 {
 
     """
     busco -i ${combined_trinity} -l ${metazoa} -c 10 -o ${sample}_combined.met.transcriptome -m transcriptome -e 1e-5 -f
-    mv ${sample}_combined.met.transcriptome/*.txt "."
+    mv ${sample}_combined_met.transcriptome/*.txt "."
     """
 }
 
@@ -431,7 +431,7 @@ process BUSCO_transcriptome_mollusca3 {
 
     """
     busco -i ${combined_trinity} -l ${mollusca} -c 10 -o ${sample}_combined.mol.transcriptome -m transcriptome -e 1e-5 -f
-    mv ${sample}_combined.mol.transcriptome/*.txt "."
+    mv ${sample}_combined_mol.transcriptome/*.txt "."
     """
 }
 
@@ -729,7 +729,7 @@ process BUSCO_translatome_mollusca {
 
     """
     busco -i ${Transdecoder_pep} -l ${mollusca} -c 10 -o ${sample}_TD.mol.protein -m protein -e 1e-5 -f
-    mv ${sample}_TD.mol.protein/*.txt "."
+    mv ${sample}_TD_mol.protein/*.txt "."
     
     """
 }
@@ -795,7 +795,7 @@ process BUSCO_translatome_mollusca2 {
 
     """
     busco -i ${TD2_pep} -l ${mollusca} -c 10 -o ${sample}_TD2.mol.protein -m protein -e 1e-5 -f
-    mv ${sample}_TD2.mol.protein/*.txt "."
+    mv ${sample}_TD2_mol.protein/*.txt "."
     
     """
 }
@@ -861,7 +861,7 @@ process BUSCO_translatome_mollusca3 {
 
     """
     busco -i ${combined_pep} -l ${mollusca} -c 10 -o ${sample}_combined.mol.protein -m protein -e 1e-5 -f
-    mv ${sample}_combined.mol.protein/*.txt "."
+    mv ${sample}_combined_mol.protein/*.txt "."
     
     """
 }
@@ -1361,26 +1361,26 @@ workflow {
         .map { row -> row.collectEntries { key, value -> [key.replaceAll('"', ''), value?.toString()?.replaceAll('"', '')] } }
 
     // Define Input: Paired Trimmed reads Tuple. Extracts as tuple the sample name and the trimmed reads
-    input_R1R2 = csv_channel.map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2)) }
+    def input_R1R2 = csv_channel.map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2)) }
 
     // Run Process: Fastqc
     input_R1R2 | PostTrimFastqc
 
     //Define Input: Fastqc htmls. Using the output of Fastqc as an input for MultiQC
-    fastqc_output = PostTrimFastqc.out.fastqc_zips
+    def fastqc_output = PostTrimFastqc.out.fastqc_zips
 
 
     //Run Process: MultQC
     fastqc_output | MultiQC
 
     // Define Input: Bowtie 
-    input_bowtie = csv_channel.map { row -> tuple(row.Sample_name, file(row.Transcriptome1), file(row.R1), file(row.R2)) }
+    def input_bowtie = csv_channel.map { row -> tuple(row.Sample_name, file(row.Transcriptome1), file(row.R1), file(row.R2)) }
 
     //Run Process: Bowtie
     input_bowtie | Bowtie
 
     // Define Input: Bowtie2 
-    input_bowtie2 = csv_channel
+    def input_bowtie2 = csv_channel
         .filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim() != '' && row.Transcriptome2.trim().toLowerCase() != 'null' }
         .map { row -> tuple(row.Sample_name, file(row.Transcriptome2), file(row.R1), file(row.R2)) }
 
@@ -1388,14 +1388,14 @@ workflow {
     input_bowtie2 | Bowtie2
 
     //Define Input: Trinity Fasta 
-    input_trinity_fasta = csv_channel.map { row -> tuple(row.Sample_name, file(row.Transcriptome1)) }
+    def input_trinity_fasta = csv_channel.map { row -> tuple(row.Sample_name, file(row.Transcriptome1)) }
 
     //Run Process: TrinityStats
     input_trinity_fasta | TrinityStats
 
 
     //Define Input: Trinity Fasta 
-    input_trinity_fasta2 = csv_channel
+    def input_trinity_fasta2 = csv_channel
         .filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim().toLowerCase() != 'null' }
         .map { row -> tuple(row.Sample_name, file(row.Transcriptome2)) }
 
@@ -1404,13 +1404,13 @@ workflow {
 
     // Transcriptome 1 
     //Define Input: Transcriptome1 Fasta + BUSCOlin1 tuple 
-    input_BUSCOlin1 = csv_channel.map { row -> tuple(row.Sample_name, file(row.Transcriptome1), row.BUSCO_lin1, row.Transcriptome1_label) }
+    def input_BUSCOlin1 = csv_channel.map { row -> tuple(row.Sample_name, file(row.Transcriptome1), row.BUSCO_lin1, row.Transcriptome1_label) }
 
     //Run Process: BUSCO_lin1
     input_BUSCOlin1 | BUSCO_transcriptome_metazoa
 
     //Define Input: Transcriptome1 Fasta + BUSCOlin2 tuple 
-    input_BUSCOlin2 = csv_channel.map { row -> tuple(row.Sample_name, file(row.Transcriptome1), row.BUSCO_lin2, row.Transcriptome1_label) }
+    def input_BUSCOlin2 = csv_channel.map { row -> tuple(row.Sample_name, file(row.Transcriptome1), row.BUSCO_lin2, row.Transcriptome1_label) }
 
     //Run Process: BUSCO_lin2
     input_BUSCOlin2 | BUSCO_transcriptome_mollusca
@@ -1418,7 +1418,7 @@ workflow {
     // Transcriptome 2
 
     //Define Input: Transcriptome2 Fasta + BUSCOlin1 tuple 
-    input_BUSCOlin1_2 = csv_channel
+    def input_BUSCOlin1_2 = csv_channel
         .filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim() != '' && row.Transcriptome2.trim().toLowerCase() != 'null' }
         .map { row -> tuple(row.Sample_name, file(row.Transcriptome2), row.BUSCO_lin1, row.Transcriptome2_label) }
 
@@ -1426,7 +1426,7 @@ workflow {
     input_BUSCOlin1_2 | BUSCO_transcriptome_metazoa2
 
     //Define Input: Transcriptome2 Fasta + BUSCOlin2 tuple 
-    input_BUSCOlin2_2 = csv_channel
+    def input_BUSCOlin2_2 = csv_channel
         .filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim() != '' && row.Transcriptome2.trim().toLowerCase() != 'null' }
         .map { row -> tuple(row.Sample_name, file(row.Transcriptome2), row.BUSCO_lin2, row.Transcriptome2_label) }
 
@@ -1434,7 +1434,7 @@ workflow {
     input_BUSCOlin2_2 | BUSCO_transcriptome_mollusca2
 
     //Define Input:  Transcriptome_Combined 
-    input_Transcriptome_Combined = csv_channel
+    def input_Transcriptome_Combined = csv_channel
         .filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim() != '' && row.Transcriptome2.trim().toLowerCase() != 'null' }
         .map { row -> tuple(row.Sample_name, file(row.Transcriptome1), row.Transcriptome1_label, file(row.Transcriptome2), row.Transcriptome2_label) }
     // Run process ; 
@@ -1443,7 +1443,7 @@ workflow {
 
     // Transcriptome_Combined
     //Define Input: Combined transcriptome Fasta + BUSCOlin1 tuple 
-    input_BUSCOlin1_3 = csv_channel
+    def input_BUSCOlin1_3 = csv_channel
         .filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim() != '' && row.Transcriptome2.trim().toLowerCase() != 'null' }
         .map { row -> tuple(row.Sample_name, row.BUSCO_lin1) }
         .join(Transcriptome_Combined.out.transcriptome_combined)
@@ -1452,7 +1452,7 @@ workflow {
     input_BUSCOlin1_3 | BUSCO_transcriptome_metazoa3
 
     //Define Input: Combined transcriptome Fasta + BUSCOlin2 tuple 
-    input_BUSCOlin2_3 = csv_channel
+   def input_BUSCOlin2_3 = csv_channel
         .filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim() != '' && row.Transcriptome2.trim().toLowerCase() != 'null' }
         .map { row -> tuple(row.Sample_name, row.BUSCO_lin2) }
         .join(Transcriptome_Combined.out.transcriptome_combined)
@@ -1466,20 +1466,20 @@ workflow {
 
 
     // Define Input: Trinity fasta + R1 + R2 tuple 
-    input_TrinityKallisto_single = csv_channel
+    def input_TrinityKallisto_single = csv_channel
         .filter { row -> !row.Transcriptome2?.trim() || row.Transcriptome2.trim().toLowerCase() == 'null' }
         .map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2), row.Strandedness, file(row.Transcriptome1)) }
 
-    input_TrinityKallisto_combined = csv_channel
+    def input_TrinityKallisto_combined = csv_channel
         .filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim() != '' && row.Transcriptome2.trim().toLowerCase() != 'null' }
         .map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2), row.Strandedness) }
         .join(Transcriptome_Combined.out.transcriptome_combined)
 
     // Combine both channels using mix() operator
-    input_TrinityKallisto_all = input_TrinityKallisto_single.mix(input_TrinityKallisto_combined)
+    def input_TrinityKallisto_all = input_TrinityKallisto_single.mix(input_TrinityKallisto_combined)
 
     // Run Process: Kallisto_Trinity
-    input_TrinityKallisto_all | Kallisto_Trinity
+    def input_TrinityKallisto_all | Kallisto_Trinity
 
 
     //Define Input: Database_Fasta. This is set up to allow for multiple different databases if needed.
@@ -1495,14 +1495,14 @@ workflow {
 
 
     //Define Input: Blastx 
-    Blastxinputfasta_single = csv_channel
+    def Blastxinputfasta_single = csv_channel
         .filter { row -> !row.Transcriptome2?.trim() || row.Transcriptome2.trim().toLowerCase() == 'null' }
         .map { row ->
             tuple(row.Sample_name, file(row.Transcriptome1))
         }
         
 
-    Blastxinputfasta_combined = csv_channel
+   def  Blastxinputfasta_combined = csv_channel
         .filter { row -> row.Transcriptome2?.trim() && row.Transcriptome2.trim() != '' && row.Transcriptome2.trim().toLowerCase() != 'null' }
         .map { row ->
             tuple(row.Sample_name)
@@ -1510,18 +1510,18 @@ workflow {
         .join(Transcriptome_Combined.out.transcriptome_combined)
 
     // Combine both channels using mix() operator
-    Blastxinputfasta_all_1 = Blastxinputfasta_single.mix(Blastxinputfasta_combined)
-    Blastxinputfasta_all = Blastxinputfasta_all_1.combine(Blastdatabasecreation.out.proteindb)
+    def Blastxinputfasta_all_1 = Blastxinputfasta_single.mix(Blastxinputfasta_combined)
+    def Blastxinputfasta_all = Blastxinputfasta_all_1.combine(Blastdatabasecreation.out.proteindb)
     // Run Process: Blastx 
     Blastxinputfasta_all | Blastx
     //Run Process: Transdecoder
-    Transcriptpome1 = csv_channel
+    def Transcriptpome1 = csv_channel
         .filter { row -> !row.Transcriptome2?.trim() || row.Transcriptome2.trim().toLowerCase() == 'null' }
         .map { row ->
             tuple(row.Sample_name, file(row.Transcriptome1))
         }
 
-    input_orf = Transcriptpome1.mix(Transcriptome_Combined.out.transcriptome_combined)
+    def input_orf = Transcriptpome1.mix(Transcriptome_Combined.out.transcriptome_combined)
 
     //Define Input: sample_with_genome 
     csv_channel
@@ -1533,115 +1533,115 @@ workflow {
         }
         .set { branched_samples }
 
-    Sample_with_Genome = branched_samples.with_genome.map { row -> tuple(row.Sample_name) }
+    def Sample_with_Genome = branched_samples.with_genome.map { row -> tuple(row.Sample_name) }
 
-    Sample_without_Genome = branched_samples.without_genome.map { row -> tuple(row.Sample_name) }
+    def Sample_without_Genome = branched_samples.without_genome.map { row -> tuple(row.Sample_name) }
     // Initialize variables that will be used after the conditional blocks
-    BUSCOlin1 = csv_channel.map { row -> tuple(row.Sample_name, row.BUSCO_lin1) }
-    BUSCOlin2 = csv_channel.map { row -> tuple(row.Sample_name, row.BUSCO_lin2) }
+    def BUSCOlin1 = csv_channel.map { row -> tuple(row.Sample_name, row.BUSCO_lin1) }
+    def BUSCOlin2 = csv_channel.map { row -> tuple(row.Sample_name, row.BUSCO_lin2) }
 
     // Transdecoder
     if (params.ORFPrediction == "TD") {
         // TD only
         input_orf | Transdecoder
         //Define Input: Transdecoder pep + BUSCOlin1 tuple 
-        Transdecoder_pep = Transdecoder.out.transdecoder_pep
-        input_BUSCOlin1_L = Transdecoder_pep.join(BUSCOlin1)
+        def Transdecoder_pep = Transdecoder.out.transdecoder_pep
+        def input_BUSCOlin1_L = Transdecoder_pep.join(BUSCOlin1)
 
         //Run Process: BUSCO_lin1
         input_BUSCOlin1_L | BUSCO_translatome_metazoa
 
         //Define Input: Transdecoder pep + BUSCOlin2 tuple 
-        input_BUSCOlin2_L = Transdecoder_pep.join(BUSCOlin2)
+        def input_BUSCOlin2_L = Transdecoder_pep.join(BUSCOlin2)
 
         //Run Process: BUSCO_lin2
         input_BUSCOlin2_L | BUSCO_translatome_mollusca
         //Define Input for input_ORF_complete 
-        Transdecodercds = Transdecoder.out.transdecoder_cds
-        Transdecoderpep = Transdecoder.out.transdecoder_pep
-        input_ORF_complete = Transdecoderpep.join(Transdecodercds)
+        def Transdecodercds = Transdecoder.out.transdecoder_cds
+        def Transdecoderpep = Transdecoder.out.transdecoder_pep
+        def input_ORF_complete = Transdecoderpep.join(Transdecodercds)
 
         //Define Input: Blastp - Match Transdecoder output with databases
-        input_Blastp = Transdecoderpep.combine(Blastdatabasecreation.out.proteindb)
+        def input_Blastp = Transdecoderpep.combine(Blastdatabasecreation.out.proteindb)
     }
     else if (params.ORFPrediction == "Both") {
         // Both 
         input_orf | Transdecoder
         input_orf | TD2
         // Define input: ORFs_Combined
-        input_ORFs_Combined = Transdecoder.out.transdecoder_pep.join(Transdecoder.out.transdecoder_cds).join(TD2.out.TD2_pep).join(TD2.out.TD2_cds)
+        def input_ORFs_Combined = Transdecoder.out.transdecoder_pep.join(Transdecoder.out.transdecoder_cds).join(TD2.out.TD2_pep).join(TD2.out.TD2_cds)
         // Run Process: ORFs_Combined
         input_ORFs_Combined | ORFs_Combined
 
         //Define Input: Transdecoder pep + BUSCOlin1 tuple 
-        Transdecoder_pep = Transdecoder.out.transdecoder_pep
-        input_BUSCOlin1_L = Transdecoder_pep.join(BUSCOlin1)
+        def Transdecoder_pep = Transdecoder.out.transdecoder_pep
+        def input_BUSCOlin1_L = Transdecoder_pep.join(BUSCOlin1)
 
         //Run Process: BUSCO_lin1
         input_BUSCOlin1_L | BUSCO_translatome_metazoa
 
         //Define Input: Transdecoder pep + BUSCOlin2 tuple 
-        input_BUSCOlin2_L = Transdecoder_pep.join(BUSCOlin2)
+        def input_BUSCOlin2_L = Transdecoder_pep.join(BUSCOlin2)
 
         //Run Process: BUSCO_lin2
         input_BUSCOlin2_L | BUSCO_translatome_mollusca
 
         // TD2
         //Define Input: Transdecoder pep + BUSCOlin1 tuple 
-        TD2_pep = TD2.out.TD2_pep
-        input_BUSCOlin1_L_2 = TD2_pep.join(BUSCOlin1)
+        def TD2_pep = TD2.out.TD2_pep
+        def input_BUSCOlin1_L_2 = TD2_pep.join(BUSCOlin1)
         //Run Process: BUSCO_lin1
         input_BUSCOlin1_L_2 | BUSCO_translatome_metazoa2
         //Define Input: Transdecoder pep + BUSCOlin2 tuple 
-        input_BUSCOlin2_L_2 = TD2_pep.join(BUSCOlin2)
+        def input_BUSCOlin2_L_2 = TD2_pep.join(BUSCOlin2)
         //Run Process: BUSCO_lin2
         input_BUSCOlin2_L_2 | BUSCO_translatome_mollusca2
         // Combined
         //Define Input: Transdecoder pep + BUSCOlin1 tuple 
         Combined_pep = ORFs_Combined.out.combined_pep
-        input_BUSCOlin1_L_3 = Combined_pep.join(BUSCOlin1)
+        def input_BUSCOlin1_L_3 = Combined_pep.join(BUSCOlin1)
         //Run Process: BUSCO_lin1
         input_BUSCOlin1_L_3 | BUSCO_translatome_metazoa3
         //Define Input: Transdecoder pep + BUSCOlin2 tuple 
-        input_BUSCOlin2_L_3 = Combined_pep.join(BUSCOlin2)
+        def input_BUSCOlin2_L_3 = Combined_pep.join(BUSCOlin2)
         //Run Process: BUSCO_lin2
         input_BUSCOlin2_L_3 | BUSCO_translatome_mollusca3
 
         //Define Input for input_ORF_complete 
-        input_ORFs_Combined_NoGenomeCDHit = Sample_without_Genome.join(ORFs_Combined.out.combined_pep).join(ORFs_Combined.out.combined_cds)
+        def input_ORFs_Combined_NoGenomeCDHit = Sample_without_Genome.join(ORFs_Combined.out.combined_pep).join(ORFs_Combined.out.combined_cds).filter { tuple -> tuple != null && tuple.size() > 0 }
         input_ORFs_Combined_NoGenomeCDHit | ORFs_Combined_NoGenomeCDHit
 
-        NoGenomeCompleteInput = Sample_without_Genome.join(ORFs_Combined_NoGenomeCDHit.out.combined_pep).join(ORFs_Combined_NoGenomeCDHit.out.combined_cds)
-        GenomeCompleteInput = Sample_with_Genome.join(ORFs_Combined.out.combined_pep).join(ORFs_Combined.out.combined_cds)
-        input_ORF_complete = NoGenomeCompleteInput.mix(GenomeCompleteInput)
+        def NoGenomeCompleteInput = Sample_without_Genome.join(ORFs_Combined_NoGenomeCDHit.out.combined_pep).join(ORFs_Combined_NoGenomeCDHit.out.combined_cds)
+        def GenomeCompleteInput = Sample_with_Genome.join(ORFs_Combined.out.combined_pep).join(ORFs_Combined.out.combined_cds)
+        def input_ORF_complete = NoGenomeCompleteInput.mix(GenomeCompleteInput)
 
 
-        NoGenomeCompleteInputpep = Sample_without_Genome.join(ORFs_Combined_NoGenomeCDHit.out.combined_pep).combine(Blastdatabasecreation.out.proteindb)
-        GenomeCompleteInputpep = Sample_with_Genome.join(ORFs_Combined.out.combined_pep).combine(Blastdatabasecreation.out.proteindb)
+        def NoGenomeCompleteInputpep = Sample_without_Genome.join(ORFs_Combined_NoGenomeCDHit.out.combined_pep).combine(Blastdatabasecreation.out.proteindb)
+        def GenomeCompleteInputpep = Sample_with_Genome.join(ORFs_Combined.out.combined_pep).combine(Blastdatabasecreation.out.proteindb)
         //Define Input: Blastp - Match Transdecoder output with databases
-        input_Blastp = NoGenomeCompleteInputpep.mix(GenomeCompleteInputpep)
+        def input_Blastp = NoGenomeCompleteInputpep.mix(GenomeCompleteInputpep)
     }
     else {
         // TD2  logic 
         input_orf | TD2
         // TD2
         //Define Input: Transdecoder pep + BUSCOlin1 tuple 
-        TD2_pep = TD2.out.TD2_pep
-        input_BUSCOlin1_L_2 = TD2_pep.join(BUSCOlin1)
+        def TD2_pep = TD2.out.TD2_pep
+        def input_BUSCOlin1_L_2 = TD2_pep.join(BUSCOlin1)
         //Run Process: BUSCO_lin1
         input_BUSCOlin1_L_2 | BUSCO_translatome_metazoa2
         //Define Input: Transdecoder pep + BUSCOlin2 tuple 
-        input_BUSCOlin2_L_2 = TD2_pep.join(BUSCOlin2)
+        def input_BUSCOlin2_L_2 = TD2_pep.join(BUSCOlin2)
         //Run Process: BUSCO_lin2
         input_BUSCOlin2_L_2 | BUSCO_translatome_mollusca2
 
         //Define Input for input_ORF_complete 
-        TD2cds = TD2.out.TD2_cds
-        TD2pep = TD2.out.TD2_pep
-        input_ORF_complete = TD2pep.join(TD2cds)
+        def TD2cds = TD2.out.TD2_cds
+       def TD2pep = TD2.out.TD2_pep
+        def input_ORF_complete = TD2pep.join(TD2cds)
 
         //Define Input: Blastp - Match Transdecoder output with databases
-        input_Blastp = TD2pep.combine(Blastdatabasecreation.out.proteindb)
+        def input_Blastp = TD2pep.combine(Blastdatabasecreation.out.proteindb)
     }
 
     //Run Process: Transdecoder filter for complete ORFs
@@ -1649,9 +1649,9 @@ workflow {
 
 
     //Define Input: Transdecoder cds + R1 + R2 + Strandedness tuple 
-    Complete_cds = ORF_complete.out.complete_cds
-    KallistoTransdecoderR1R2S = csv_channel.map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2), row.Strandedness) }
-    input_TransKallisto = Complete_cds.join(KallistoTransdecoderR1R2S)
+    def Complete_cds = ORF_complete.out.complete_cds
+    def KallistoTransdecoderR1R2S = csv_channel.map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2), row.Strandedness) }
+    def input_TransKallisto = Complete_cds.join(KallistoTransdecoderR1R2S)
 
     //Run Process: TransKallisto
     input_TransKallisto | Kallisto_Transdecoder
@@ -1662,14 +1662,14 @@ workflow {
 
 
     //Define Input: Sample name + completepep tuple
-    input_signalp = ORF_complete.out.complete_pep
+    def input_signalp = ORF_complete.out.complete_pep
 
     //Run Process: SignalP
     input_signalp | SignalP
 
     //Define Input: sample name + mature sequences + completepep tuple 
-    maturesequences = SignalP.out.maturesequences
-    maturecomplete = maturesequences.join(input_signalp).join(ORF_complete.out.complete_cds)
+   def maturesequences = SignalP.out.maturesequences
+   def  maturecomplete = maturesequences.join(input_signalp).join(ORF_complete.out.complete_cds)
 
     //Run Process: Filter2   
     maturecomplete | Filter2
@@ -1677,7 +1677,7 @@ workflow {
     //Define Input: stats sample name + pep + cds + completepep + completecds + mature +signalp  tuple 
     // With the optional NULL's the order here does not match the input tuple. but for this particular proceess it doesnt matter because it is just running seqkit stats on all of them
     if (params.ORFPrediction == "TD") {
-        stats_join = Transdecoder_pep
+        def stats_join = Transdecoder_pep
             .join(Transdecoder.out.transdecoder_cds)
             .join(ORF_complete.out.complete_pep)
             .join(ORF_complete.out.complete_cds)
@@ -1688,7 +1688,7 @@ workflow {
             .combine(channel.of("NULL"))
     }
     else if (params.ORFPrediction == "Both") {
-        stats_join = Transdecoder_pep
+        def stats_join = Transdecoder_pep
             .join(Transdecoder.out.transdecoder_cds)
             .join(ORF_complete.out.complete_pep)
             .join(ORF_complete.out.complete_cds)
@@ -1699,7 +1699,7 @@ workflow {
             .join(input_ORF_complete)
     }
     else {
-        stats_join = ORF_complete.out.complete_pep.join(ORF_complete.out.complete_cds).join(maturesequences).join(Filter2.out.complete_pep_signalp).join(TD2_pep).join(TD2.out.TD2_cds).join(input_ORF_complete).combine(channel.of("NULL"))..combine(channel.of("NULL"))
+        def stats_join = ORF_complete.out.complete_pep.join(ORF_complete.out.complete_cds).join(maturesequences).join(Filter2.out.complete_pep_signalp).join(TD2_pep).join(TD2.out.TD2_cds).join(input_ORF_complete).combine(channel.of("NULL"))..combine(channel.of("NULL"))
     }
 
 
@@ -1708,7 +1708,7 @@ workflow {
     stats_join | stats
 
     //Define Input: genomefasta 
-    Genomefasta = csv_channel
+    def Genomefasta = csv_channel
         .filter { row ->
             def path = row.Genome_fasta_path
             path != null && path != 'NULL' && path.toString() != 'NULL' && path.toString().trim() != ''
@@ -1721,27 +1721,28 @@ workflow {
 
     // Run Process: BlastnGenome database creation
     GenomeBlastdatabasecreation(Genomefasta)
-    genomedb = GenomeBlastdatabasecreation.out.genomedbfiles
-    signalpsummary = SignalP.out.signalpsummary
-    DeepTMHMMinput = input_signalp.join(signalpsummary)
+    def genomedb = GenomeBlastdatabasecreation.out.genomedbfiles
+   
 
     // Optional Params 
     if (params.DeepTMHMM) {
+        def signalpsummary = SignalP.out.signalpsummary
+        def DeepTMHMMinput = input_signalp.join(signalpsummary)
         DeepTMHMMinput | DeepTMHMM
-        input_DeepTMHMMFilter = DeepTMHMM.out.mature
+        def input_DeepTMHMMFilter = DeepTMHMM.out.mature
             .join(ORF_complete.out.complete_pep)
             .join(ORF_complete.out.complete_cds)
             .join(Filter2.out.complete_pep_signalp)
             .join(Filter2.out.complete_cds_signalp)
             .join(SignalP.out.maturesequences)
         input_DeepTMHMMFilter | DeepTMHMMFilter
-        input_Interproscan = DeepTMHMMFilter.out.complete_pep_secreted
-        BlastnInput = DeepTMHMMFilter.out.complete_cds_secreted.join(genomedb)
+        def input_Interproscan = DeepTMHMMFilter.out.complete_pep_secreted
+        def BlastnInput = DeepTMHMMFilter.out.complete_cds_secreted.join(genomedb)
     }
     else {
-        input_Interproscan = Filter2.out.complete_pep_signalp
+        def input_Interproscan = Filter2.out.complete_pep_signalp
         //Define Input: Genome BLAST 
-        BlastnInput = Filter2.out.complete_cds_signalp.join(genomedb)
+        def BlastnInput = Filter2.out.complete_cds_signalp.join(genomedb)
     }
 
     //Run Process: Interproscan  (Complete secreted pep ORFs only)
@@ -1753,13 +1754,13 @@ workflow {
     def NonToxin_fasta_file = file(params.nontoxprot_fasta, checkIfExists: false).exists()
         ? file(params.nontoxprot_fasta)
         : file(params.Fallback_nontoxin_fasta)
-    input_nontoxindatabasefasta = Channel.fromPath(NonToxin_fasta_file)
+    def input_nontoxindatabasefasta = Channel.fromPath(NonToxin_fasta_file)
 
     //Run Process: BlastdatabasecreationNonToxin
     input_nontoxindatabasefasta | BlastdatabasecreationNonToxin
 
     // Define Input: BlastpNonToxin
-    input_nontoxinBlastp = input_Interproscan.combine(BlastdatabasecreationNonToxin.out.nontoxinproteindb)
+    def input_nontoxinBlastp = input_Interproscan.combine(BlastdatabasecreationNonToxin.out.nontoxinproteindb)
 
     //Run Process:BlastpNonToxin
     input_nontoxinBlastp | BlastpNonToxin
