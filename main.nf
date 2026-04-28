@@ -397,7 +397,7 @@ process BUSCO_transcriptome_metazoa3 {
     script:
 
     """
-    busco -i ${combined_trinity} -l ${metazoa} -c 10 -o ${sample}_combined.met.transcriptome -m transcriptome -e 1e-5 -f
+    busco -i ${combined_trinity} -l ${metazoa} -c 10 -o ${sample}_combined_met.transcriptome -m transcriptome -e 1e-5 -f
     mv ${sample}_combined_met.transcriptome/*.txt "."
     """
 }
@@ -430,7 +430,7 @@ process BUSCO_transcriptome_mollusca3 {
     script:
 
     """
-    busco -i ${combined_trinity} -l ${mollusca} -c 10 -o ${sample}_combined.mol.transcriptome -m transcriptome -e 1e-5 -f
+    busco -i ${combined_trinity} -l ${mollusca} -c 10 -o ${sample}_combined_mol.transcriptome -m transcriptome -e 1e-5 -f
     mv ${sample}_combined_mol.transcriptome/*.txt "."
     """
 }
@@ -728,7 +728,7 @@ process BUSCO_translatome_mollusca {
     script:
 
     """
-    busco -i ${Transdecoder_pep} -l ${mollusca} -c 10 -o ${sample}_TD.mol.protein -m protein -e 1e-5 -f
+    busco -i ${Transdecoder_pep} -l ${mollusca} -c 10 -o ${sample}_TD_mol.protein -m protein -e 1e-5 -f
     mv ${sample}_TD_mol.protein/*.txt "."
     
     """
@@ -794,7 +794,7 @@ process BUSCO_translatome_mollusca2 {
     script:
 
     """
-    busco -i ${TD2_pep} -l ${mollusca} -c 10 -o ${sample}_TD2.mol.protein -m protein -e 1e-5 -f
+    busco -i ${TD2_pep} -l ${mollusca} -c 10 -o ${sample}_TD2_mol.protein -m protein -e 1e-5 -f
     mv ${sample}_TD2_mol.protein/*.txt "."
     
     """
@@ -860,7 +860,7 @@ process BUSCO_translatome_mollusca3 {
     script:
 
     """
-    busco -i ${combined_pep} -l ${mollusca} -c 10 -o ${sample}_combined.mol.protein -m protein -e 1e-5 -f
+    busco -i ${combined_pep} -l ${mollusca} -c 10 -o ${sample}_combined_mol.protein -m protein -e 1e-5 -f
     mv ${sample}_combined_mol.protein/*.txt "."
     
     """
