@@ -1611,8 +1611,8 @@ workflow {
         input_ORFs_Combined_CDHit_Input = ORFs_Combined.out.combined_pep.join(ORFs_Combined.out.combined_cds)
         input_ORFs_Combined_CDHit_Input | ORFs_Combined_CDHit
 
-        input_ORF_complete = ORFs_Combined_NoGenomeCDHit.out.combined_pep.join(ORFs_Combined_NoGenomeCDHit.out.combined_cds)
-        input_Blastp = ORFs_Combined_NoGenomeCDHit.out.combined_pep.combine(Blastdatabasecreation.out.proteindb)
+        input_ORF_complete = ORFs_Combined_CDHit.out.combined_pep.join(ORFs_Combined_CDHit.out.combined_cds)
+        input_Blastp = ORFs_Combined_CDHit.out.combined_pep.combine(Blastdatabasecreation.out.proteindb)
     }
     else {
         // TD2  logic 
