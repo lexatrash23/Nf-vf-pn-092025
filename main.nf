@@ -363,7 +363,7 @@ process Transcriptome_Combined {
     seqkit replace -p '(.+)' -r '${transcriptome2_label}_\$1' ${transcriptome2} > Transcriptome2_labelled.fasta
     cat Transcriptome1_labelled.fasta Transcriptome2_labelled.fasta > Transcriptome_combined.fasta
     seqkit rmdup Transcriptome_combined.fasta -s -o ${sample}_transcriptome_combined.deduplicated.fasta
-    cd-hit-est -i ${sample}_transcriptome_combined.deduplicated.fasta  -o ${sample}_transcriptome_combined.deduplicated.cdhit95.fasta -c 0.95 -d 0
+    cd-hit-est -i ${sample}_transcriptome_combined.deduplicated.fasta  -o ${sample}_transcriptome_combined.deduplicated.cdhit95.fasta -c 0.95 -d 0 -aS 0.9 -aL 0.9
 
     """
 }
@@ -638,7 +638,7 @@ process ORFs_Combined {
 }
 
 // Process 6: remove duplicates for those with no genomes
-process ORFs_Combined_NoGenomeCDHit {
+process ORFs_Combined_CDHit {
 
     errorStrategy 'retry'
     maxRetries 4
@@ -661,7 +661,7 @@ process ORFs_Combined_NoGenomeCDHit {
     script:
 
     """
-    cd-hit -i ${combined_pep}  -o ${sample}_combined.deduplicatedcds.cd95.pep -c 0.95 -d 0
+    cd-hit -i ${combined_pep}  -o ${sample}_combined.deduplicatedcds.cd95.pep -c 0.95 -d 0 -aS 0.9 -aL 0.9
     seqkit seq -n -i ${sample}_combined.deduplicatedcds.cd95.pep > ids_from_pep.txt
     seqkit grep -f ids_from_pep.txt ${combined_cds} -o ${sample}_combined.deduplicated.cd95pep.cds
 
@@ -1608,18 +1608,11 @@ workflow {
         input_BUSCOlin2_L_3 | BUSCO_translatome_mollusca3
 
         //ine Input for input_ORF_complete 
-        input_ORFs_Combined_NoGenomeCDHit = Sample_without_Genome.join(ORFs_Combined.out.combined_pep).join(ORFs_Combined.out.combined_cds).filter { tuple -> tuple != null && tuple.size() > 0 }
-        input_ORFs_Combined_NoGenomeCDHit | ORFs_Combined_NoGenomeCDHit
+        input_ORFs_Combined_CDHit_Input = ORFs_Combined.out.combined_pep.join(ORFs_Combined.out.combined_cds)
+        input_ORFs_Combined_CDHit_Input | ORFs_Combined_CDHit
 
-        NoGenomeCompleteInput = Sample_without_Genome.join(ORFs_Combined_NoGenomeCDHit.out.combined_pep).join(ORFs_Combined_NoGenomeCDHit.out.combined_cds)
-        GenomeCompleteInput = Sample_with_Genome.join(ORFs_Combined.out.combined_pep).join(ORFs_Combined.out.combined_cds)
-        input_ORF_complete = NoGenomeCompleteInput.mix(GenomeCompleteInput)
-
-
-        NoGenomeCompleteInputpep = Sample_without_Genome.join(ORFs_Combined_NoGenomeCDHit.out.combined_pep).combine(Blastdatabasecreation.out.proteindb)
-        GenomeCompleteInputpep = Sample_with_Genome.join(ORFs_Combined.out.combined_pep).combine(Blastdatabasecreation.out.proteindb)
-        //ine Input: Blastp - Match Transdecoder output with databases
-        input_Blastp = NoGenomeCompleteInputpep.mix(GenomeCompleteInputpep)
+        input_ORF_complete = ORFs_Combined_NoGenomeCDHit.out.combined_pep.join(ORFs_Combined_NoGenomeCDHit.out.combined_cds)
+        input_Blastp = ORFs_Combined_NoGenomeCDHit.out.combined_pep.combine(Blastdatabasecreation.out.proteindb)
     }
     else {
         // TD2  logic 
