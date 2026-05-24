@@ -62,8 +62,8 @@ process MultiQC {
     conda "multiqc=1.33"
     container 'community.wave.seqera.io/library/multiqc:1.33--9daaf37cc59ba7dc'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/Fastqc/posttrim/", mode: 'copy'
-    publishDir "${params.outdir}/${sample}/Analysis/results/htmls/", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Fastqc/posttrim/", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Analysis/htmls/", mode: 'copy'
 
     input:
     tuple val(sample), path(fastqc_zips)
@@ -94,7 +94,7 @@ process Bowtie {
     conda "bowtie2=2.5.4"
     container 'community.wave.seqera.io/library/bowtie2:2.5.4--d5022d6316284d3d'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/Bowtie/Transcriptome1", pattern: "*.log", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Bowtie/Transcriptome1", pattern: "*.log", mode: 'copy'
 
     input:
     tuple val(sample), path(trinity_fasta), path(R1), path(R2)
@@ -129,7 +129,7 @@ process Bowtie2 {
     conda "bowtie2=2.5.4"
     container 'community.wave.seqera.io/library/bowtie2:2.5.4--d5022d6316284d3d'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/Bowtie/Transcriptome2", pattern: "*.log", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Bowtie/Transcriptome2", pattern: "*.log", mode: 'copy'
 
     input:
     tuple val(sample), path(trinity_fasta2), path(R1), path(R2)
@@ -162,7 +162,7 @@ process TrinityStats {
     conda "seqkit=2.12.0"
     container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/Stats/", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Stats/", mode: 'copy'
 
     input:
     tuple val(sample), path(trinity_fasta)
@@ -191,7 +191,7 @@ process TrinityStats2 {
     conda "seqkit=2.12.0"
     container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/Stats/", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Stats/", mode: 'copy'
 
     input:
     tuple val(sample), path(trinity_fasta2)
@@ -222,7 +222,7 @@ process BUSCO_transcriptome_metazoa {
     conda "busco=5.8.3"
     container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/BUSCO/transcriptome/Transcriptome1", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/BUSCO/transcriptome/Transcriptome1", mode: 'copy'
 
     input:
     tuple val(sample), path(trinity_fasta), val(metazoa), val(transcriptome1_label)
@@ -254,7 +254,7 @@ process BUSCO_transcriptome_mollusca {
     conda "busco=5.8.3"
     container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/BUSCO/transcriptome/Transcriptome1", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/BUSCO/transcriptome/Transcriptome1", mode: 'copy'
 
     input:
     tuple val(sample), path(trinity_fasta), val(mollusca), val(transcriptome1_label)
@@ -287,7 +287,7 @@ process BUSCO_transcriptome_metazoa2 {
     container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/BUSCO/transcriptome/Transcriptome2", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/BUSCO/transcriptome/Transcriptome2", mode: 'copy'
 
     input:
     tuple val(sample), path(trinity_fasta2), val(metazoa), val(transcriptome2_label)
@@ -319,7 +319,7 @@ process BUSCO_transcriptome_mollusca2 {
     conda "busco=5.8.3"
     container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/BUSCO/transcriptome/Transcriptome2", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/BUSCO/transcriptome/Transcriptome2", mode: 'copy'
 
     input:
     tuple val(sample), path(trinity_fasta2), val(mollusca), val(transcriptome2_label)
@@ -347,7 +347,7 @@ process Transcriptome_Combined {
     conda "seqkit=2.12.0 bioconda::cd-hit=4.8.1"
     container 'community.wave.seqera.io/library/cd-hit_seqkit:27b33ce1ba0d851c'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/Combined_Transcriptome/", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Combined_Transcriptome/", mode: 'copy'
 
     input:
     tuple val(sample), path(transcriptome1), val(transcriptome1_label), path(transcriptome2), val(transcriptome2_label)
@@ -386,7 +386,7 @@ process BUSCO_transcriptome_metazoa3 {
     container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/BUSCO/transcriptome/Combined", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/BUSCO/transcriptome/Combined", mode: 'copy'
 
     input:
     tuple val(sample), val(metazoa), path(combined_trinity)
@@ -419,7 +419,7 @@ process BUSCO_transcriptome_mollusca3 {
     conda "busco=5.8.3"
     container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/BUSCO/transcriptome/Combined", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/BUSCO/transcriptome/Combined", mode: 'copy'
 
     input:
     tuple val(sample), val(mollusca), path(combined_trinity)
@@ -447,7 +447,7 @@ process Kallisto_Trinity {
     cpus { task.cpus * task.attempt }
     time { task.time * task.attempt }
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/kallisto/trinity/output", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/kallisto/trinity/output", mode: 'copy'
 
     errorStrategy 'retry'
     maxRetries 4
@@ -504,8 +504,11 @@ process Blastx {
     label 'process_single'
     label 'process_long'
 
-    errorStrategy 'ignore'
+    errorStrategy 'retry'
     maxRetries 4
+
+    cpus { task.cpus * task.attempt }
+    time { task.time * task.attempt }
 
     cpus { task.cpus * task.attempt }
     time { task.time * task.attempt }
@@ -514,7 +517,7 @@ process Blastx {
     conda "blast=2.17.0"
     container 'community.wave.seqera.io/library/blast:2.17.0--6279aeee601cb05e'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/Blast/Blastx/", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Blast/Blastx/", mode: 'copy'
 
     input:
     tuple val(sample), path(combined_trinity), path(proteindb)
@@ -547,7 +550,7 @@ process Transdecoder {
     time { task.time * task.attempt }
 
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/ORFprediction/Transdecoder/", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/ORFprediction/Transdecoder/", mode: 'copy'
 
     input:
     tuple val(sample), path(combined_trinity)
@@ -581,7 +584,7 @@ process TD2 {
     time { task.time * task.attempt }
 
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/ORFprediction/TD2/", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/ORFprediction/TD2/", mode: 'copy'
 
     input:
     tuple val(sample), path(combined_trinity)
@@ -611,7 +614,7 @@ process ORFs_Combined {
     conda "seqkit=2.12.0"
     container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/ORFprediction/Combined/All", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/ORFprediction/Combined/All", mode: 'copy'
 
     input:
     tuple val(sample), path(transdecoder_pep), path(transdecoder_cds), path(TD2_pep), path(TD2_cds)
@@ -649,7 +652,7 @@ process ORFs_Combined_CDHit {
     conda "seqkit=2.12.0 bioconda::cd-hit=4.8.1"
     container 'community.wave.seqera.io/library/cd-hit_seqkit:27b33ce1ba0d851c'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/ORFprediction/Combined/All", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/ORFprediction/Combined/All", mode: 'copy'
 
     input:
     tuple val(sample), path(combined_pep), path(combined_cds)
@@ -684,7 +687,7 @@ process BUSCO_translatome_metazoa {
     conda "busco=5.8.3"
     container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/BUSCO/translatome/Transdecoder/", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/BUSCO/translatome/Transdecoder/", mode: 'copy'
 
     input:
     tuple val(sample), path(Transdecoder_pep), val(metazoa)
@@ -717,7 +720,7 @@ process BUSCO_translatome_mollusca {
     conda "busco=5.8.3"
     container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/BUSCO/translatome/Transdecoder/", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/BUSCO/translatome/Transdecoder/", mode: 'copy'
 
     input:
     tuple val(sample), path(Transdecoder_pep), val(mollusca)
@@ -750,7 +753,7 @@ process BUSCO_translatome_metazoa2 {
     conda "busco=5.8.3"
     container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/BUSCO/translatome/TD2/", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/BUSCO/translatome/TD2/", mode: 'copy'
 
     input:
     tuple val(sample), path(TD2_pep), val(metazoa)
@@ -783,7 +786,7 @@ process BUSCO_translatome_mollusca2 {
     conda "busco=5.8.3"
     container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/BUSCO/translatome/TD2/", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/BUSCO/translatome/TD2/", mode: 'copy'
 
     input:
     tuple val(sample), path(TD2_pep), val(mollusca)
@@ -816,7 +819,7 @@ process BUSCO_translatome_metazoa3 {
     conda "busco=5.8.3"
     container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/BUSCO/translatome/Combined/", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/BUSCO/translatome/Combined/", mode: 'copy'
 
     input:
     tuple val(sample), path(combined_pep), val(metazoa)
@@ -849,7 +852,7 @@ process BUSCO_translatome_mollusca3 {
     conda "busco=5.8.3"
     container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/BUSCO/translatome/Combined/", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/BUSCO/translatome/Combined/", mode: 'copy'
 
     input:
     tuple val(sample), path(combined_pep), val(mollusca)
@@ -882,7 +885,7 @@ process Kallisto_Transdecoder {
     conda "kallisto=0.51.1"
     container 'community.wave.seqera.io/library/kallisto:0.51.1--d7728813dda40c70'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/kallisto/transdecoder/output", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/kallisto/transdecoder/output", mode: 'copy'
 
     input:
     tuple val(sample), path(complete_cds), path(R1), path(R2), val(Strandedness)
@@ -922,7 +925,7 @@ process Blastp {
     conda "blast=2.17.0"
     container 'community.wave.seqera.io/library/blast:2.17.0--6279aeee601cb05e'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/Blast/Blastp_Toxin/", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Blast/Blastp_Toxin/", mode: 'copy'
 
     input:
     tuple val(sample), path(combined_pep), path(proteindb)
@@ -955,7 +958,7 @@ process ORF_complete {
     conda "seqkit=2.12.0"
     container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/ORFprediction/Combined/Complete/", pattern: "*cleaned*", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/ORFprediction/Combined/Complete/", pattern: "*cleaned*", mode: 'copy'
 
     input:
     tuple val(sample), path(combined_pep), path(combined_cds)
@@ -987,7 +990,7 @@ process SignalP {
     cpus { task.cpus * task.attempt }
     time { task.time * task.attempt }
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/Secreted/Mature/Signalp", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Secreted/Mature/Signalp", mode: 'copy'
 
     input:
     tuple val(sample), path(complete_pep)
@@ -1018,7 +1021,7 @@ process Filter2 {
     conda "seqkit=2.12.0"
     container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/Secreted/Full_Secreted/Signalp", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Secreted/Full_Secreted/Signalp", mode: 'copy'
 
     input:
     tuple val(sample), path(maturesequences), path(complete_pep), path(complete_cds)
@@ -1048,7 +1051,7 @@ process stats {
     conda "seqkit=2.12.0"
     container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/Stats", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Stats", mode: 'copy'
 
     input:
     tuple val(sample), path(Transdecoder_pep), path(Transdecoder_cds), path(complete_pep), path(complete_cds), path(maturesequences), path(complete_pep_signalp), path(TD2_pep), path(TD2_cds), path(combined_pep), path(combined_cds)
@@ -1093,8 +1096,8 @@ process DeepTMHMM {
     conda "seqkit=2.12.0"
     container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/Secreted/Mature/DeepTMHMM", pattern: "*min5.fasta", mode: 'copy'
-    publishDir "${params.outdir}/${sample}/Venomflow/results/Stats", pattern: "*.txt", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Secreted/Mature/DeepTMHMM", pattern: "*min5.fasta", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Stats", pattern: "*.txt", mode: 'copy'
 
     input:
     tuple val(sample), path(complete_pep), path(signalpsummary)
@@ -1132,10 +1135,10 @@ process DeepTMHMMFilter {
     conda "seqkit=2.12.0"
     container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/Secreted/Full_Secreted/DeepTMHMM", pattern: "*DeepTMHMM*", mode: 'copy'
-    publishDir "${params.outdir}/${sample}/Venomflow/results/Secreted/Full_Secreted/Combined", pattern: "*sequences.deduplicated*", mode: 'copy'
-    publishDir "${params.outdir}/${sample}/Venomflow/results/Stats", pattern: "*.txt", mode: 'copy'
-    publishDir "${params.outdir}/${sample}/Venomflow/results/Secreted/Mature/Combined/", pattern: "*.combined.mature.deduplicated.pep.fasta", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Secreted/Full_Secreted/DeepTMHMM", pattern: "*DeepTMHMM*", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Secreted/Full_Secreted/Combined", pattern: "*sequences.deduplicated*", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Stats", pattern: "*.txt", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Secreted/Mature/Combined/", pattern: "*.combined.mature.deduplicated.pep.fasta", mode: 'copy'
 
     input:
     tuple val(sample), path(DeepTMHMM_mature), path(complete_pep), path(complete_cds), path(complete_pep_signalp), path(complete_cds_signalp), path(signalpmature)
@@ -1182,7 +1185,7 @@ process Interproscan {
     cpus { task.cpus * task.attempt }
     time { task.time * task.attempt }
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/Interproscan", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Interproscan", mode: 'copy'
 
     input:
     tuple val(sample), path(secreted_pep)
@@ -1241,7 +1244,7 @@ process BlastpNonToxin {
     conda "blast=2.17.0"
     container 'community.wave.seqera.io/library/blast:2.17.0--6279aeee601cb05e'
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/Blast/Blastp_NonToxin/", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Blast/Blastp_NonToxin/", mode: 'copy'
 
     input:
     tuple val(sample), path(secreted_pep), path(proteindb)
@@ -1296,7 +1299,7 @@ process GenomeBlasts6 {
     cpus { task.cpus * task.attempt }
     time { task.time * task.attempt }
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/Blast/Blastn/", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Blast/Blastn/", mode: 'copy'
 
     input:
     tuple val(sample), path(secretedcds), path(genomedb)
@@ -1326,7 +1329,7 @@ process GenomeBlasts0 {
     cpus { task.cpus * task.attempt }
     time { task.time * task.attempt }
 
-    publishDir "${params.outdir}/${sample}/Venomflow/results/Blast/Blastn/", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Blast/Blastn/", mode: 'copy'
 
     input:
     tuple val(sample), path(secretedcds), path(genomedb)
