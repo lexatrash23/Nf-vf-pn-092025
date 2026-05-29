@@ -63,7 +63,7 @@ process MultiQC {
     container 'community.wave.seqera.io/library/multiqc:1.33--9daaf37cc59ba7dc'
 
     publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Fastqc/posttrim/", mode: 'copy'
-    publishDir "${params.outdir}/${sample}/Analysis/htmls/", mode: 'copy'
+    publishDir "${params.outdir}/${sample}/FinalOutputs/htmls/", mode: 'copy'
 
     input:
     tuple val(sample), path(fastqc_zips)
@@ -984,7 +984,7 @@ process SignalP {
     maxRetries 4
 
 
-    label 'process_low'
+    label 'process_medium'
     label 'process_long'
 
     cpus { task.cpus * task.attempt }
