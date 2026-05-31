@@ -571,7 +571,7 @@ process Transdecoder {
 // Process 10: TD2
 process TD2 {
 
-    label 'process_medium'
+    label 'process_high'
 
     conda "bioconda::td2"
     container 'community.wave.seqera.io/library/td2:ca3786e862ccfcd7'
