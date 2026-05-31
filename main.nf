@@ -538,7 +538,7 @@ process Blastx {
 // Process 10: Transdecoder
 process Transdecoder {
 
-    label 'process_medium'
+    label 'process_high'
 
     conda "transdecoder=5.7.1"
     container 'community.wave.seqera.io/library/transdecoder:5.7.1--bfc613e7081a52d9'
