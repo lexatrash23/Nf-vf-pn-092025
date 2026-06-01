@@ -363,7 +363,7 @@ process Transcriptome_Combined {
     seqkit replace -p '(.+)' -r '${transcriptome2_label}_\$1' ${transcriptome2} > Transcriptome2_labelled.fasta
     cat Transcriptome1_labelled.fasta Transcriptome2_labelled.fasta > Transcriptome_combined.fasta
     seqkit rmdup Transcriptome_combined.fasta -s -o ${sample}_transcriptome_combined.deduplicated.fasta
-    cd-hit-est -i ${sample}_transcriptome_combined.deduplicated.fasta  -o ${sample}_transcriptome_combined.deduplicated.cdhit95.fasta -c 0.95 -d 0 -aS 0.9 -aL 0.9
+    cd-hit-est -i ${sample}_transcriptome_combined.deduplicated.fasta  -o ${sample}_transcriptome_combined.deduplicated.cdhit95.fasta -c 0.95 -d 0 -aS 0.9 -aL 0.9 -M 2865
 
     """
 }
@@ -441,7 +441,7 @@ process Kallisto_Trinity {
     conda "kallisto=0.51.1"
     container 'community.wave.seqera.io/library/kallisto:0.51.1--d7728813dda40c70'
 
-    label 'process_single'
+    label 'process_double'
     label 'process_long'
 
     cpus { 5 * task.attempt }
@@ -539,6 +539,7 @@ process Blastx {
 process Transdecoder {
 
     label 'process_high'
+    label 'process_long'
 
     conda "transdecoder=5.7.1"
     container 'community.wave.seqera.io/library/transdecoder:5.7.1--bfc613e7081a52d9'
@@ -572,6 +573,8 @@ process Transdecoder {
 process TD2 {
 
     label 'process_high'
+    label 'process_long'
+
 
     conda "bioconda::td2"
     container 'community.wave.seqera.io/library/td2:ca3786e862ccfcd7'
