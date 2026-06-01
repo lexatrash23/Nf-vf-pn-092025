@@ -538,7 +538,7 @@ process Blastx {
 // Process 10: Transdecoder
 process Transdecoder {
 
-    label 'process_high'
+    label 'process_medium'
     label 'process_long'
 
     conda "transdecoder=5.7.1"
@@ -572,7 +572,7 @@ process Transdecoder {
 // Process 10: TD2
 process TD2 {
 
-    label 'process_high'
+    label 'process_medium'
     label 'process_long'
 
 
