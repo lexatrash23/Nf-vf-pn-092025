@@ -547,7 +547,8 @@ process Transdecoder {
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
     maxRetries 4
 
-    cpus { 10 * task.attempt }
+    memory { 20.GB * task.attempt }
+
 
 
     publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/ORFprediction/Transdecoder/", mode: 'copy'
@@ -582,7 +583,7 @@ process TD2 {
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
     maxRetries 4
 
-    cpus { 10 * task.attempt }
+    memory { 20.GB * task.attempt }
 
 
     publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/ORFprediction/TD2/", mode: 'copy'
