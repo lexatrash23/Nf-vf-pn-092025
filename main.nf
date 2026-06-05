@@ -441,7 +441,7 @@ process Kallisto_Trinity {
     conda "kallisto=0.51.1"
     container 'community.wave.seqera.io/library/kallisto:0.51.1--d7728813dda40c70'
 
-    label 'process_double'
+    label 'process_low'
     label 'process_long'
 
     
