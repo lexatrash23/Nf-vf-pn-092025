@@ -342,7 +342,7 @@ process Transcriptome_Combined {
     maxRetries 4
 
 
-    label 'process_single'
+    label 'process_double'
 
     conda "seqkit=2.12.0 bioconda::cd-hit=4.8.1"
     container 'community.wave.seqera.io/library/cd-hit_seqkit:27b33ce1ba0d851c'
