@@ -35,7 +35,7 @@ process PostTrimFastqc {
 
 
 
-    label 'process_bare'
+    label 'process_low'
 
     conda "fastqc=0.12.1"
     container 'community.wave.seqera.io/library/fastqc:0.12.1--aa717e1a9d994d74'
@@ -58,7 +58,7 @@ process MultiQC {
     maxRetries 3
 
 
-    label 'process_bare'
+    label 'process_low'
     conda "multiqc=1.33"
     container 'community.wave.seqera.io/library/multiqc:1.33--9daaf37cc59ba7dc'
 
@@ -157,7 +157,7 @@ process TrinityStats {
 
 
 
-    label 'process_bare'
+    label 'process_low'
 
     conda "seqkit=2.12.0"
     container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
@@ -185,7 +185,7 @@ process TrinityStats2 {
     maxRetries 3
 
 
-    label 'process_bare'
+    label 'process_low'
 
 
     conda "seqkit=2.12.0"
@@ -336,7 +336,7 @@ process BUSCO_transcriptome_mollusca2 {
 process Transcriptome_Combined {
 
 
-    label 'process_bare'
+    label 'process_low'
     
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
@@ -440,7 +440,7 @@ process Kallisto_Trinity {
     container 'community.wave.seqera.io/library/kallisto:0.51.1--d7728813dda40c70'
 
 
-    label 'process_bare'
+    label 'process_low'
     
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
@@ -482,7 +482,7 @@ process Blastdatabasecreation {
     maxRetries 3
 
 
-    label 'process_bare'
+    label 'process_low'
 
     conda "blast=2.17.0"
     container 'community.wave.seqera.io/library/blast:2.17.0--6279aeee601cb05e'
@@ -501,7 +501,7 @@ process Blastdatabasecreation {
 // Process 9: Blastx
 process Blastx {
 
-    label 'process_bare'
+    label 'process_low'
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
     maxRetries 3
@@ -606,7 +606,7 @@ process ORFs_Combined {
     maxRetries 3
 
 
-    label 'process_bare'
+    label 'process_low'
 
     conda "seqkit=2.12.0"
     container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
@@ -644,7 +644,7 @@ process ORFs_Combined_CDHit {
     maxRetries 3
 
 
-    label 'process_bare'
+    label 'process_low'
 
     conda "seqkit=2.12.0 bioconda::cd-hit=4.8.1"
     container 'community.wave.seqera.io/library/cd-hit_seqkit:27b33ce1ba0d851c'
@@ -872,7 +872,7 @@ process Kallisto_Transdecoder {
 
 
 
-    label 'process_bare'
+    label 'process_low'
     
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
@@ -916,7 +916,7 @@ process Blastp {
     maxRetries 3
 
 
-    label 'process_bare'
+    label 'process_low'
 
     
     
@@ -949,7 +949,7 @@ process ORF_complete {
     maxRetries 3
 
 
-    label 'process_bare'
+    label 'process_low'
 
     
     
@@ -1018,7 +1018,7 @@ process Filter2 {
     maxRetries 3
 
 
-    label 'process_bare'
+    label 'process_low'
 
     conda "seqkit=2.12.0"
     container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
@@ -1048,7 +1048,7 @@ process stats {
     maxRetries 3
 
 
-    label 'process_bare'
+    label 'process_low'
 
     conda "seqkit=2.12.0"
     container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
@@ -1130,7 +1130,7 @@ process DeepTMHMMFilter {
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
     maxRetries 3
 
-    label 'process_bare'
+    label 'process_low'
 
 
 
@@ -1214,7 +1214,7 @@ process BlastdatabasecreationNonToxin {
     maxRetries 3
 
 
-    label 'process_bare'
+    label 'process_low'
 
     conda "blast=2.17.0"
     container 'community.wave.seqera.io/library/blast:2.17.0--6279aeee601cb05e'
@@ -1238,7 +1238,7 @@ process BlastpNonToxin {
     maxRetries 3
 
 
-    label 'process_bare'
+    label 'process_low'
 
 
 
@@ -1271,7 +1271,7 @@ process GenomeBlastdatabasecreation {
     conda "blast=2.17.0"
     container 'community.wave.seqera.io/library/blast:2.17.0--6279aeee601cb05e'
 
-    label 'process_bare'
+    label 'process_low'
 
     input:
     tuple val(sample), path(genome_fasta)
@@ -1288,7 +1288,7 @@ process GenomeBlastdatabasecreation {
 // Process 23: GenomeBlasts6
 process GenomeBlasts6 {
 
-    label 'process_bare'
+    label 'process_low'
     
 
     conda "blast=2.17.0"
@@ -1316,7 +1316,7 @@ process GenomeBlasts6 {
 // Process 21: GenomeBlasts0
 process GenomeBlasts0 {
 
-    label 'process_bare'
+    label 'process_low'
     
 
     conda "blast=2.17.0"
