@@ -440,7 +440,7 @@ process Kallisto_Trinity {
     container 'community.wave.seqera.io/library/kallisto:0.51.1--d7728813dda40c70'
 
 
-    label 'process_low'
+    label 'process_medium'
     
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
@@ -872,7 +872,7 @@ process Kallisto_Transdecoder {
 
 
 
-    label 'process_low'
+    label 'process_medium'
     
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
@@ -916,7 +916,7 @@ process Blastp {
     maxRetries 3
 
 
-    label 'process_low'
+    label 'process_medium'
 
     
     
@@ -1238,7 +1238,7 @@ process BlastpNonToxin {
     maxRetries 3
 
 
-    label 'process_low'
+    label 'process_medium'
 
 
 
@@ -1288,7 +1288,7 @@ process GenomeBlastdatabasecreation {
 // Process 23: GenomeBlasts6
 process GenomeBlasts6 {
 
-    label 'process_low'
+    label 'process_medium'
     
 
     conda "blast=2.17.0"
@@ -1316,7 +1316,7 @@ process GenomeBlasts6 {
 // Process 21: GenomeBlasts0
 process GenomeBlasts0 {
 
-    label 'process_low'
+    label 'process_medium'
     
 
     conda "blast=2.17.0"
