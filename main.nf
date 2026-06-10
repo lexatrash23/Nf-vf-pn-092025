@@ -973,8 +973,8 @@ process ORF_complete {
     seqkit grep -n -r -p "ORF type:complete" ${combined_cds} -o "${sample}.combine.complete.cds"
     awk '{if (\$0 ~ /^>/) print \$0; else {gsub(/\\*/, ""); print \$0}}' "${sample}.combine.complete.pep" > "${sample}.combine.complete.cleaned1.pep"
     awk '{if (\$0 ~ /^>/) print \$0; else {gsub(/\\*/, ""); print \$0}}' "${sample}.combine.complete.cds" > "${sample}.combine.complete.cleaned1.cds"
-    seqkit --min-len 1 "${sample}.combine.complete.cleaned1.pep" > "${sample}.combine.complete.cleaned.pep"
-    seqkit --min-len 1 "${sample}.combine.complete.cleaned1.cds" > "${sample}.combine.complete.cleaned.cds"
+    seqkit seq -m 1 "${sample}.combine.complete.cleaned1.pep" > "${sample}.combine.complete.cleaned.pep"
+    seqkit seq -m 1 "${sample}.combine.complete.cleaned1.cds" > "${sample}.combine.complete.cleaned.cds"
 
     """
 }
