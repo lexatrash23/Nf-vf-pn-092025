@@ -88,9 +88,6 @@ process Bowtie {
     maxRetries 3
 
 
-
-
-
     conda "bowtie2=2.5.4"
     container 'community.wave.seqera.io/library/bowtie2:2.5.4--d5022d6316284d3d'
 
@@ -105,8 +102,8 @@ process Bowtie {
     script:
 
     """
-    bowtie2-build ${trinity_fasta} ${sample}_transcriptome_index
-    bowtie2 -x ${sample}_transcriptome_index -1 ${R1} -2 ${R2} -S ${sample}_mapped_reads.sam -p 8 --no-unal 2> stats.log
+    bowtie2-build ${trinity_fasta} ${sample}_transcriptome_index -p ${task.cpus}
+    bowtie2 -x ${sample}_transcriptome_index -1 ${R1} -2 ${R2} -S ${sample}_mapped_reads.sam -p ${task.cpus} --no-unal 2> stats.log 
 
 
 
@@ -140,8 +137,8 @@ process Bowtie2 {
     script:
 
     """
-    bowtie2-build ${trinity_fasta2} ${sample}_transcriptome_index
-    bowtie2 -x ${sample}_transcriptome_index -1 ${R1} -2 ${R2} -S ${sample}_mapped_reads.sam -p 8 --no-unal 2> stats.log
+    bowtie2-build ${trinity_fasta2} ${sample}_transcriptome_index -p ${task.cpus}
+    bowtie2 -x ${sample}_transcriptome_index -1 ${R1} -2 ${R2} -S ${sample}_mapped_reads.sam -p ${task.cpus} --no-unal 2> stats.log
 
 
 
@@ -216,9 +213,6 @@ process BUSCO_transcriptome_metazoa {
     label 'process_medium'
 
 
-
-
-
     conda "busco=5.8.3"
     container 'community.wave.seqera.io/library/busco:5.8.3--dac4836fc2571f70'
 
@@ -233,7 +227,7 @@ process BUSCO_transcriptome_metazoa {
     script:
 
     """
-    busco -i ${trinity_fasta} -l ${metazoa} -c 10 -o ${sample}_${transcriptome1_label}_met.transcriptome -m transcriptome -e 1e-5 -f
+    busco -i ${trinity_fasta} -l ${metazoa} -c ${task.cpus} -o ${sample}_${transcriptome1_label}_met.transcriptome -m transcriptome -e 1e-5 -f
     mv ${sample}_${transcriptome1_label}_met.transcriptome/*.txt "."
     """
 }
@@ -265,7 +259,7 @@ process BUSCO_transcriptome_mollusca {
     script:
 
     """
-    busco -i ${trinity_fasta} -l ${mollusca} -c 10 -o ${sample}_${transcriptome1_label}_mol.transcriptome -m transcriptome -e 1e-5 -f
+    busco -i ${trinity_fasta} -l ${mollusca} -c ${task.cpus} -o ${sample}_${transcriptome1_label}_mol.transcriptome -m transcriptome -e 1e-5 -f
     mv ${sample}_${transcriptome1_label}_mol.transcriptome/*.txt "."
     """
 }
@@ -278,9 +272,6 @@ process BUSCO_transcriptome_metazoa2 {
 
 
     label 'process_medium'
-
-
-
 
 
     conda "busco=5.8.3"
@@ -298,7 +289,7 @@ process BUSCO_transcriptome_metazoa2 {
     script:
 
     """
-    busco -i ${trinity_fasta2} -l ${metazoa} -c 10 -o ${sample}_${transcriptome2_label}_met.transcriptome -m transcriptome -e 1e-5 -f
+    busco -i ${trinity_fasta2} -l ${metazoa} -c ${task.cpus} -o ${sample}_${transcriptome2_label}_met.transcriptome -m transcriptome -e 1e-5 -f
     mv ${sample}_${transcriptome2_label}_met.transcriptome/*.txt "."
     """
 }
@@ -327,7 +318,7 @@ process BUSCO_transcriptome_mollusca2 {
     script:
 
     """
-    busco -i ${trinity_fasta2} -l ${mollusca} -c 10 -o ${sample}_${transcriptome2_label}_mol.transcriptome -m transcriptome -e 1e-5 -f
+    busco -i ${trinity_fasta2} -l ${mollusca} -c ${task.cpus} -o ${sample}_${transcriptome2_label}_mol.transcriptome -m transcriptome -e 1e-5 -f
     mv ${sample}_${transcriptome2_label}_mol.transcriptome/*.txt "."
     """
 }
@@ -395,7 +386,7 @@ process BUSCO_transcriptome_metazoa3 {
     script:
 
     """
-    busco -i ${combined_trinity} -l ${metazoa} -c 10 -o ${sample}_combined_met.transcriptome -m transcriptome -e 1e-5 -f
+    busco -i ${combined_trinity} -l ${metazoa} -c ${task.cpus} -o ${sample}_combined_met.transcriptome -m transcriptome -e 1e-5 -f
     mv ${sample}_combined_met.transcriptome/*.txt "."
     """
 }
@@ -409,9 +400,6 @@ process BUSCO_transcriptome_mollusca3 {
 
 
     label 'process_medium'
-
-
-
 
 
     conda "busco=5.8.3"
@@ -428,7 +416,7 @@ process BUSCO_transcriptome_mollusca3 {
     script:
 
     """
-    busco -i ${combined_trinity} -l ${mollusca} -c 10 -o ${sample}_combined_mol.transcriptome -m transcriptome -e 1e-5 -f
+    busco -i ${combined_trinity} -l ${mollusca} -c ${task.cpus} -o ${sample}_combined_mol.transcriptome -m transcriptome -e 1e-5 -f
     mv ${sample}_combined_mol.transcriptome/*.txt "."
     """
 }
@@ -440,7 +428,7 @@ process Kallisto_Trinity {
     container 'community.wave.seqera.io/library/kallisto:0.51.1--d7728813dda40c70'
 
 
-    label 'process_medium'
+    label 'process_low'
 
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
@@ -469,8 +457,8 @@ process Kallisto_Trinity {
     else
         stranded_flag=""
     fi
-    kallisto index -i index ${combined_trinity}
-    kallisto quant -i index -o ./ -b 100 ${R1} ${R2} \$stranded_flag
+    kallisto index -i index ${combined_trinity} -t ${task.cpus}
+    kallisto quant -i index -o ./ -b 100 ${R1} ${R2} \$stranded_flag -t ${task.cpus}
 
     """
 }
@@ -524,8 +512,8 @@ process Blastx {
     script:
     """
    
-    blastx -query ${combined_trinity} -db ToxProtdb/proteindb -out ${sample}.blastx.db.6.txt -evalue 1e-5 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
-    blastx -query ${combined_trinity} -db ToxProtdb/proteindb -out ${sample}.blastx.db.0.txt -evalue 1e-5 -outfmt '0'
+    blastx -query ${combined_trinity} -db ToxProtdb/proteindb -out ${sample}.blastx.db.6.txt -evalue 1e-5 -num_threads ${task.cpus} -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
+    blastx -query ${combined_trinity} -db ToxProtdb/proteindb -out ${sample}.blastx.db.0.txt -evalue 1e-5 -num_threads ${task.cpus} -outfmt '0'
 
     """
 }
@@ -533,7 +521,7 @@ process Blastx {
 // Process 10: Transdecoder
 process Transdecoder {
 
-    label 'process_high'
+    label 'process_low'
 
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
@@ -566,7 +554,7 @@ process Transdecoder {
 // Process 10: TD2
 process TD2 {
 
-    label 'process_medium'
+    label 'process_low'
 
 
 
@@ -695,7 +683,7 @@ process BUSCO_translatome_metazoa {
     script:
 
     """
-    busco -i ${Transdecoder_pep} -l ${metazoa} -c 10 -o ${sample}_TD_met.protein -m protein -e 1e-5 -f
+    busco -i ${Transdecoder_pep} -l ${metazoa} -c ${task.cpus} -o ${sample}_TD_met.protein -m protein -e 1e-5 -f
     mv ${sample}_TD_met.protein/*.txt "."
     
     """
@@ -728,7 +716,7 @@ process BUSCO_translatome_mollusca {
     script:
 
     """
-    busco -i ${Transdecoder_pep} -l ${mollusca} -c 10 -o ${sample}_TD_mol.protein -m protein -e 1e-5 -f
+    busco -i ${Transdecoder_pep} -l ${mollusca} -c ${task.cpus} -o ${sample}_TD_mol.protein -m protein -e 1e-5 -f
     mv ${sample}_TD_mol.protein/*.txt "."
     
     """
@@ -761,7 +749,7 @@ process BUSCO_translatome_metazoa2 {
     script:
 
     """
-    busco -i ${TD2_pep} -l ${metazoa} -c 10 -o ${sample}_TD2_met.protein -m protein -e 1e-5 -f
+    busco -i ${TD2_pep} -l ${metazoa} -c ${task.cpus} -o ${sample}_TD2_met.protein -m protein -e 1e-5 -f
     mv ${sample}_TD2_met.protein/*.txt "."
     
     """
@@ -794,7 +782,7 @@ process BUSCO_translatome_mollusca2 {
     script:
 
     """
-    busco -i ${TD2_pep} -l ${mollusca} -c 10 -o ${sample}_TD2_mol.protein -m protein -e 1e-5 -f
+    busco -i ${TD2_pep} -l ${mollusca} -c ${task.cpus} -o ${sample}_TD2_mol.protein -m protein -e 1e-5 -f
     mv ${sample}_TD2_mol.protein/*.txt "."
     
     """
@@ -827,7 +815,7 @@ process BUSCO_translatome_metazoa3 {
     script:
 
     """
-    busco -i ${combined_pep} -l ${metazoa} -c 10 -o ${sample}_combined_met.protein -m protein -e 1e-5 -f
+    busco -i ${combined_pep} -l ${metazoa} -c ${task.cpus} -o ${sample}_combined_met.protein -m protein -e 1e-5 -f
     mv ${sample}_combined_met.protein/*.txt "."
     
     """
@@ -860,7 +848,7 @@ process BUSCO_translatome_mollusca3 {
     script:
 
     """
-    busco -i ${combined_pep} -l ${mollusca} -c 10 -o ${sample}_combined_mol.protein -m protein -e 1e-5 -f
+    busco -i ${combined_pep} -l ${mollusca} -c ${task.cpus} -o ${sample}_combined_mol.protein -m protein -e 1e-5 -f
     mv ${sample}_combined_mol.protein/*.txt "."
     
     """
@@ -872,7 +860,7 @@ process Kallisto_Transdecoder {
 
 
 
-    label 'process_medium'
+    label 'process_low'
 
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
@@ -903,8 +891,8 @@ process Kallisto_Transdecoder {
     else
         stranded_flag=""
     fi
-    kallisto index -i index ${complete_cds}
-    kallisto quant -i index -o ./ -b 100 ${R1} ${R2} \$stranded_flag
+    kallisto index -i index ${complete_cds} -t ${task.cpus}
+    kallisto quant -i index -o ./ -b 100 ${R1} ${R2} \$stranded_flag -t ${task.cpus}
 
     """
 }
@@ -916,7 +904,7 @@ process Blastp {
     maxRetries 3
 
 
-    label 'process_medium'
+    label 'process_low'
 
 
 
@@ -936,8 +924,8 @@ process Blastp {
     script:
     """
 
-    blastp -query ${combined_pep} -db ToxProtdb/proteindb -out ${sample}.blastp.db.6.txt -evalue 1e-5 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
-    blastp -query ${combined_pep} -db ToxProtdb/proteindb -out ${sample}.blastp.db.0.txt -evalue 1e-5 -outfmt '0'
+    blastp -query ${combined_pep} -db ToxProtdb/proteindb -out ${sample}.blastp.db.6.txt -evalue 1e-5 -num_threads ${task.cpus} -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
+    blastp -query ${combined_pep} -db ToxProtdb/proteindb -out ${sample}.blastp.db.0.txt -evalue 1e-5 -num_threads ${task.cpus} -outfmt '0'
 
     """
 }
@@ -1089,10 +1077,6 @@ process DeepTMHMM {
 
     label 'process_medium'
 
-
-
-
-
     conda "seqkit=2.12.0"
     container 'community.wave.seqera.io/library/seqkit:2.12.0--430b52150147f163'
 
@@ -1182,9 +1166,6 @@ process Interproscan {
     label 'process_medium'
 
 
-
-
-
     publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Interproscan", mode: 'copy'
 
     input:
@@ -1236,7 +1217,7 @@ process BlastpNonToxin {
     maxRetries 3
 
 
-    label 'process_medium'
+    label 'process_low'
 
 
 
@@ -1254,7 +1235,7 @@ process BlastpNonToxin {
     script:
     """
 
-    blastp -query ${secreted_pep} -db Folder/NonToxinDataBase -out ${sample}.nontoxin.blastp.db.6.txt -evalue 1e-5 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
+    blastp -query ${secreted_pep} -db Folder/NonToxinDataBase -out ${sample}.nontoxin.blastp.db.6.txt -evalue 1e-5-num_threads ${task.cpus} -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
 
     """
 }
@@ -1286,7 +1267,7 @@ process GenomeBlastdatabasecreation {
 // Process 23: GenomeBlasts6
 process GenomeBlasts6 {
 
-    label 'process_medium'
+    label 'process_low'
 
 
     conda "blast=2.17.0"
@@ -1303,10 +1284,12 @@ process GenomeBlasts6 {
 
     output:
     tuple val(sample), path("${sample}.blastn.db.6.txt"), emit: blastn6
+    tuple val(sample), path("${sample}.blastn.db.0.txt"), emit: blastn6
+
 
     script:
     """
-    blastn -query ${secretedcds} -db genomedb -out ${sample}.blastn.db.6.txt -evalue 1e-5 -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send sstrand evalue bitscore qframe qcovs"
+    blastn -query ${secretedcds} -db genomedb -out ${sample}.blastn.db.6.txt -evalue 1e-5 -num_threads ${task.cpus} -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send sstrand evalue bitscore qframe qcovs"
 
     """
 }
@@ -1314,7 +1297,7 @@ process GenomeBlasts6 {
 // Process 21: GenomeBlasts0
 process GenomeBlasts0 {
 
-    label 'process_medium'
+    label 'process_low'
 
 
     conda "blast=2.17.0"
@@ -1336,7 +1319,7 @@ process GenomeBlasts0 {
 
     script:
     """
-    blastn -query ${secretedcds} -db genomedb -out ${sample}.blastn.db.0.txt -evalue 1e-5 -outfmt '0'
+    blastn -query ${secretedcds} -db genomedb -out ${sample}.blastn.db.0.txt -evalue 1e-5 -num_threads ${task.cpus}  -outfmt '0'
 
     """
 }
