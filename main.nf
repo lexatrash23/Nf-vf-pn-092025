@@ -1343,6 +1343,7 @@ workflow {
         .splitCsv(header: true, sep: ',')
         .map { row -> row.collectEntries { key, value -> [key.replaceAll('"', ''), value?.toString()?.replaceAll('"', '')] } }
 
+
     // ine Input: Paired Trimmed reads Tuple. Extracts as tuple the sample name and the trimmed reads
     input_R1R2 = csv_channel.map { row -> tuple(row.Sample_name, file(row.R1), file(row.R2)) }
 
@@ -1597,6 +1598,12 @@ workflow {
         input_ORF_complete = ORFs_Combined_CDHit.out.combined_pep.join(ORFs_Combined_CDHit.out.combined_cds)
         input_Blastp = ORFs_Combined_CDHit.out.combined_pep.combine(Blastdatabasecreation.out.proteindb)
     }
+    else if (params.ORFPrediction == "Done"){
+        ORFspep = csv_channel.map { row -> tuple(row.Sample_name, file(row.ORFpep)) }
+        ORFscds = csv_channel.map { row -> tuple(row.Sample_name, file(row.ORFcds)) }
+        input_ORF_complete = ORFspep.join(ORFscds)
+        input_Blastp = ORFspep.combine(Blastdatabasecreation.out.proteindb)
+    }
     else {
         // TD2  logic 
         input_orf | TD2
@@ -1745,4 +1752,7 @@ workflow {
     BlastnInput | GenomeBlasts6
     //Run Process: BlastnGenome
     BlastnInput | GenomeBlasts0
+    
+
+
 }
