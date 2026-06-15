@@ -31,7 +31,7 @@ process PostTrimFastqc {
 
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
 
@@ -55,7 +55,7 @@ process PostTrimFastqc {
 // Process 2: MultiQC
 process MultiQC {
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
     label 'process_low'
@@ -85,7 +85,7 @@ process Bowtie {
 
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
     conda "bowtie2=2.5.4"
@@ -117,7 +117,7 @@ process Bowtie2 {
 
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
 
@@ -150,7 +150,7 @@ process Bowtie2 {
 process TrinityStats {
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
 
@@ -179,7 +179,7 @@ process TrinityStats {
 process TrinityStats2 {
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
     label 'process_low'
@@ -207,7 +207,7 @@ process TrinityStats2 {
 process BUSCO_transcriptome_metazoa {
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
     label 'process_medium'
@@ -236,7 +236,7 @@ process BUSCO_transcriptome_metazoa {
 process BUSCO_transcriptome_mollusca {
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
     label 'process_medium'
@@ -268,7 +268,7 @@ process BUSCO_transcriptome_mollusca {
 process BUSCO_transcriptome_metazoa2 {
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
     label 'process_medium'
@@ -298,7 +298,7 @@ process BUSCO_transcriptome_metazoa2 {
 process BUSCO_transcriptome_mollusca2 {
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
     label 'process_medium'
@@ -331,7 +331,7 @@ process Transcriptome_Combined {
 
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
     conda "seqkit=2.12.0 bioconda::cd-hit=4.8.1"
     container 'community.wave.seqera.io/library/cd-hit_seqkit:27b33ce1ba0d851c'
@@ -362,7 +362,7 @@ process Transcriptome_Combined {
 process BUSCO_transcriptome_metazoa3 {
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
     label 'process_medium'
@@ -395,7 +395,7 @@ process BUSCO_transcriptome_metazoa3 {
 process BUSCO_transcriptome_mollusca3 {
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
 
@@ -432,13 +432,13 @@ process Kallisto_Trinity {
 
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
     publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/kallisto/trinity/output", mode: 'copy'
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
     input:
     tuple val(sample), path(R1), path(R2), val(Strandedness), path(combined_trinity)
@@ -467,7 +467,7 @@ process Kallisto_Trinity {
 process Blastdatabasecreation {
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
     label 'process_low'
@@ -492,7 +492,7 @@ process Blastx {
     label 'process_low'
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
 
@@ -525,7 +525,7 @@ process Transdecoder {
 
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
     conda "transdecoder=5.7.1"
@@ -563,7 +563,7 @@ process TD2 {
 
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
 
@@ -591,7 +591,7 @@ process TD2 {
 process ORFs_Combined {
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
     label 'process_low'
@@ -629,7 +629,7 @@ process ORFs_Combined {
 process ORFs_Combined_CDHit {
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
     label 'process_low'
@@ -663,7 +663,7 @@ process BUSCO_translatome_metazoa {
 
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
 
@@ -696,7 +696,7 @@ process BUSCO_translatome_mollusca {
 
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
 
@@ -729,7 +729,7 @@ process BUSCO_translatome_metazoa2 {
 
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
 
@@ -762,7 +762,7 @@ process BUSCO_translatome_mollusca2 {
 
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
 
@@ -795,7 +795,7 @@ process BUSCO_translatome_metazoa3 {
 
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
 
@@ -828,7 +828,7 @@ process BUSCO_translatome_mollusca3 {
 
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
 
@@ -864,7 +864,7 @@ process Kallisto_Transdecoder {
 
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
 
@@ -901,7 +901,7 @@ process Kallisto_Transdecoder {
 process Blastp {
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
     label 'process_low'
@@ -934,7 +934,7 @@ process Blastp {
 process ORF_complete {
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
     label 'process_low'
@@ -969,7 +969,7 @@ process ORF_complete {
 process SignalP {
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
     label 'process_medium'
@@ -1001,7 +1001,7 @@ process SignalP {
 process Filter2 {
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
     label 'process_low'
@@ -1031,7 +1031,7 @@ process Filter2 {
 process stats {
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
     label 'process_low'
@@ -1073,7 +1073,7 @@ process stats {
 process DeepTMHMM {
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
     label 'process_medium'
 
@@ -1110,7 +1110,7 @@ process DeepTMHMM {
 process DeepTMHMMFilter {
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
     label 'process_low'
 
@@ -1161,7 +1161,7 @@ process DeepTMHMMFilter {
 process Interproscan {
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
     label 'process_medium'
 
@@ -1190,7 +1190,7 @@ process Interproscan {
 process BlastdatabasecreationNonToxin {
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
     label 'process_low'
@@ -1214,7 +1214,7 @@ process BlastdatabasecreationNonToxin {
 process BlastpNonToxin {
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
     label 'process_low'
@@ -1244,7 +1244,7 @@ process BlastpNonToxin {
 process GenomeBlastdatabasecreation {
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
     conda "blast=2.17.0"
@@ -1274,7 +1274,7 @@ process GenomeBlasts6 {
     container 'community.wave.seqera.io/library/blast:2.17.0--6279aeee601cb05e'
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
     publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Blast/Blastn/", mode: 'copy'
@@ -1284,7 +1284,7 @@ process GenomeBlasts6 {
 
     output:
     tuple val(sample), path("${sample}.blastn.db.6.txt"), emit: blastn6
-    tuple val(sample), path("${sample}.blastn.db.0.txt"), emit: blastn6
+    tuple val(sample), path("${sample}.blastn.db.0.txt"), emit: blastn0
 
 
     script:
@@ -1304,7 +1304,7 @@ process GenomeBlasts0 {
     container 'community.wave.seqera.io/library/blast:2.17.0--6279aeee601cb05e'
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
-    maxRetries 3
+    maxRetries 5
 
 
 
