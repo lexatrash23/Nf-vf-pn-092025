@@ -1507,19 +1507,7 @@ workflow {
 
     input_orf = Transcriptpome1.mix(Transcriptome_Combined.out.transcriptome_combined)
 
-    //ine Input: sample_with_genome 
-    csv_channel
-        .branch { row ->
-            def path = row.Genome_fasta_path?.toString()?.trim()
-            def hasGenome = path && path != '' && !path.equalsIgnoreCase('NULL')
-            with_genome: hasGenome
-            without_genome: true
-        }
-        .set { branched_samples }
 
-    Sample_with_Genome = branched_samples.with_genome.map { row -> tuple(row.Sample_name) }
-
-    Sample_without_Genome = branched_samples.without_genome.map { row -> tuple(row.Sample_name) }
     // Initialize variables that will be used after the conditional blocks
     BUSCOlin1 = csv_channel.map { row -> tuple(row.Sample_name, row.BUSCO_lin1) }
     BUSCOlin2 = csv_channel.map { row -> tuple(row.Sample_name, row.BUSCO_lin2) }
