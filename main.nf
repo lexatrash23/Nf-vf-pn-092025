@@ -1001,15 +1001,15 @@ process SignalP {
 
         l=length(seq)
 
-        if (l > 2000) print \> "too_long.faa"
-        else print \> "signalp_input.faa"
-        }' ${complete_pep}
+        if (l > 2000) print ${complete_pep} "too_long.faa"
+        else print ${sample} "signalp_input.faa"
+        }' ${sample}
 
     signalp -fasta too_long.faa -mature -prefix "part1"
     signalp -fasta signalp_input.faa -mature -prefix "part2"
     cat part1_mature.fasta part2_mature.fasta > ${sample}_mature.fasta
-    cat part1_mature.fasta part2_mature.fasta > ${sample}_mature.fasta
-    cat *.signalp5 > ${sample}.signalp5
+    cat part1_mature.fasta part2_mature.fasta > _mature.fasta
+    cat *.signalp5 > .signalp5
 
     """
 }
@@ -1302,7 +1302,6 @@ process GenomeBlasts6 {
     output:
     tuple val(sample), path("${sample}.blastn.db.6.txt"), emit: blastn6
     tuple val(sample), path("${sample}.blastn.db.0.txt"), emit: blastn0
-
 
     script:
     """
@@ -1603,7 +1602,7 @@ workflow {
         input_ORF_complete = ORFs_Combined_CDHit.out.combined_pep.join(ORFs_Combined_CDHit.out.combined_cds)
         input_Blastp = ORFs_Combined_CDHit.out.combined_pep.combine(Blastdatabasecreation.out.proteindb)
     }
-    else if (params.ORFPrediction == "Done"){
+    else if (params.ORFPrediction == "Done") {
         ORFspep = csv_channel.map { row -> tuple(row.Sample_name, file(row.ORFpep)) }
         ORFscds = csv_channel.map { row -> tuple(row.Sample_name, file(row.ORFcds)) }
         input_ORF_complete = ORFspep.join(ORFscds)
@@ -1757,7 +1756,4 @@ workflow {
     BlastnInput | GenomeBlasts6
     //Run Process: BlastnGenome
     BlastnInput | GenomeBlasts0
-    
-
-
 }
