@@ -992,18 +992,18 @@ process SignalP {
 
     """
     
-awk '
-    BEGIN { RS=">"; FS="\\n" }
-    NR>1 {
-    seq=""
-    for (i=2;i<=NF;i++) seq=seq \$i
-    gsub(/[ \\t]/,"",seq)
+    awk '
+        BEGIN { RS=">"; FS="\\n" }
+        NR>1 {
+        seq=""
+        for (i=2;i<=NF;i++) seq=seq \$i
+        gsub(/[ \\t]/,"",seq)
 
-    l=length(seq)
+        l=length(seq)
 
-    if (l > 2000) print \> "too_long.faa"
-    else print \> "signalp_input.faa"
-    }' ${complete_pep}
+        if (l > 2000) print \> "too_long.faa"
+        else print \> "signalp_input.faa"
+        }' ${complete_pep}
 
     signalp -fasta too_long.faa -mature -prefix "part1"
     signalp -fasta signalp_input.faa -mature -prefix "part2"
