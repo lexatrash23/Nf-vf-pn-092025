@@ -521,7 +521,7 @@ process Blastx {
 // Process 10: Transdecoder
 process Transdecoder {
 
-    label 'process_low'
+    label 'process_varied'
 
 
     errorStrategy { task.attempt <= 4 ? 'retry' : 'ignore' }
@@ -554,7 +554,7 @@ process Transdecoder {
 // Process 10: TD2
 process TD2 {
 
-    label 'process_low'
+    label 'process_varied'
 
 
 
