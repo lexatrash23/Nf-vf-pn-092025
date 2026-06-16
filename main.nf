@@ -992,13 +992,27 @@ process SignalP {
 
     """
     
-    seqkit seq -w 0 ${complete_pep} \
-    | awk '
-    BEGIN{i=0}
-    (/^>/){i++; print ">seq"i; next}
-    {gsub(/[^ACDEFGHIKLMNPQRSTVWY]/,""); if(length($0)>0) print $0}
-' > signalp_safe.fa
-    signalp -fasta signalp_safe.fa -mature -prefix "${sample}"
+    awk '
+        BEGIN { RS=">"; FS="\n" }
+        NR>1 {
+        seq=""
+        for (i=2;i<=NF;i++) seq=seq \$i
+        gsub(/[ \t]/,"",seq)
+
+        l=length(seq)
+
+        if (l > 2000) print > "too_long.faa"
+        else print > "signalp_input.faa"
+        }' ${complete_pep}
+
+    signalp -fasta too_long.faa -mature -prefix "part1"
+    signalp -fasta signalp_input.faa -mature -prefix "part2"
+    cat part1_mature.fasta part2_mature.fasta > ${sample}_mature.fasta
+    cat part1_mature.fasta part2_mature.fasta > ${sample}_mature.fasta
+    cat *.signalp5 > ${sample}.signalp5
+
+
+
     """
 }
 
