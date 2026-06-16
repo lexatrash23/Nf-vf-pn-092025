@@ -992,8 +992,13 @@ process SignalP {
 
     """
     
-
-    signalp -fasta ${complete_pep} -mature -prefix "${sample}"
+    seqkit seq -w 0 ${complete_pep} \
+    | awk '
+    BEGIN{i=0}
+    (/^>/){i++; print ">seq"i; next}
+    {gsub(/[^ACDEFGHIKLMNPQRSTVWY]/,""); if(length($0)>0) print $0}
+' > signalp_safe.fa
+    signalp -fasta signalp_safe.fa -mature -prefix "${sample}"
     """
 }
 
