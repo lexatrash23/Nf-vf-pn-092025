@@ -988,7 +988,7 @@ process SignalP {
 
     """
 
-    signalp -fasta ${complete_pep}-mature -prefix ${sample}
+    signalp -fasta ${complete_pep} -mature -prefix ${sample}
 
     """
 }
