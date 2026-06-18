@@ -1231,7 +1231,7 @@ process BlastpNonToxin {
     script:
     """
 
-    blastp -query ${secreted_pep} -db Folder/NonToxinDataBase -out ${sample}.nontoxin.blastp.db.6.txt -evalue 1e-5-num_threads ${task.cpus} -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
+    blastp -query ${secreted_pep} -db Folder/NonToxinDataBase -out ${sample}.nontoxin.blastp.db.6.txt -evalue 1e-5 -num_threads ${task.cpus} -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qframe qcovs"
 
     """
 }
@@ -1280,7 +1280,6 @@ process GenomeBlasts6 {
 
     output:
     tuple val(sample), path("${sample}.blastn.db.6.txt"), emit: blastn6
-    tuple val(sample), path("${sample}.blastn.db.0.txt"), emit: blastn0
 
 
     script:
