@@ -973,6 +973,7 @@ process SignalP {
 
 
     label 'process_medium'
+    conda "seqkit=2.12.0"
 
 
     publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Secreted/Mature/Signalp", mode: 'copy'
@@ -981,15 +982,20 @@ process SignalP {
     tuple val(sample), path(complete_pep)
 
     output:
-    tuple val(sample), path("*_mature.fasta"), emit: maturesequences
-    tuple val(sample), path("*.signalp5"), emit: signalpsummary
+    tuple val(sample), path("${sample}_mature.fasta"), emit: maturesequences
+    tuple val(sample), path("${sample}_summary.signalp5"), emit: signalpsummary
 
     script:
 
     """
+    seqkit split ${complete_pep} -s 10000
+    for file in  "${complete_pep}".split/*
+    do
+        signalp -fasta "$file" -mature
+    done
 
-    signalp -fasta ${complete_pep} -mature -prefix ${sample}
-
+    cat *mature.fasta > ${sample}_mature.fasta
+    cat *.signap5 > ${sample}_summary.signalp5
     """
 }
 
@@ -1584,6 +1590,8 @@ workflow {
     else if (params.ORFPrediction == "Done"){
         ORFspep = csv_channel.map { row -> tuple(row.Sample_name, file(row.ORFpep)) }
         ORFscds = csv_channel.map { row -> tuple(row.Sample_name, file(row.ORFcds)) }
+        input_ORFs_Combined_CDHit_Input = ORFspep.join(ORFscds)
+        input_ORFs_Combined_CDHit_Input | ORFs_Combined_CDHit
         input_ORF_complete = ORFspep.join(ORFscds)
         input_Blastp = ORFspep.combine(Blastdatabasecreation.out.proteindb)
     }
