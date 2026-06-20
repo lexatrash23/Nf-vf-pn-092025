@@ -991,7 +991,7 @@ process SignalP {
     seqkit split ${complete_pep} -s 10000
     for file in  "${complete_pep}".split/*
     do
-        signalp -fasta "$file" -mature
+        signalp -fasta "\$file" -mature
     done
 
     cat *mature.fasta > ${sample}_mature.fasta
