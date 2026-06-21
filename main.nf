@@ -1044,7 +1044,7 @@ process stats {
     publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Stats", mode: 'copy'
 
     input:
-    tuple val(sample), path(Transdecoder_pep), path(Transdecoder_cds), path(complete_pep), path(complete_cds), path(maturesequences), path(complete_pep_signalp), path(TD2_pep), path(TD2_cds), path(combined_pep), path(combined_cds)
+    tuple val(sample), path(Transdecoder_pep), path(Transdecoder_cds), path(complete_pep), path(complete_cds), path(maturesequences), path(complete_pep_signalp), path(TD2_pep), path(TD2_cds), val(combined_pep), val(combined_cds)
 
     output:
     path "*"
