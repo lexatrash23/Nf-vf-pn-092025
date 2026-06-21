@@ -1673,10 +1673,10 @@ workflow {
             .join(input_ORF_complete)
     }
     else if (params.ORFPrediction == "Done") {
-        stats_join = ORF_complete.out.complete_pep.join(ORF_complete.out.complete_cds).join(maturesequences).join(Filter2.out.complete_pep_signalp).join(ORFspep).join(ORFscds).join(input_ORF_complete).combine(channel.of("NULL"))..combine(channel.of("NULL"))
+        stats_join = ORF_complete.out.complete_pep.join(ORF_complete.out.complete_cds).join(maturesequences).join(Filter2.out.complete_pep_signalp).join(ORFspep).join(ORFscds).join(input_ORF_complete).combine(channel.of("NULL")).combine(channel.of("NULL"))
     }
     else {
-        stats_join = ORF_complete.out.complete_pep.join(ORF_complete.out.complete_cds).join(maturesequences).join(Filter2.out.complete_pep_signalp).join(TD2_pep).join(TD2.out.TD2_cds).join(input_ORF_complete).combine(channel.of("NULL"))..combine(channel.of("NULL"))
+        stats_join = ORF_complete.out.complete_pep.join(ORF_complete.out.complete_cds).join(maturesequences).join(Filter2.out.complete_pep_signalp).join(TD2_pep).join(TD2.out.TD2_cds).join(input_ORF_complete).combine(channel.of("NULL")).combine(channel.of("NULL"))
     }
 
 
