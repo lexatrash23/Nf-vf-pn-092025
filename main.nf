@@ -1044,7 +1044,7 @@ process stats {
     publishDir "${params.outdir}/${sample}/Pipelines/Venomflow/Stats", mode: 'copy'
 
     input:
-    tuple val(sample), path(Transdecoder_pep), path(Transdecoder_cds), path(complete_pep), path(complete_cds), path(maturesequences), path(complete_pep_signalp), path(TD2_pep), path(TD2_cds), val(combined_pep), val(combined_cds)
+    tuple val(sample), path(Transdecoder_pep), path(Transdecoder_cds), path(complete_pep), path(complete_cds), path(maturesequences), path(complete_pep_signalp), path(TD2_pep), path(TD2_cds), val(combined_pep), va(combined_cds)
 
     output:
     path "*"
@@ -1592,8 +1592,8 @@ workflow {
         ORFscds = csv_channel.map { row -> tuple(row.Sample_name, file(row.ORFcds)) }
         input_ORFs_Combined_CDHit_Input = ORFspep.join(ORFscds)
         input_ORFs_Combined_CDHit_Input | ORFs_Combined_CDHit
-        input_ORF_complete = ORFspep.join(ORFscds)
-        input_Blastp = ORFspep.combine(Blastdatabasecreation.out.proteindb)
+        input_ORF_complete = ORFs_Combined_CDHit.out.combined_pep.join(ORFs_Combined_CDHit.out.combined_cds)
+        input_Blastp = ORFs_Combined_CDHit.out.combined_pep.combine(Blastdatabasecreation.out.proteindb)
     }
     else {
         // TD2  logic 
