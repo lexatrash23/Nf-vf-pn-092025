@@ -972,7 +972,7 @@ process SignalP {
     maxRetries 5
 
 
-    label 'process_varied'
+    label 'process_medium'
     conda "seqkit=2.12.0"
 
 
