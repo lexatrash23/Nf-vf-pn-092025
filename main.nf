@@ -1532,10 +1532,12 @@ workflow {
         //ine Input for input_ORF_complete 
         Transdecodercds = Transdecoder.out.transdecoder_cds
         Transdecoderpep = Transdecoder.out.transdecoder_pep
-        input_ORF_complete = Transdecoderpep.join(Transdecodercds)
 
-        //ine Input: Blastp - Match Transdecoder output with databases
-        input_Blastp = Transdecoderpep.combine(Blastdatabasecreation.out.proteindb)
+        input_ORFs_Combined_CDHit_Input = Transdecoderpep.join(Transdecodercds)
+        input_ORFs_Combined_CDHit_Input | ORFs_Combined_CDHit
+        input_ORF_complete = ORFs_Combined_CDHit.out.combined_pep.join(ORFs_Combined_CDHit.out.combined_cds)
+        input_Blastp = ORFs_Combined_CDHit.out.combined_pep.combine(Blastdatabasecreation.out.proteindb)
+
     }
     else if (params.ORFPrediction == "Both") {
         // Both 
@@ -1612,10 +1614,10 @@ workflow {
         //ine Input for input_ORF_complete 
         TD2cds = TD2.out.TD2_cds
         TD2pep = TD2.out.TD2_pep
-        input_ORF_complete = TD2pep.join(TD2cds)
-
-        //ine Input: Blastp - Match Transdecoder output with databases
-        input_Blastp = TD2pep.combine(Blastdatabasecreation.out.proteindb)
+        input_ORFs_Combined_CDHit_Input = TD2pep.join(TD2cds)
+        input_ORFs_Combined_CDHit_Input | ORFs_Combined_CDHit
+        input_ORF_complete = ORFs_Combined_CDHit.out.combined_pep.join(ORFs_Combined_CDHit.out.combined_cds)
+        input_Blastp = ORFs_Combined_CDHit.out.combined_pep.combine(Blastdatabasecreation.out.proteindb)
     }
 
     //Run Process: Transdecoder filter for complete ORFs
