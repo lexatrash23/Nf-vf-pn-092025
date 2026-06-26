@@ -1183,7 +1183,7 @@ process Interproscan {
 
     awk '{if (\$0 ~ /^>/) print \$0; else {gsub(/\\*/, ""); print \$0}}' ${secreted_pep} > "${sample}.Trinity.fasta.secreted.cleaned.pep"
 
-    interproscan.sh -goterms -i "${sample}.Trinity.fasta.secreted.cleaned.pep" -pa -t p -d ./ -f TSV 
+    interproscan.sh -goterms -i "${sample}.Trinity.fasta.secreted.cleaned.pep" -pa -t p -d ./ -f TSV  -cpu ${task.cpus}
 
     """
 }
